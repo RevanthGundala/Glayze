@@ -1,16 +1,39 @@
 import { Input } from "@/components/ui/Input";
 import { View, Text, SafeAreaView } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SwipeButton } from "@/components/ui/SwipeButton";
+import { CONTRACT_ADDRESS, abi } from "@/utils/constants";
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useRouter } from "expo-router";
 
 export default function Glayze() {
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [url, setUrl] = useState("");
+  const router = useRouter();
 
   const [deployment, setDeployment] = useState(0);
   const [fee, setFee] = useState(0);
   const [total, setTotal] = useState(0);
+
+  const { data: hash, isPending, writeContract } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash });
+
+  const handleSwipe = () => {
+    writeContract({
+      address: CONTRACT_ADDRESS,
+      abi,
+      functionName: "glayze",
+      args: [name, symbol, url],
+    });
+  };
+
+  useEffect(() => {
+    if (isConfirmed) {
+      router.push("/aux/success");
+    }
+  }, [isConfirmed]);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -35,11 +58,15 @@ export default function Glayze() {
           />
         </View>
         <PaymentDetails deployment={deployment} fee={fee} total={total} />
-        <SwipeButton
-          primaryColor="bg-primary"
-          text="Swipe to Confirm"
-          onComplete={() => {}}
-        />
+        {!isPending && !isConfirming ? (
+          <SwipeButton
+            primaryColor="bg-primary"
+            text="Swipe to Confirm"
+            onComplete={handleSwipe}
+          />
+        ) : (
+          <Text>Swipping...</Text>
+        )}
       </View>
     </SafeAreaView>
   );

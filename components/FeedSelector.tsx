@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 
-import { Item } from "@/types/types";
+import { Item } from "@/utils/types";
 
 type FeedSelectorProps = {
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;

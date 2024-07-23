@@ -8,7 +8,7 @@ import {
   FlatList,
   SafeAreaView,
 } from "react-native";
-import { Route } from "@/types/types";
+import { Route } from "@/utils/types";
 import { useEffect } from "react";
 import { Menu } from "@/components/Menu";
 

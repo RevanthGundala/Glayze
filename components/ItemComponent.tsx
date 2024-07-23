@@ -1,7 +1,7 @@
 import React from "react";
 import { TouchableOpacity, Text, View, Image } from "react-native";
 import { Link } from "expo-router";
-import { Item } from "@/types/types";
+import { Item } from "@/utils/types";
 
 type ItemComponentProps = {
   item: Item;

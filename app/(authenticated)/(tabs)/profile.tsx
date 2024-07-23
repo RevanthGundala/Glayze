@@ -2,7 +2,7 @@ import { View, Text, Modal, TouchableOpacity, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
-import { Route } from "../../../types/types";
+import { Route } from "../../../utils/types";
 import { Menu } from "@/components/Menu";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
@@ -17,7 +17,7 @@ export default function Profile() {
     },
     {
       name: "Contact Support",
-      href: "/(authenticated)/profile/contact-support", // TODO: change to twitter link
+      href: "/", // TODO: change to twitter link
     },
     {
       name: "Privacy and Security",

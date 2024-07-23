@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
-import { Route } from "../types/types";
+import { Route } from "../utils/types";
 
 type MenuProps = {
   routes: Route[];

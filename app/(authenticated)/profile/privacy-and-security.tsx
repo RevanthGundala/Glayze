@@ -1,7 +1,7 @@
 import React from "react";
 
 import { View, Text, SafeAreaView } from "react-native";
-import { Route } from "../../../types/types";
+import { Route } from "../../../utils/types";
 import { Menu } from "@/components/Menu";
 import { BackArrow } from "@/components/ui/BackArrow";
 

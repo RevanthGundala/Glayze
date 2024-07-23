@@ -1,18 +1,50 @@
+import "@walletconnect/react-native-compat";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
-import { SafeAreaView } from "react-native";
 import { useRouter } from "expo-router";
 import { PostHogProvider } from "posthog-react-native";
+import { WagmiProvider } from "wagmi";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { defaultWagmiConfig } from "@web3modal/wagmi-react-native";
+import { sepolia, base } from "wagmi/chains";
+
+const queryClient = new QueryClient();
+
+const projectId = process.env.EXPO_PUBLIC_WALLET_CONNECT_ID!;
+
+// TODO: Update metadata
+const metadata = {
+  name: "AppKit RN",
+  description: "AppKit RN Example",
+  url: "https://walletconnect.com",
+  icons: ["https://avatars.githubusercontent.com/u/37784886"],
+  redirect: {
+    native: "YOUR_APP_SCHEME://",
+    universal: "YOUR_APP_UNIVERSAL_LINK.com",
+  },
+};
+
+const chains = [sepolia, base] as const;
+
+const config = defaultWagmiConfig({
+  projectId,
+  metadata,
+  chains,
+});
 
 export default function Layout() {
   return (
     <PostHogProvider
-      apiKey="phc_xKZtsLn1p5MICA2mx5LxNm1v0BND5WvFu5hHrL3r0L7"
+      apiKey={process.env.EXPO_PUBLIC_POSTHOG_API_KEY}
       options={{
         host: "https://us.i.posthog.com",
       }}
     >
-      <InitialLayout />
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <InitialLayout />
+        </QueryClientProvider>
+      </WagmiProvider>
     </PostHogProvider>
   );
 }
@@ -62,10 +94,6 @@ const InitialLayout = () => {
       />
       <Stack.Screen
         name="(authenticated)/profile/my-account"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="(authenticated)/profile/contact-support"
         options={{ headerShown: false }}
       />
       <Stack.Screen

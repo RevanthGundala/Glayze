@@ -4,7 +4,7 @@ import { FeedSelector } from "@/components/FeedSelector";
 import { ScrollView, Animated } from "react-native";
 import { ItemComponent } from "@/components/ItemComponent";
 import { useState, useRef, useEffect } from "react";
-import { Item } from "@/types/types";
+import { Item } from "@/utils/types";
 import { useHomeScrollY } from "@/hooks/useHomeScrollY";
 
 export default function Home() {

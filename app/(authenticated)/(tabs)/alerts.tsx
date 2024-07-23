@@ -6,7 +6,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import React, { useState } from "react";
-import { Alert } from "../../../types/types";
+import { Alert } from "../../../utils/types";
 
 export default function Alerts() {
   const [alerts, setAlerts] = useState<Alert[]>([

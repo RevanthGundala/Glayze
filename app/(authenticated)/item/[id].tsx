@@ -11,6 +11,7 @@ import { BackArrow } from "@/components/ui/BackArrow";
 import { Image } from "expo-image";
 import { Graph } from "@/components/Graph";
 import { Button } from "@/components/ui/Button";
+import { BlurView } from "expo-blur";
 
 export default function Item() {
   const { id } = useLocalSearchParams();
@@ -32,8 +33,11 @@ export default function Item() {
           />
         </View>
       </View>
-      <ScrollView className="flex-1">
-        <Graph price={120} change={2.5} />
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ paddingBottom: 80 }}
+      >
+        <Graph price={120} change={2.5} symbol="WIF" />
         <Position
           marketValue={0}
           shares={0}
@@ -49,8 +53,8 @@ export default function Item() {
           allTimeLow={0}
           createdAt={new Date()}
         />
-        <BuySellButtons />
       </ScrollView>
+      <BuySellButtons />
     </SafeAreaView>
   );
 }
@@ -192,19 +196,25 @@ const Stats = ({
 const BuySellButtons = () => {
   const router = useRouter();
   return (
-    <View className="absolute bottom-0 left-0 right-0 flex-row justify-between p-4 bg-background">
-      <Button
-        buttonStyle="flex-1 mr-2 bg-white rounded-lg py-3"
-        onPress={() => router.navigate("(authenticated)/item/sell")}
-      >
-        <Text className="text-black text-center font-medium">Sell</Text>
-      </Button>
-      <Button
-        buttonStyle="flex-1 ml-2 bg-primary rounded-lg py-3"
-        onPress={() => router.navigate("(authenticated)/item/buy")}
-      >
-        <Text className="text-black text-center font-medium">Buy</Text>
-      </Button>
-    </View>
+    <BlurView
+      intensity={10}
+      tint="dark"
+      className="absolute bottom-0 left-0 right-0"
+    >
+      <View className="flex-row justify-between p-4 mb-4">
+        <Button
+          buttonStyle="flex-1 mr-2 bg-white rounded-lg py-3"
+          onPress={() => router.navigate("(authenticated)/item/sell")}
+        >
+          <Text className="text-black text-center font-medium">Sell</Text>
+        </Button>
+        <Button
+          buttonStyle="flex-1 ml-2 bg-primary rounded-lg py-3"
+          onPress={() => router.navigate("(authenticated)/item/buy")}
+        >
+          <Text className="text-black text-center font-medium">Buy</Text>
+        </Button>
+      </View>
+    </BlurView>
   );
 };

@@ -4,7 +4,13 @@ import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { Button } from "@/components/ui/Button";
 
-export default function Success() {
+type SuccessProps = {
+  type: "buy" | "sell";
+  amount: number;
+  asset: any;
+};
+
+export default function Success({ type, amount, asset }: SuccessProps) {
   const router = useRouter();
 
   return (
@@ -25,15 +31,15 @@ export default function Success() {
         <Text className="text-white text-lg mb-4">Transaction Details:</Text>
         <View className="flex-row justify-between mb-2">
           <Text className="text-gray-400">Type:</Text>
-          <Text className="text-white">Buy</Text>
+          <Text className="text-white">{type}</Text>
         </View>
         <View className="flex-row justify-between mb-2">
           <Text className="text-gray-400">Amount:</Text>
-          <Text className="text-white">$100.00</Text>
+          <Text className="text-white">${amount}</Text>
         </View>
         <View className="flex-row justify-between">
           <Text className="text-gray-400">Asset:</Text>
-          <Text className="text-white">Bitcoin</Text>
+          <Text className="text-white">{asset}</Text>
         </View>
       </View>
 
