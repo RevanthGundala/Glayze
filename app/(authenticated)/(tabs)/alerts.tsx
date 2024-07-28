@@ -6,21 +6,49 @@ import {
   SafeAreaView,
 } from "react-native";
 import React, { useState } from "react";
-import { Alert } from "../../../utils/types";
+import { useAlerts } from "@/hooks/useAlerts";
+import { supabase } from "@/utils/supabase";
 
 export default function Alerts() {
-  const [alerts, setAlerts] = useState<Alert[]>([
-    { id: 1, message: "John Doe accepted your referral invite" },
-    { id: 2, message: "Jane Smith accepted your referral invite" },
-    // Add more alerts as needed
-  ]);
+  const { data: alerts, isLoading, isError } = useAlerts();
 
-  const clearAlert = (id: number) => {
-    setAlerts(alerts.filter((alert) => alert.id !== id));
+  if (isLoading)
+    return (
+      <View className="flex-1 bg-background">
+        <Text>Loading...</Text>
+      </View>
+    );
+  if (isError)
+    return (
+      <View className="flex-1 bg-background">
+        <Text>Error loading profile</Text>
+      </View>
+    );
+  if (!alerts)
+    return (
+      <View className="flex-1 bg-background">
+        <Text>No profile data found</Text>
+      </View>
+    );
+
+  const clearAlert = async (id: number) => {
+    const { error } = await supabase
+      .from("Referrals")
+      .update({ show: false })
+      .eq("id", id);
+    if (error) {
+      console.error("Error clearing alert", error);
+    }
   };
 
-  const clearAllAlerts = () => {
-    setAlerts([]);
+  const clearAllAlerts = async () => {
+    const { error } = await supabase
+      .from("Referrals")
+      .update({ show: false })
+      .eq("show", true);
+    if (error) {
+      console.error("Error clearing all alerts", error);
+    }
   };
 
   return (
@@ -47,7 +75,11 @@ export default function Alerts() {
               key={alert.id}
               className="bg-neutral rounded-lg p-4 mb-4 flex-row justify-between items-center"
             >
-              <Text className="text-white flex-1 mr-2">{alert.message}</Text>
+              <Text className="text-white flex-1 mr-2">
+                {alert.is_accepted
+                  ? `${alert.to} accepted your referral invite`
+                  : `Your referral invite to ${alert.to} is pending`}
+              </Text>
               <TouchableOpacity onPress={() => clearAlert(alert.id)}>
                 <Text className="text-white">X</Text>
               </TouchableOpacity>

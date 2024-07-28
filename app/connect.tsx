@@ -4,9 +4,11 @@ import { BackArrow } from "@/components/ui/BackArrow";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "expo-router";
 import { Link } from "expo-router";
+import { useLinkWithOAuth } from "@privy-io/expo";
 
 export default function Connect() {
   const router = useRouter();
+  const { link } = useLinkWithOAuth();
   return (
     <SafeAreaView className="flex-1 bg-background">
       <BackArrow />
@@ -20,7 +22,7 @@ export default function Connect() {
             buttonStyle={
               "flex flex-row justify-center items-center bg-primary rounded-full"
             }
-            onPress={() => router.push("/connect")}
+            onPress={() => link({ provider: "twitter", redirectUri: "/login" })}
           >
             <Text className="text-black text-lg font-medium px-8 py-3">
               Connect to X

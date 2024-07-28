@@ -2,11 +2,15 @@ import { Input } from "@/components/ui/Input";
 import { View, Text, SafeAreaView } from "react-native";
 import { useEffect, useState } from "react";
 import { SwipeButton } from "@/components/ui/SwipeButton";
-import { CONTRACT_ADDRESS, abi } from "@/utils/constants";
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { CONTRACT_ADDRESS } from "@/utils/constants";
 import { useRouter } from "expo-router";
+import { useSmartAccount } from "../../../contexts/SmartAccountContext";
+import { encodeFunctionData, parseAbi } from "viem";
+import { PaymasterMode } from "@biconomy/account";
+import abi from "../../../abi.json";
 
 export default function Glayze() {
+  const { isLoading, smartAccount } = useSmartAccount();
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [url, setUrl] = useState("");
@@ -16,24 +20,33 @@ export default function Glayze() {
   const [fee, setFee] = useState(0);
   const [total, setTotal] = useState(0);
 
-  const { data: hash, isPending, writeContract } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } =
-    useWaitForTransactionReceipt({ hash });
-
-  const handleSwipe = () => {
-    writeContract({
-      address: CONTRACT_ADDRESS,
+  const handleSwipe = async () => {
+    if (!smartAccount) console.log("No smart account");
+    const encodedCall = encodeFunctionData({
       abi,
-      functionName: "glayze",
+      functionName: "createPost",
       args: [name, symbol, url],
     });
+
+    const tx = {
+      to: CONTRACT_ADDRESS,
+      data: encodedCall,
+    };
+
+    const amountInWei = await smartAccount?.getGasEstimate([tx, tx], {
+      paymasterServiceData: {
+        mode: PaymasterMode.SPONSORED,
+      },
+    });
+
+    console.log(amountInWei?.toString());
   };
 
-  useEffect(() => {
-    if (isConfirmed) {
-      router.push("/aux/success");
-    }
-  }, [isConfirmed]);
+  // useEffect(() => {
+  //   if (isConfirmed) {
+  //     router.push("/aux/success");
+  //   }
+  // }, [isConfirmed]);
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -58,7 +71,12 @@ export default function Glayze() {
           />
         </View>
         <PaymentDetails deployment={deployment} fee={fee} total={total} />
-        {!isPending && !isConfirming ? (
+        <SwipeButton
+          primaryColor="bg-primary"
+          text="Swipe to Confirm"
+          onComplete={handleSwipe}
+        />
+        {/* {!isPending && !isConfirming ? (
           <SwipeButton
             primaryColor="bg-primary"
             text="Swipe to Confirm"
@@ -66,7 +84,7 @@ export default function Glayze() {
           />
         ) : (
           <Text>Swipping...</Text>
-        )}
+        )} */}
       </View>
     </SafeAreaView>
   );

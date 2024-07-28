@@ -6,19 +6,42 @@ import { Route } from "../../../utils/types";
 import { Menu } from "@/components/Menu";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { useProfile } from "@/hooks/useProfile";
+import { usePrivy } from "@privy-io/expo";
+import { GLAYZE_TWITTER, GLAYZE_DISCORD } from "@/utils/constants";
 
 export default function Profile() {
-  const name = "Emma Watson";
-  const handle = "@emmawatson";
+  const { data, isLoading, isError } = useProfile();
+
+  if (isLoading)
+    return (
+      <View className="flex-1 bg-background">
+        <Text>Loading...</Text>
+      </View>
+    );
+  if (isError)
+    return (
+      <View className="flex-1 bg-background">
+        <Text>Error loading profile</Text>
+      </View>
+    );
+  if (!data)
+    return (
+      <View className="flex-1 bg-background">
+        <Text>No profile data found</Text>
+      </View>
+    );
+
+  const { name, handle, profile_pic } = data;
   const routes: Route[] = [
     {
       name: "My Account",
       href: "/(authenticated)/profile/my-account",
     },
-    {
-      name: "Contact Support",
-      href: "/", // TODO: change to twitter link
-    },
+    // {
+    //   name: "Contact Support",
+    //   href: "/",
+    // },
     {
       name: "Privacy and Security",
       href: "/(authenticated)/profile/privacy-and-security",
@@ -30,13 +53,20 @@ export default function Profile() {
       <View className="mt-16 items-center">
         <View className="items-center py-8 space-y-4">
           <Image
-            source={require("@/assets/images/icon.png")}
+            source={
+              profile_pic
+                ? { uri: profile_pic }
+                : require("@/assets/images/icon.png")
+            }
             className="w-16 h-16"
           />
           <View className="pb-8 items-center">
             <Text className="text-white text-2xl font-semibold">{name}</Text>
-            <Text className="text-white text-lg opacity-80">{handle}</Text>
-            <Link href="/(authenticated)/(tabs)/home" className="mt-2">
+            <Text className="text-white text-lg opacity-80">@{handle}</Text>
+            <Link
+              href={`https://x.com/${handle}`}
+              className="mt-2 hover:pointer-cursor"
+            >
               <Image
                 source={require("@/assets/images/x.png")}
                 className="w-6 h-6"
@@ -45,6 +75,7 @@ export default function Profile() {
           </View>
           <Menu routes={routes} />
           <LogOut />
+          <Socials />
         </View>
       </View>
     </SafeAreaView>
@@ -52,11 +83,13 @@ export default function Profile() {
 }
 
 const LogOut = () => {
+  const { logout } = usePrivy();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
 
   const handleLogOut = () => {
     setModalVisible(false);
+    logout();
     router.replace("/");
   };
 
@@ -103,6 +136,30 @@ const LogOut = () => {
           </View>
         </TouchableOpacity>
       </Modal>
+    </View>
+  );
+};
+
+const Socials = () => {
+  return (
+    <View className="mt-36">
+      <Text className="text-white text-sm opacity-70 text-center mb-4">
+        Connect
+      </Text>
+      <View className="flex-row justify-center items-center space-x-8">
+        <Link href={GLAYZE_TWITTER} className="hover:pointer-cursor">
+          <Image
+            source={require("@/assets/images/socials/twitter.png")}
+            className="w-6 h-6 opacity-70"
+          />
+        </Link>
+        <Link href={GLAYZE_DISCORD} className="hover:pointer-cursor">
+          <Image
+            source={require("@/assets/images/socials/discord.png")}
+            className="w-8 h-8 opacity-70"
+          />
+        </Link>
+      </View>
     </View>
   );
 };
