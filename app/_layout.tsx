@@ -65,7 +65,7 @@ const InitialLayout = () => {
   const wallet = useEmbeddedWallet();
   const router = useRouter();
   useEffect(() => {
-    router.replace("/(authenticated)/home");
+    // router.replace("/(authenticated)/home");
     // if (!isReady) return;
     // if (isConnected(wallet)) {
     //   router.replace("/(authenticated)/home");
@@ -94,23 +94,19 @@ const InitialLayout = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="(authenticated)/item/[id]"
+        name="(authenticated)/post/[id]"
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="(authenticated)/item/sell"
+        name="(authenticated)/post/sell"
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="(authenticated)/item/buy"
+        name="(authenticated)/post/buy"
         options={{ headerShown: false }}
       />
       <Stack.Screen
         name="(authenticated)/profile/my-account"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="(authenticated)/profile/privacy-and-security"
         options={{ headerShown: false }}
       />
     </Stack>

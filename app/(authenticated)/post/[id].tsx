@@ -12,46 +12,67 @@ import { Image } from "expo-image";
 import { Graph } from "@/components/Graph";
 import { Button } from "@/components/ui/Button";
 import { BlurView } from "expo-blur";
+import { usePost } from "@/hooks/usePost";
+import { usePostPrices } from "@/hooks/usePostPrices";
+import { Time } from "@/utils/types";
+import { usePosition } from "@/hooks/usePosition";
 
-export default function Item() {
+export default function Post() {
+  const address = "0x1234567890";
   const { id } = useLocalSearchParams();
+  const { data: post, isLoading, isError } = usePost(id);
+  const [selectedTime, setSelectedTime] = useState<Time>("1H");
+  const { data: postPrices } = usePostPrices(
+    parseInt(id as string),
+    selectedTime
+  );
+  const { data: position } = usePosition(post, address);
 
-  const [marketCap, setMarketCap] = useState(0);
-  const [volume, setVolume] = useState(0);
-  const [allTimeHigh, setAllTimeHigh] = useState(0);
-  const [allTimeLow, setAllTimeLow] = useState(0);
-  const [createdAt, setCreatedAt] = useState(new Date());
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
+  if (isError || !post) {
+    return <Text>Error loading post</Text>;
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <View className="flex flex-row justify-between items-center w-full">
         <BackArrow />
         <View className="px-6 py-4">
-          <Image
+          {/* <Image
             source={require("@/assets/images/share.png")}
             className="w-6 h-6 opacity-80"
-          />
+          /> */}
         </View>
       </View>
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 80 }}
       >
-        <Graph price={120} change={2.5} symbol="WIF" />
+        <Graph
+          price={post.price ?? 0}
+          change={postPrices?.price_change ?? 0}
+          symbol={post.symbol ?? ""}
+          selectedTime={selectedTime}
+          setSelectedTime={setSelectedTime}
+        />
         <Position
-          marketValue={0}
-          shares={0}
-          averageCost={0}
-          firstBought={new Date()}
-          todaysReturn={0}
-          totalReturn={0}
+          marketValue={position?.marketValue ?? 0}
+          tokens={position?.tokens ?? 0}
+          averageCost={position?.averageCost ?? 0}
+          firstBought={position?.firstBought ?? new Date()}
+          todaysReturn={position?.todaysReturn ?? 0}
+          totalReturn={position?.totalReturn ?? 0}
+          todaysReturnPercent={position?.todaysReturnPercent ?? 0}
+          totalReturnPercent={position?.totalReturnPercent ?? 0}
         />
         <Stats
-          marketCap={0}
-          volume={0}
-          allTimeHigh={0}
-          allTimeLow={0}
-          createdAt={new Date()}
+          marketCap={post.market_cap ?? 0}
+          volume={post.volume ?? 0}
+          allTimeHigh={post.ath ?? 0}
+          // allTimeLow={0}
+          createdAt={new Date(post.created_at)}
         />
       </ScrollView>
       <BuySellButtons />
@@ -61,20 +82,24 @@ export default function Item() {
 
 type PositionProps = {
   marketValue: number;
-  shares: number;
+  tokens: number;
   averageCost: number;
   firstBought: Date;
   todaysReturn: number;
   totalReturn: number;
+  todaysReturnPercent: number;
+  totalReturnPercent: number;
 };
 
 const Position = ({
   marketValue,
-  shares,
+  tokens,
   averageCost,
   firstBought,
   todaysReturn,
   totalReturn,
+  todaysReturnPercent,
+  totalReturnPercent,
 }: PositionProps) => {
   return (
     <View className="p-6">
@@ -88,8 +113,8 @@ const Position = ({
           <Text className="text-white text-lg">${marketValue}</Text>
         </View>
         <View className="flex-1 items-end">
-          <Text className="text-gray-400 text-sm">Shares</Text>
-          <Text className="text-white text-lg">{shares}</Text>
+          <Text className="text-gray-400 text-sm">Tokens</Text>
+          <Text className="text-white text-lg">{tokens}</Text>
         </View>
       </View>
 
@@ -108,12 +133,16 @@ const Position = ({
 
       <View className="flex-row justify-between mt-4">
         <Text className="text-gray-400 text-sm">Today's return</Text>
-        <Text className="text-green-500 text-lg">+${todaysReturn}(+0.07%)</Text>
+        <Text className="text-green-500 text-lg">
+          +${todaysReturn}(+{todaysReturnPercent}%)
+        </Text>
       </View>
 
       <View className="flex-row justify-between">
         <Text className="text-gray-400 text-sm">Total return</Text>
-        <Text className="text-green-500 text-lg">+${totalReturn}(0.0%)</Text>
+        <Text className="text-green-500 text-lg">
+          +${totalReturn}({totalReturnPercent}%)
+        </Text>
       </View>
     </View>
   );
@@ -131,14 +160,14 @@ type StatsProps = {
   marketCap: number;
   volume: number;
   allTimeHigh: number;
-  allTimeLow: number;
+  // allTimeLow: number;
   createdAt: Date;
 };
 const Stats = ({
   marketCap,
   volume,
   allTimeHigh,
-  allTimeLow,
+  // allTimeLow,
   createdAt,
 }: StatsProps) => {
   type Stat = {
@@ -162,11 +191,11 @@ const Stats = ({
       imageKey: "all-time-high",
       value: allTimeHigh,
     },
-    {
-      title: "All Time Low",
-      imageKey: "all-time-low",
-      value: allTimeLow,
-    },
+    // {
+    //   title: "All Time Low",
+    //   imageKey: "all-time-low",
+    //   value: allTimeLow,
+    // },
     {
       title: "Created At",
       imageKey: "created-at",
@@ -204,13 +233,13 @@ const BuySellButtons = () => {
       <View className="flex-row justify-between p-4 mb-4">
         <Button
           buttonStyle="flex-1 mr-2 bg-white rounded-lg py-3"
-          onPress={() => router.navigate("(authenticated)/item/sell")}
+          onPress={() => router.navigate("(authenticated)/post/sell")}
         >
           <Text className="text-black text-center font-medium">Sell</Text>
         </Button>
         <Button
           buttonStyle="flex-1 ml-2 bg-primary rounded-lg py-3"
-          onPress={() => router.navigate("(authenticated)/item/buy")}
+          onPress={() => router.navigate("(authenticated)/post/buy")}
         >
           <Text className="text-black text-center font-medium">Buy</Text>
         </Button>

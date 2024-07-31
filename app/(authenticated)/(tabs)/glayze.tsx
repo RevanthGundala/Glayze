@@ -1,5 +1,13 @@
 import { Input } from "@/components/ui/Input";
-import { View, Text, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  Keyboard,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Platform,
+} from "react-native";
 import { useEffect, useState } from "react";
 import { SwipeButton } from "@/components/ui/SwipeButton";
 import { CONTRACT_ADDRESS } from "@/utils/constants";
@@ -8,6 +16,9 @@ import { useSmartAccount } from "../../../contexts/SmartAccountContext";
 import { encodeFunctionData, parseAbi } from "viem";
 import { PaymasterMode } from "@biconomy/account";
 import abi from "../../../abi.json";
+import { ScrollView } from "react-native";
+import { authenticate } from "@/actions/authenticate";
+import { Button } from "@/components/ui/Button";
 
 export default function Glayze() {
   const { isLoading, smartAccount } = useSmartAccount();
@@ -50,42 +61,50 @@ export default function Glayze() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <View className="p-6">
-        <Text className="text-white font-semibold text-2xl text-center">
-          Ready to Glayze?
-        </Text>
-        <View className="space-y-6 mt-8">
-          <View>
-            <Text className="text-white text-lg">Name</Text>
-            <Input placeholder="ELON" value={name} onChangeText={setName} />
-          </View>
-          <View>
-            <Text className="text-white text-lg">Symbol</Text>
-            <Input placeholder="ELON" value={symbol} onChangeText={setSymbol} />
-          </View>
-          <Text className="text-white text-lg">URL</Text>
-          <Input
-            placeholder="https://x.com/ElonMusk/123213"
-            value={url}
-            onChangeText={setUrl}
-          />
-        </View>
-        <PaymentDetails deployment={deployment} fee={fee} total={total} />
-        <SwipeButton
-          primaryColor="bg-primary"
-          text="Swipe to Confirm"
-          onComplete={handleSwipe}
-        />
-        {/* {!isPending && !isConfirming ? (
-          <SwipeButton
-            primaryColor="bg-primary"
-            text="Swipe to Confirm"
-            onComplete={handleSwipe}
-          />
-        ) : (
-          <Text>Swipping...</Text>
-        )} */}
-      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+          <ScrollView
+            contentContainerStyle={{ flexGrow: 1 }}
+            className="px-6 py-2"
+          >
+            <Text className="text-white font-semibold text-2xl text-center">
+              Ready to Glayze?
+            </Text>
+            <View className="space-y-6 mt-8">
+              <View>
+                <Text className="text-white text-lg">Name</Text>
+                <Input placeholder="ELON" value={name} onChangeText={setName} />
+              </View>
+              <View>
+                <Text className="text-white text-lg">Symbol</Text>
+                <Input
+                  placeholder="ELON"
+                  value={symbol}
+                  onChangeText={setSymbol}
+                />
+              </View>
+              <Text className="text-white text-lg">URL</Text>
+              <Input
+                placeholder="https://x.com/ElonMusk/123213"
+                value={url}
+                onChangeText={setUrl}
+              />
+            </View>
+            <PaymentDetails deployment={deployment} fee={fee} total={total} />
+            <Button
+              buttonStyle="bg-primary w-full rounded-lg my-4"
+              onPress={authenticate}
+            >
+              <Text className="text-black text-center font-semibold py-4">
+                Pay ${total}
+              </Text>
+            </Button>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

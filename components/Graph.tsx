@@ -10,12 +10,18 @@ type GraphProps = {
   price: number;
   change: number;
   symbol: string;
+  selectedTime: Time;
+  setSelectedTime: React.Dispatch<React.SetStateAction<Time>>;
 };
 
-export const Graph = ({ price, change, symbol }: GraphProps) => {
-  const [selectedTime, setSelectedTime] = useState<Time>("LIVE");
-  const [chartData, setChartData] = useState<any[]>([]);
-  const times: Time[] = ["LIVE", "1H", "1D", "1W", "1M", "ALL"];
+export const Graph = ({
+  price,
+  change,
+  symbol,
+  selectedTime,
+  setSelectedTime,
+}: GraphProps) => {
+  const times: Time[] = ["1H", "1D", "1W", "1M", "ALL"];
   const font = useFont(SpaceMono, 12);
   const { state, isActive } = useChartPressState({ x: 0, y: { price: 0 } });
 

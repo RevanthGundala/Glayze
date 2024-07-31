@@ -3,13 +3,17 @@ import { View, Text, SafeAreaView } from "react-native";
 import { Input } from "@/components/ui/Input";
 import { BackArrow } from "@/components/ui/BackArrow";
 import { Button } from "@/components/ui/Button";
+import { useReferral } from "@/hooks";
+import { share } from "@/actions/share";
 
 export default function Refer() {
-  const [glayzeAmount, setGlayzeAmount] = useState(20); // TODO: Fetch from API
-  const [link, setLink] = useState("https://glaze.fun/invite/123"); // TODO: Fetch from API
+  const [auraAmount, setAuraAmount] = useState(20); // TODO: Fetch from API
+  const address = "0x1234567890"; // TODO: Fetch from API
+  const { data } = useReferral(address);
 
-  const handlePress = () => {
+  const handlePress = async () => {
     // TODO: Implement referral functionality
+    await share(data?.referralLink || null);
   };
 
   return (
@@ -19,18 +23,18 @@ export default function Refer() {
         <Text className="text-white font-semibold text-2xl">
           Refer your friends.
         </Text>
-        <Text className="text-white font-semibold text-2xl">Earn $GLAYZE.</Text>
+        <Text className="text-white font-semibold text-2xl">Earn $AURA.</Text>
       </View>
       <View className="flex-col space-y-4 p-6">
         <Text className="text-white opacity-70 leading-6">
-          You and your friend both earn 5 $GLAYZE when they make a transaction
-          within 14 days of the invite. Use $GLAYZE to pay for transaction fees.
+          You and your friend both earn 5 $AURA when they make a transaction
+          within 14 days of the invite. Use $AURA to pay for transaction fees.
         </Text>
-        <ReferralCard amount={glayzeAmount} />
+        <ReferralCard amount={auraAmount} />
         <Text className="text-white font-medium text-lg pb-2">
           Share your link
         </Text>
-        <Input placeholder={link} readOnly />
+        <Input placeholder={data?.referralLink || ""} readOnly />
         <Button
           buttonStyle="bg-primary w-full rounded-lg my-4"
           onPress={handlePress}
@@ -51,8 +55,8 @@ type ReferralCardProps = {
 const ReferralCard = ({ amount }: ReferralCardProps) => {
   return (
     <View className="bg-neutral p-6 rounded-3xl my-8">
-      <Text className="text-gray-400 text-xl mb-3">Total Amount Earned</Text>
-      <Text className="text-white text-3xl font-bold">{amount} $GLAYZE</Text>
+      <Text className="text-gray-400 text-xl mb-3">Current Balance</Text>
+      <Text className="text-white text-3xl font-bold">{amount} $AURA</Text>
     </View>
   );
 };

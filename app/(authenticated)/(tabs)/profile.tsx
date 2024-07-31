@@ -8,7 +8,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useProfile } from "@/hooks/useProfile";
 import { usePrivy } from "@privy-io/expo";
-import { GLAYZE_TWITTER, GLAYZE_DISCORD } from "@/utils/constants";
+import {
+  GLAYZE_TWITTER,
+  GLAYZE_DISCORD,
+  GLAYZE_PRIVACY_POLICY,
+} from "@/utils/constants";
 
 export default function Profile() {
   const { data, isLoading, isError } = useProfile();
@@ -44,7 +48,7 @@ export default function Profile() {
     // },
     {
       name: "Privacy and Security",
-      href: "/(authenticated)/profile/privacy-and-security",
+      href: GLAYZE_PRIVACY_POLICY,
     },
   ];
 

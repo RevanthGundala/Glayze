@@ -10,9 +10,11 @@ import { useRouter } from "expo-router";
 
 export default function MyAccount() {
   const address = "0x1234567890123456789012345678901234567890";
-  const connectedAccounts = [
-    { name: "Unlink X Account", href: "/profile/my-account" },
-  ];
+
+  const handlePress = () => {
+    console.log("Hello");
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <BackArrow />
@@ -33,6 +35,14 @@ export default function MyAccount() {
             <Text className="text-white text-lg font-bold ">Ethereum</Text>
           </View>
           <Input placeholder={address} readOnly />
+          <Button
+            buttonStyle="bg-primary w-full rounded-lg my-4"
+            onPress={handlePress}
+          >
+            <Text className="text-black text-center py-4">
+              Send USDC on Base
+            </Text>
+          </Button>
         </View>
         <Text className="text-white text-2xl font-bold">
           Connected Accounts

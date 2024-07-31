@@ -11,34 +11,49 @@ export type Database = {
     Tables: {
       Posts: {
         Row: {
+          ath: number | null
           contract_creator: string | null
+          contract_creator_handle: string | null
+          contract_creator_username: string | null
           created_at: string
+          market_cap: number | null
           name: string | null
           post_id: number
           price: number | null
           real_creator: string | null
           symbol: string | null
           url: string | null
+          volume: number | null
         }
         Insert: {
+          ath?: number | null
           contract_creator?: string | null
+          contract_creator_handle?: string | null
+          contract_creator_username?: string | null
           created_at?: string
+          market_cap?: number | null
           name?: string | null
           post_id: number
           price?: number | null
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
+          volume?: number | null
         }
         Update: {
+          ath?: number | null
           contract_creator?: string | null
+          contract_creator_handle?: string | null
+          contract_creator_username?: string | null
           created_at?: string
+          market_cap?: number | null
           name?: string | null
           post_id?: number
           price?: number | null
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
+          volume?: number | null
         }
         Relationships: []
       }
@@ -75,18 +90,21 @@ export type Database = {
           content: string | null
           created_at: string
           id: number
+          show: boolean | null
         }
         Insert: {
           address?: string | null
           content?: string | null
           created_at?: string
           id?: number
+          show?: boolean | null
         }
         Update: {
           address?: string | null
           content?: string | null
           created_at?: string
           id?: number
+          show?: boolean | null
         }
         Relationships: []
       }
@@ -96,6 +114,7 @@ export type Database = {
           created_at: string
           is_buy: boolean | null
           post_id: number
+          price: number | null
           token_amount: number | null
           trader: string | null
           usdc_amount: number | null
@@ -105,6 +124,7 @@ export type Database = {
           created_at?: string
           is_buy?: boolean | null
           post_id: number
+          price?: number | null
           token_amount?: number | null
           trader?: string | null
           usdc_amount?: number | null
@@ -114,6 +134,7 @@ export type Database = {
           created_at?: string
           is_buy?: boolean | null
           post_id?: number
+          price?: number | null
           token_amount?: number | null
           trader?: string | null
           usdc_amount?: number | null

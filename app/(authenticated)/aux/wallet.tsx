@@ -5,8 +5,7 @@ import { BackArrow } from "@/components/ui/BackArrow";
 import { Button } from "@/components/ui/Button";
 
 export default function Wallet() {
-  const [glayzeAmount, setGlayzeAmount] = useState(20); // TODO: Fetch from API
-  const [link, setLink] = useState("https://glaze.fun/invite/123"); // TODO: Fetch from API
+  const address = "0x1234567890"; // TODO: Fetch from API
 
   const handlePress = () => {
     // TODO: Implement referral functionality
@@ -19,20 +18,18 @@ export default function Wallet() {
         <Text className="text-white font-semibold text-2xl">Deposit USDC</Text>
       </View>
       <View className="flex-col space-y-4 p-6">
-        <QRCode />
         <Text className="text-white font-medium pb-2">Your EVM Address</Text>
-        <Input placeholder={link} readOnly />
+        <Input placeholder={address} readOnly />
         <Text className="text-white font-semibold pb-2">
-          WARNING! Only send on USDC on MegaETH Network
+          WARNING! Only send on USDC on Base
         </Text>
-        <Button buttonStyle="bg-primary w-full rounded-lg" onPress={handlePress}>
-          <Text className="text-black text-center py-4">Hello</Text>
+        <Button
+          buttonStyle="bg-primary w-full rounded-lg"
+          onPress={handlePress}
+        >
+          <Text className="text-black text-center py-4">Share</Text>
         </Button>
       </View>
     </SafeAreaView>
   );
 }
-
-const QRCode = () => {
-  return <View></View>;
-};
