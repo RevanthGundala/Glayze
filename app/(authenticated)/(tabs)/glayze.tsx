@@ -9,7 +9,6 @@ import {
   Platform,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { SwipeButton } from "@/components/ui/SwipeButton";
 import { CONTRACT_ADDRESS } from "@/utils/constants";
 import { useRouter } from "expo-router";
 import { useSmartAccount } from "../../../contexts/SmartAccountContext";
@@ -19,6 +18,7 @@ import abi from "../../../abi.json";
 import { ScrollView } from "react-native";
 import { authenticate } from "@/actions/authenticate";
 import { Button } from "@/components/ui/Button";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Glayze() {
   const { isLoading, smartAccount } = useSmartAccount();
@@ -26,6 +26,7 @@ export default function Glayze() {
   const [symbol, setSymbol] = useState("");
   const [url, setUrl] = useState("");
   const router = useRouter();
+  const { theme } = useTheme();
 
   const [deployment, setDeployment] = useState(0);
   const [fee, setFee] = useState(0);
@@ -53,14 +54,11 @@ export default function Glayze() {
     console.log(amountInWei?.toString());
   };
 
-  // useEffect(() => {
-  //   if (isConfirmed) {
-  //     router.push("/aux/success");
-  //   }
-  // }, [isConfirmed]);
-
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: theme.backgroundColor }}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -70,35 +68,64 @@ export default function Glayze() {
             contentContainerStyle={{ flexGrow: 1 }}
             className="px-6 py-2"
           >
-            <Text className="text-white font-semibold text-2xl text-center">
+            <Text
+              className="font-semibold text-2xl text-center"
+              style={{ color: theme.textColor }}
+            >
               Ready to Glayze?
             </Text>
             <View className="space-y-6 mt-8">
               <View>
-                <Text className="text-white text-lg">Name</Text>
-                <Input placeholder="ELON" value={name} onChangeText={setName} />
+                <Text className="text-lg" style={{ color: theme.textColor }}>
+                  Name
+                </Text>
+                <Input
+                  placeholder="ELON"
+                  value={name}
+                  onChangeText={setName}
+                  style={{
+                    color: theme.textColor,
+                    backgroundColor: theme.secondaryBackgroundColor,
+                  }}
+                />
               </View>
               <View>
-                <Text className="text-white text-lg">Symbol</Text>
+                <Text className="text-lg" style={{ color: theme.textColor }}>
+                  Symbol
+                </Text>
                 <Input
                   placeholder="ELON"
                   value={symbol}
                   onChangeText={setSymbol}
+                  style={{
+                    color: theme.textColor,
+                    backgroundColor: theme.secondaryBackgroundColor,
+                  }}
                 />
               </View>
-              <Text className="text-white text-lg">URL</Text>
+              <Text className="text-lg" style={{ color: theme.textColor }}>
+                URL
+              </Text>
               <Input
                 placeholder="https://x.com/ElonMusk/123213"
                 value={url}
                 onChangeText={setUrl}
+                style={{
+                  color: theme.textColor,
+                  backgroundColor: theme.secondaryBackgroundColor,
+                }}
               />
             </View>
             <PaymentDetails deployment={deployment} fee={fee} total={total} />
             <Button
-              buttonStyle="bg-primary w-full rounded-lg my-4"
+              buttonStyle="w-full rounded-lg my-4"
+              style={{ backgroundColor: theme.tintColor }}
               onPress={authenticate}
             >
-              <Text className="text-black text-center font-semibold py-4">
+              <Text
+                className="text-center font-semibold py-4"
+                style={{ color: theme.tintTextColor }}
+              >
                 Pay ${total}
               </Text>
             </Button>
@@ -116,20 +143,23 @@ type PaymentDetailsProps = {
 };
 
 const PaymentDetails = ({ deployment, fee, total }: PaymentDetailsProps) => {
+  const { theme } = useTheme();
   return (
     <View className="mt-8 space-y-4">
-      <Text className="text-white text-xl">Payment Details</Text>
+      <Text className="text-xl" style={{ color: theme.textColor }}>
+        Payment Details
+      </Text>
       <View className="flex-row justify-between items-center">
-        <Text className="text-white opacity-70">Deployment</Text>
-        <Text className="text-white">${deployment}</Text>
+        <Text style={{ color: theme.mutedForegroundColor }}>Deployment</Text>
+        <Text style={{ color: theme.textColor }}>${deployment}</Text>
       </View>
       <View className="flex-row justify-between items-center">
-        <Text className="text-white opacity-70">Fee</Text>
-        <Text className="text-white">${fee}</Text>
+        <Text style={{ color: theme.mutedForegroundColor }}>Fee</Text>
+        <Text style={{ color: theme.textColor }}>${fee}</Text>
       </View>
       <View className="flex-row justify-between items-center">
-        <Text className="text-white opacity-70">Total</Text>
-        <Text className="text-white">${total}</Text>
+        <Text style={{ color: theme.mutedForegroundColor }}>Total</Text>
+        <Text style={{ color: theme.textColor }}>${total}</Text>
       </View>
     </View>
   );

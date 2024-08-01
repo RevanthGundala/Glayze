@@ -12,7 +12,7 @@ type Props = {
 export const VerifiedBadge = ({ user, className }: Props) => {
   const verified = user.verified || user.is_blue_verified || user.verified_type;
   let icon = <Verified />;
-  let iconClassName = "text-[#1D9BF0]"; // Assuming this is the --tweet-verified-blue-color
+  let iconClassName: string | null = "text-[#1D9BF0]"; // Assuming this is the --tweet-verified-blue-color
 
   if (verified) {
     if (!user.is_blue_verified) {

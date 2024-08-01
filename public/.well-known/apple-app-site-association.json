@@ -1,0 +1,23 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "6587549824.app.glayze",
+        "paths": [
+          "/records/*"
+        ]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": [
+      "6587549824.app.glayze"
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "6587549824.app.glayze"
+    ]
+  }
+}

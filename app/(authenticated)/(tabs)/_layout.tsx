@@ -1,17 +1,19 @@
 import { Tabs } from "expo-router";
 import { Image } from "expo-image";
-import { useState, useRef, useEffect } from "react";
-import { useHomeScrollY } from "@/hooks/useHomeScrollY";
+import { useState, useRef, useEffect, useMemo } from "react";
+import { useHomeScrollY } from "@/hooks/use-home-scroll-y";
 import { Animated } from "react-native";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const OPAQUE_OPACITY = 1;
-const TRANSPARENT_OPACITY = 0.3; // Adjust this value to your preference
+const TRANSPARENT_OPACITY = 0.3;
 
 export default function TabLayout() {
   const homeScrollY = useHomeScrollY();
   const [tabBarOpacity] = useState(new Animated.Value(OPAQUE_OPACITY));
   const lastScrollY = useRef(0);
   const scrollVelocity = useRef(0);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const listener = homeScrollY.addListener(({ value }) => {
@@ -19,21 +21,18 @@ export default function TabLayout() {
       lastScrollY.current = value;
 
       if (value <= 0) {
-        // At the top of the scroll view
         Animated.timing(tabBarOpacity, {
           toValue: OPAQUE_OPACITY,
           duration: 150,
           useNativeDriver: false,
         }).start();
       } else if (scrollVelocity.current > 0) {
-        // Scrolling down
         Animated.timing(tabBarOpacity, {
           toValue: TRANSPARENT_OPACITY,
           duration: 150,
           useNativeDriver: false,
         }).start();
       } else if (scrollVelocity.current < 0) {
-        // Scrolling up
         Animated.timing(tabBarOpacity, {
           toValue: OPAQUE_OPACITY,
           duration: 150,
@@ -47,17 +46,30 @@ export default function TabLayout() {
     };
   }, [homeScrollY, tabBarOpacity]);
 
-  const backgroundColorInterpolation = tabBarOpacity.interpolate({
-    inputRange: [TRANSPARENT_OPACITY, OPAQUE_OPACITY],
-    outputRange: ["rgba(36, 36, 36, 0.3)", "rgba(36, 36, 36, 1)"],
-  });
+  const animatedStyles = useMemo(() => {
+    const backgroundColorInterpolation = tabBarOpacity.interpolate({
+      inputRange: [TRANSPARENT_OPACITY, OPAQUE_OPACITY],
+      outputRange: ["rgba(36, 36, 36, 0.3)", "rgba(36, 36, 36, 1)"],
+    });
+
+    return {
+      background: {
+        backgroundColor: backgroundColorInterpolation,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      },
+    };
+  }, [tabBarOpacity]);
 
   return (
     <Tabs
       screenOptions={({ route }) => ({
-        tabBarActiveTintColor: "#98EB5D",
+        tabBarActiveTintColor: theme.tintColor,
         tabBarStyle: {
-          backgroundColor: "transparent",
+          backgroundColor: theme.backgroundColor,
           position: "absolute",
           paddingTop: 15,
           bottom: 0,
@@ -66,22 +78,10 @@ export default function TabLayout() {
         },
         headerShown: false,
         tabBarBackground: () => (
-          <Animated.View
-            style={{
-              backgroundColor:
-                route.name === "home"
-                  ? backgroundColorInterpolation
-                  : "rgb(36, 36, 36)",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-            }}
-          />
+          <Animated.View style={animatedStyles.background} />
         ),
         tabBarIconStyle: {
-          marginBottom: 10, // Adjust this value to increase/decrease space below the icon
+          marginBottom: 10,
         },
       })}
     >

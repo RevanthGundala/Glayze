@@ -13,11 +13,12 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { supabase } from "@/utils/supabase";
-import { useSearch } from "@/hooks/useSearch";
+import { useSearch } from "@/hooks/use-search";
 import { Input } from "@/components/ui/Input";
-import { Menu } from "@/components/Menu";
+import { Menu } from "@/components/menu";
 import { Route } from "@/utils/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const SearchScreen = () => {
   const router = useRouter();
@@ -25,6 +26,7 @@ const SearchScreen = () => {
   const [routes, setRoutes] = useState<Route[]>([]);
   const { data, isLoading, isError } = useSearch();
   const searchBarRef = useRef(null);
+  const { theme } = useTheme();
 
   const address = "0x1234567890abcdef1234567890abcdef12345678";
 
@@ -53,30 +55,42 @@ const SearchScreen = () => {
 
   if (isLoading) {
     return (
-      <View className="flex-1 bg-background">
-        <Text>Loading...</Text>
+      <View
+        className="flex-1"
+        style={{ backgroundColor: theme.backgroundColor }}
+      >
+        <Text style={{ color: theme.textColor }}>Loading...</Text>
       </View>
     );
   }
 
   if (isError) {
     return (
-      <View className="flex-1 bg-background">
-        <Text>Error loading profile</Text>
+      <View
+        className="flex-1"
+        style={{ backgroundColor: theme.backgroundColor }}
+      >
+        <Text style={{ color: theme.textColor }}>Error loading profile</Text>
       </View>
     );
   }
 
   if (!data) {
     return (
-      <View className="flex-1 bg-background">
-        <Text>No profile data found</Text>
+      <View
+        className="flex-1"
+        style={{ backgroundColor: theme.backgroundColor }}
+      >
+        <Text style={{ color: theme.textColor }}>No profile data found</Text>
       </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: theme.backgroundColor }}
+    >
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
@@ -91,11 +105,14 @@ const SearchScreen = () => {
                 handleSearch={handleSearch}
               />
               <View className="flex-row justify-between items-center px-6 pt-2 pb-6">
-                <Text className="text-white text-xl font-semibold">
+                <Text
+                  className="text-xl font-semibold"
+                  style={{ color: theme.textColor }}
+                >
                   Recent Searches
                 </Text>
                 <TouchableOpacity onPress={clearSearchHistory}>
-                  <Text className="text-white">Clear</Text>
+                  <Text style={{ color: theme.tintColor }}>Clear</Text>
                 </TouchableOpacity>
               </View>
 
@@ -116,6 +133,7 @@ type SearchBarProps = {
 
 const SearchBar = React.forwardRef<TextInput, SearchBarProps>(
   ({ searchText, setSearchText, handleSearch }, ref) => {
+    const { theme } = useTheme();
     const handleClear = () => {
       setSearchText("");
       if (ref && typeof ref !== "function") {
@@ -132,13 +150,21 @@ const SearchBar = React.forwardRef<TextInput, SearchBarProps>(
           onChangeText={setSearchText}
           onSubmitEditing={handleSearch}
           search
+          style={{
+            color: theme.textColor,
+            backgroundColor: theme.backgroundColor,
+          }}
         />
         {searchText.length > 0 && (
           <TouchableOpacity
             onPress={handleClear}
             className="absolute right-6 top-1/2 -translate-y-1/2"
           >
-            <Ionicons name="close-circle" size={24} color="gray" />
+            <Ionicons
+              name="close-circle"
+              size={24}
+              color={theme.mutedForegroundColor}
+            />
           </TouchableOpacity>
         )}
       </View>

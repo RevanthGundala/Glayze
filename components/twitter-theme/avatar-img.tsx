@@ -1,11 +1,12 @@
 import { Image } from "expo-image";
 
 type AvatarImgProps = {
-  src: string;
+  source: string;
   alt: string;
   width: number;
   height: number;
 };
 
-// eslint-disable-next-line jsx-a11y/alt-text -- The alt text is part of `...props`
-export const AvatarImg = (props: AvatarImgProps) => <Image {...props} />;
+export const AvatarImg = ({ source, alt, width, height }: AvatarImgProps) => (
+  <Image source={{ uri: source }} alt={alt} style={{ width, height }} />
+);

@@ -3,7 +3,7 @@ import { View, Text, Pressable, Modal, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { BackArrow } from "@/components/ui/BackArrow";
 import { Input } from "@/components/ui/Input";
-import { Menu } from "@/components/Menu";
+import { Menu } from "@/components/menu";
 import { Image } from "expo-image";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "expo-router";

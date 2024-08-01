@@ -40,3 +40,34 @@ export const formatNumber = (n: number): string => {
   if (n > 999) return `${(n / 1000).toFixed(1)}K`;
   return n.toString();
 };
+
+export const formatDate = (date: Date) => {
+  const hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const formattedHours = hours % 12 || 12;
+
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const formattedTime = `${formattedHours}:${minutes} ${ampm}`;
+  const formattedDate = `${
+    monthNames[date.getMonth()]
+  } ${date.getDate()}, ${date.getFullYear()}`;
+  const weekday = weekdays[date.getDay()];
+
+  return `${formattedTime} · ${formattedDate}`;
+};

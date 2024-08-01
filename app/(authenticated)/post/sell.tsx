@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/Button";
 import React, { useState } from "react";
 import { Text, SafeAreaView, View, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
-import { SwipeButton } from "@/components/ui/SwipeButton";
 import { useRouter } from "expo-router";
 
 export default function Sell() {
@@ -79,11 +78,11 @@ export default function Sell() {
         </View>
 
         <View className="mt-auto mb-12">
-          <SwipeButton
+          {/* <SwipeButton
             text="Swipe to Buy"
             primaryColor="bg-primary"
             onComplete={handleSwipe}
-          />
+          /> */}
         </View>
       </View>
     </SafeAreaView>

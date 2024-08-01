@@ -14,6 +14,7 @@ import {
   useEmbeddedWallet,
 } from "@privy-io/expo";
 import { SmartAccountProvider } from "../contexts/SmartAccountContext";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 
 const queryClient = new QueryClient();
 
@@ -47,14 +48,16 @@ export default function Layout() {
         host: "https://us.i.posthog.com",
       }}
     >
-      <PrivyProvider appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}>
-        {/* <WagmiProvider config={config}> */}
-        <QueryClientProvider client={queryClient}>
-          <SmartAccountProvider>
-            <InitialLayout />
-          </SmartAccountProvider>
-        </QueryClientProvider>
-      </PrivyProvider>
+      <ThemeProvider>
+        <PrivyProvider appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}>
+          {/* <WagmiProvider config={config}> */}
+          <QueryClientProvider client={queryClient}>
+            <SmartAccountProvider>
+              <InitialLayout />
+            </SmartAccountProvider>
+          </QueryClientProvider>
+        </PrivyProvider>
+      </ThemeProvider>
       {/* </WagmiProvider> */}
     </PostHogProvider>
   );
@@ -65,7 +68,7 @@ const InitialLayout = () => {
   const wallet = useEmbeddedWallet();
   const router = useRouter();
   useEffect(() => {
-    // router.replace("/(authenticated)/home");
+    router.replace("/(authenticated)/home");
     // if (!isReady) return;
     // if (isConnected(wallet)) {
     //   router.replace("/(authenticated)/home");
@@ -75,7 +78,10 @@ const InitialLayout = () => {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="connect" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="connect-to-twitter"
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="end" options={{ headerShown: false }} />
       <Stack.Screen
         name="(authenticated)/(tabs)"

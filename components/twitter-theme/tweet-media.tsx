@@ -1,78 +1,53 @@
-import React, { useState, Fragment } from "react";
-import { View, TouchableOpacity, Text, Image } from "react-native";
-import { EnrichedTweet, EnrichedQuotedTweet } from "react-tweet";
+import React from "react";
+import { View, TouchableOpacity, Dimensions, Text } from "react-native";
+import {
+  EnrichedTweet,
+  EnrichedQuotedTweet,
+  TwitterComponents,
+} from "react-tweet";
 import { MediaDetails } from "react-tweet/api";
 import { TweetMediaVideo } from "./tweet-media-video";
+import { getMediaUrl } from "./utils";
+import { Image } from "expo-image";
 
-const getMediaUrl = () => {};
-
-const getSkeletonStyle = (media: MediaDetails, itemCount: number) => {
-  let paddingBottom = 56.25; // default of 16x9
-  if (itemCount === 1) {
-    paddingBottom =
-      (100 / media.original_info.width) * media.original_info.height;
-  }
-  if (itemCount === 2) {
-    paddingBottom = paddingBottom * 2;
-  }
-  return {
-    width: media.type === "photo" ? undefined : "auto",
-    paddingBottom: `${paddingBottom}%`,
-  };
-};
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const MEDIA_MAX_WIDTH = SCREEN_WIDTH * 0.85;
+const MEDIA_MAX_HEIGHT = 200; // Reduced height to better fit both items
 
 type TweetMediaProps = {
-  tweet: EnrichedTweet | EnrichedQuotedTweet;
-  components?: any;
-  quoted?: boolean;
+  tweet: EnrichedTweet;
+  components: TwitterComponents | undefined;
 };
 
-export const TweetMedia = ({ tweet, components, quoted }: TweetMediaProps) => {
-  const length = tweet.mediaDetails?.length ?? 0;
-  const Img = components?.MediaImg ?? Image;
+export const TweetMedia = ({ tweet, components }: TweetMediaProps) => {
+  const mediaItems = tweet.mediaDetails || [];
 
   return (
     <View
-      className={`mt-3 overflow-hidden relative ${
-        !quoted && "rounded-xl border border-gray-300"
-      }`}
+      className={`mt-4 rounded-lg border border-gray-200 overflow-hidden`}
+      style={{
+        width: MEDIA_MAX_WIDTH,
+        height: MEDIA_MAX_HEIGHT,
+      }}
     >
-      <View
-        className={`grid grid-rows-1 gap-0.5 h-full w-full ${
-          length > 1 && "grid-cols-2"
-        } ${length === 3 && "grid-rows-2"} ${
-          length > 4 && "grid-rows-2 grid-cols-2"
-        }`}
-      >
-        {tweet.mediaDetails?.map((media) => (
-          <Fragment key={media.media_url_https}>
+      <View className="flex-row h-full gap-1">
+        {mediaItems.map((media, index) => (
+          <View
+            key={media.media_url_https}
+            className="flex-1 h-full overflow-hidden"
+          >
             {media.type === "photo" ? (
-              <TouchableOpacity
-                className="relative h-full w-full flex items-center justify-center"
-                onPress={() => {
-                  /* Open tweet URL */
-                }}
-              >
-                <View
-                  style={getSkeletonStyle(media, length)}
-                  className="w-full"
-                />
-                <Img
-                  source={{ uri: getMediaUrl(media, "small") }}
-                  className="absolute inset-0 h-full w-full m-0 object-cover object-center"
-                  accessibilityLabel={media.ext_alt_text || "Image"}
-                />
-              </TouchableOpacity>
+              <Image
+                source={{ uri: getMediaUrl(media, "small") }}
+                style={{ width: "100%", height: "100%" }}
+                contentFit="cover"
+                transition={200}
+                accessibilityLabel={media.ext_alt_text || "Image"}
+              />
             ) : (
-              <View className="relative h-full w-full flex items-center justify-center">
-                <View
-                  style={getSkeletonStyle(media, length)}
-                  className="w-full"
-                />
-                <TweetMediaVideo tweet={tweet} media={media} />
-              </View>
+              <TweetMediaVideo tweet={tweet} media={media} />
             )}
-          </Fragment>
+          </View>
         ))}
       </View>
     </View>

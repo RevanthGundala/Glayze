@@ -4,21 +4,24 @@ import { Image } from "expo-image";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "expo-router";
-import { Pressable } from "react-native";
-import { useState } from "react";
-
-import { useLoginWithSMS } from "@privy-io/expo";
+import { useLoginWithPasskey } from "@privy-io/expo/passkey";
 
 export default function Index() {
   const router = useRouter();
-  const [code, setCode] = useState("");
-  const [phone, setPhone] = useState("480-939-9877");
-  const { state, sendCode, loginWithCode } = useLoginWithSMS({
-    onError: (error) => {
-      console.log("Error", error);
+  const { state, loginWithPasskey } = useLoginWithPasskey({
+    onSuccess(user, isNewUser) {
+      // show a toast, send analytics event, etc...
+      console.log("User logged in", user);
+      if (!isNewUser) {
+        router.replace("/(authenticated)/home");
+      } else {
+        router.push("/connect-to-twitter");
+      }
+    },
+    onError(error) {
+      console.log("Error logging in", error);
     },
   });
-
   return (
     <SafeAreaView className="flex-1">
       {/* <View className="pt-6">
@@ -39,46 +42,33 @@ export default function Index() {
           buttonStyle={
             "flex flex-row justify-center items-center bg-primary rounded-full"
           }
-          onPress={() => router.push("/connect")}
+          onPress={() => router.push("/connect-to-twitter")}
         >
           <Text className="text-black font-medium px-8 py-4">Get Started</Text>
         </Button>
-      </View>
-      <View>
-        <TextInput onChangeText={setPhone} />
-        <Pressable
-          // Keeps button disabled while code is being sent
-          disabled={state.status === "sending-code"}
-          onPress={async () => {
-            console.log("Sending code");
-            const { success } = await sendCode({ phone });
-            console.log("Success", success);
-          }}
+        <Button
+          // Keeps button disabled until the code has been sent
+          onPress={() =>
+            loginWithPasskey({
+              relyingParty: "https://glayze.app",
+            })
+          }
         >
-          <Text>Send Code</Text>
-        </Pressable>
+          <Text>Login with passkey</Text>
+        </Button>
 
-        {state.status === "sending-code" && (
-          //  Shows only while the code is sending
-          <Text>Sending Code...</Text>
+        {state?.status === "submitting-response" && (
+          // Shows only while the login is being attempted
+          <Text>Logging in...</Text>
+        )}
+
+        {state?.status === "error" && (
+          <>
+            <Text style={{ color: "red" }}>There was an error</Text>
+            <Text style={{ color: "lightred" }}>{state?.error?.message}</Text>
+          </>
         )}
       </View>
-
-      <View>
-        <TextInput onChangeText={setCode} />
-        <Pressable
-          // Keeps button disabled until the code has been sent
-          disabled={state.status !== "awaiting-code-input"}
-          onPress={() => loginWithCode({ code })}
-        >
-          <Text>Login</Text>
-        </Pressable>
-      </View>
-
-      {state.status === "submitting-code" && (
-        // Shows only while the login is being attempted
-        <Text>Logging in...</Text>
-      )}
     </SafeAreaView>
   );
 }

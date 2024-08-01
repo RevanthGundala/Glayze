@@ -9,13 +9,13 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { BackArrow } from "@/components/ui/BackArrow";
 import { Image } from "expo-image";
-import { Graph } from "@/components/Graph";
+import { Graph } from "@/components/graph";
 import { Button } from "@/components/ui/Button";
 import { BlurView } from "expo-blur";
-import { usePost } from "@/hooks/usePost";
-import { usePostPrices } from "@/hooks/usePostPrices";
+import { usePost } from "@/hooks/use-post";
+import { usePostPrices } from "@/hooks/use-post-prices";
 import { Time } from "@/utils/types";
-import { usePosition } from "@/hooks/usePosition";
+import { usePosition } from "@/hooks/use-position";
 
 export default function Post() {
   const address = "0x1234567890";

@@ -14,14 +14,19 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.glayze"
+      "bundleIdentifier": "app.glayze",
+      "associatedDomains": ["webcredentials:https://glayze.app"]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.glayze"
+      "package": "app.glayze",
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -32,7 +37,7 @@
       [
         "expo-router",
         {
-          "origin": "http://localhost:8081/"
+          "origin": "https://glayze.app"
         }
       ],
       "expo-secure-store",
@@ -41,10 +46,26 @@
         {
           "faceIDPermission": "Allow Glayze to use Face ID."
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.0"
+          }
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": "https://glayze.app"
+      },
+      "eas": {
+        "projectId": "d63d5b9c-0234-4fef-80b5-02fd092853aa"
+      }
     }
   }
 }

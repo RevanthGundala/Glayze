@@ -6,7 +6,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import React, { useState } from "react";
-import { useAlerts } from "@/hooks/useAlerts";
+import { useAlerts } from "@/hooks/use-alerts";
 import { supabase } from "@/utils/supabase";
 
 export default function Alerts() {
