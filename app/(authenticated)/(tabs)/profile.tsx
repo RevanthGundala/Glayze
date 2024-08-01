@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
 import { Route } from "../../../utils/types";
-import { Menu } from "@/components/menu";
+import { Menu } from "../../../components/menu";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useProfile } from "@/hooks/use-profile";
