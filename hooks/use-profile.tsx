@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
 import { User } from "@/utils/types";
+import { usePrivy } from "@/utils/privy";
 
 const fetchUser = async (address: string) => {
   console.log("Fetching user");
@@ -14,10 +15,10 @@ const fetchUser = async (address: string) => {
 
 export const useProfile = () => {
   // TODO: get user address from wallet
-  const address = "0x1234567890abcdef1234567890abcdef12345678";
+  const { user } = usePrivy();
 
   return useQuery<User | null, Error>({
-    queryKey: ["user", address],
-    queryFn: () => fetchUser(address),
+    queryKey: ["user", user.wallet.address],
+    queryFn: () => fetchUser(user.wallet.address),
   });
 };

@@ -10,18 +10,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
 import { Route } from "../../../utils/types";
-import { Menu } from "../../../components/menu";
+import { Menu } from "@/components/menu";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useProfile } from "@/hooks/use-profile";
-import { usePrivy } from "@privy-io/expo";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { usePrivy } from "@/utils/privy";
 import {
   GLAYZE_TWITTER,
   GLAYZE_DISCORD,
   GLAYZE_PRIVACY_POLICY,
 } from "@/utils/constants";
-import { Header } from "@/components/header";
 
 export default function Profile() {
   const { theme, themeName } = useTheme();
