@@ -4,7 +4,7 @@
     "jsx": "react-native",
     "strict": true,
     "moduleResolution": "Bundler",
-    "module": "es2015",
+    "module": "ESNext",
     "paths": {
       "@/*": ["./*"]
     }

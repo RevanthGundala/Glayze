@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useProfile } from "@/hooks/use-profile";
 import { usePrivy } from "@privy-io/expo";
+import { useTheme } from "../../../contexts/ThemeContext";
 import {
   GLAYZE_TWITTER,
   GLAYZE_DISCORD,
@@ -15,24 +16,25 @@ import {
 } from "@/utils/constants";
 
 export default function Profile() {
+  const { theme } = useTheme();
   const { data, isLoading, isError } = useProfile();
 
   if (isLoading)
     return (
-      <View className="flex-1 bg-background">
-        <Text>Loading...</Text>
+      <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
+        <Text style={{ color: theme.textColor }}>Loading...</Text>
       </View>
     );
   if (isError)
     return (
-      <View className="flex-1 bg-background">
-        <Text>Error loading profile</Text>
+      <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
+        <Text style={{ color: theme.textColor }}>Error loading profile</Text>
       </View>
     );
   if (!data)
     return (
-      <View className="flex-1 bg-background">
-        <Text>No profile data found</Text>
+      <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
+        <Text style={{ color: theme.textColor }}>No profile data found</Text>
       </View>
     );
 
@@ -42,10 +44,10 @@ export default function Profile() {
       name: "My Account",
       href: "/(authenticated)/profile/my-account",
     },
-    // {
-    //   name: "Contact Support",
-    //   href: "/",
-    // },
+    {
+      name: "Appearance",
+      href: "/(authenticated)/profile/appearance",
+    },
     {
       name: "Privacy and Security",
       href: GLAYZE_PRIVACY_POLICY,
@@ -53,7 +55,7 @@ export default function Profile() {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
       <View className="mt-16 items-center">
         <View className="items-center py-8 space-y-4">
           <Image
@@ -65,8 +67,18 @@ export default function Profile() {
             className="w-16 h-16"
           />
           <View className="pb-8 items-center">
-            <Text className="text-white text-2xl font-semibold">{name}</Text>
-            <Text className="text-white text-lg opacity-80">@{handle}</Text>
+            <Text
+              style={{ color: theme.textColor }}
+              className="text-2xl font-semibold"
+            >
+              {name}
+            </Text>
+            <Text
+              style={{ color: theme.mutedForegroundColor }}
+              className="text-lg"
+            >
+              @{handle}
+            </Text>
             <Link
               href={`https://x.com/${handle}`}
               className="mt-2 hover:pointer-cursor"
@@ -87,6 +99,7 @@ export default function Profile() {
 }
 
 const LogOut = () => {
+  const { theme } = useTheme();
   const { logout } = usePrivy();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
@@ -101,7 +114,12 @@ const LogOut = () => {
     <View className="w-full pt-4 px-6">
       <View className="flex-row justify-between items-center w-full py-2">
         <Pressable className="flex-1" onPress={() => setModalVisible(true)}>
-          <Text className="text-white text-lg opacity-80">Log Out</Text>
+          <Text
+            style={{ color: theme.mutedForegroundColor }}
+            className="text-lg"
+          >
+            Log Out
+          </Text>
         </Pressable>
         <Image
           source={require("@/assets/images/forward-arrow.png")}
@@ -119,8 +137,14 @@ const LogOut = () => {
           onPress={() => setModalVisible(false)}
           className="flex-1 justify-end bg-black/50"
         >
-          <View className="bg-background rounded-t-3xl p-6 h-44">
-            <Text className="text-white text-lg font-medium mb-6 text-center">
+          <View
+            style={{ backgroundColor: theme.backgroundColor }}
+            className="rounded-t-3xl p-6 h-44"
+          >
+            <Text
+              style={{ color: theme.textColor }}
+              className="text-lg font-medium mb-6 text-center"
+            >
               Are you sure you want to log out?
             </Text>
             <View className="flex-row justify-between">
@@ -128,13 +152,23 @@ const LogOut = () => {
                 onPress={() => setModalVisible(false)}
                 buttonStyle="bg-neutral flex-1 py-3 rounded-lg mr-2"
               >
-                <Text className="text-white text-center">No</Text>
+                <Text
+                  style={{ color: theme.textColor }}
+                  className="text-center"
+                >
+                  No
+                </Text>
               </Button>
               <Button
                 onPress={handleLogOut}
                 buttonStyle="bg-primary py-3 flex-1 rounded-lg ml-2"
               >
-                <Text className="text-black text-center">Log Out</Text>
+                <Text
+                  style={{ color: theme.tintTextColor }}
+                  className="text-center"
+                >
+                  Log Out
+                </Text>
               </Button>
             </View>
           </View>
@@ -145,9 +179,14 @@ const LogOut = () => {
 };
 
 const Socials = () => {
+  const { theme } = useTheme();
+
   return (
     <View className="mt-36">
-      <Text className="text-white text-sm opacity-70 text-center mb-4">
+      <Text
+        style={{ color: theme.mutedForegroundColor }}
+        className="text-sm text-center mb-4"
+      >
         Connect
       </Text>
       <View className="flex-row justify-center items-center space-x-8">

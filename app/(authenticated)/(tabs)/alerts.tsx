@@ -8,26 +8,25 @@ import {
 import React, { useState } from "react";
 import { useAlerts } from "@/hooks/use-alerts";
 import { supabase } from "@/utils/supabase";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function Alerts() {
   const { data: alerts, isLoading, isError } = useAlerts();
+  const { theme } = useTheme();
 
-  if (isLoading)
+  if (isLoading || isError || !alerts)
     return (
-      <View className="flex-1 bg-background">
-        <Text>Loading...</Text>
-      </View>
-    );
-  if (isError)
-    return (
-      <View className="flex-1 bg-background">
-        <Text>Error loading profile</Text>
-      </View>
-    );
-  if (!alerts)
-    return (
-      <View className="flex-1 bg-background">
-        <Text>No profile data found</Text>
+      <View
+        className="flex-1 justify-center items-center"
+        style={{ backgroundColor: theme.backgroundColor }}
+      >
+        <Text style={{ color: theme.textColor }}>
+          {isLoading
+            ? "Loading..."
+            : isError
+            ? "Error loading profile"
+            : "No profile data found"}
+        </Text>
       </View>
     );
 
@@ -52,17 +51,25 @@ export default function Alerts() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: theme.backgroundColor }}
+    >
       <View className="pt-6 px-4 mb-4">
         <View className="flex-row justify-center items-center mb-4">
-          <Text className="text-2xl font-bold text-white">Alerts</Text>
+          <Text
+            className="text-2xl font-bold"
+            style={{ color: theme.textColor }}
+          >
+            Alerts
+          </Text>
 
           {alerts.length > 0 && (
             <TouchableOpacity
               onPress={clearAllAlerts}
               className="absolute right-4 top-6"
             >
-              <Text className="text-blue-500">Clear All</Text>
+              <Text style={{ color: theme.tintColor }}>Clear All</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -73,25 +80,32 @@ export default function Alerts() {
           {alerts.map((alert) => (
             <View
               key={alert.id}
-              className="bg-neutral rounded-lg p-4 mb-4 flex-row justify-between items-center"
+              className="rounded-lg p-4 mb-4 flex-row justify-between items-center"
+              style={{ backgroundColor: theme.secondaryBackgroundColor }}
             >
-              <Text className="text-white flex-1 mr-2">
+              <Text className="flex-1 mr-2" style={{ color: theme.textColor }}>
                 {alert.is_accepted
                   ? `${alert.to} accepted your referral invite`
                   : `Your referral invite to ${alert.to} is pending`}
               </Text>
               <TouchableOpacity onPress={() => clearAlert(alert.id)}>
-                <Text className="text-white">X</Text>
+                <Text style={{ color: theme.textColor }}>X</Text>
               </TouchableOpacity>
             </View>
           ))}
         </ScrollView>
       ) : (
         <View className="flex-1 justify-center items-center">
-          <Text className="w-[300px] text-3xl font-semibold text-center text-white mb-4">
+          <Text
+            className="w-[300px] text-3xl font-semibold text-center mb-4"
+            style={{ color: theme.textColor }}
+          >
             You have no alerts
           </Text>
-          <Text className="w-[300px] text-center text-lg text-white opacity-40">
+          <Text
+            className="w-[300px] text-center text-lg"
+            style={{ color: theme.mutedForegroundColor }}
+          >
             You will be notified when someone accepts your referral invite
           </Text>
         </View>

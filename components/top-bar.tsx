@@ -22,8 +22,6 @@ export const TopBar = () => {
       <Image
         source={require("@/assets/images/icon.png")}
         className="w-10 h-10"
-        // If you want to tint the logo based on theme, uncomment the next line
-        // style={{ tintColor: theme.textColor }}
       />
 
       <Link href="/aux/refer">

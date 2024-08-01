@@ -13,7 +13,17 @@ export const FeedSelector = ({
   selectedTab,
   setSelectedTab,
 }: FeedSelectorProps) => {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
+
+  const getTextColor = (isSelected: boolean) => {
+    return isSelected ? theme.tintTextColor : theme.mutedForegroundColor;
+  };
+
+  const getBackgroundColor = (isSelected: boolean) => {
+    return isSelected
+      ? theme.tabBarActiveTintColor
+      : theme.tabBarInactiveTintColor;
+  };
 
   return (
     <View
@@ -23,30 +33,28 @@ export const FeedSelector = ({
         backgroundColor: theme.backgroundColor,
       }}
     >
-      {tabs.map((tab) => (
-        <TouchableOpacity
-          key={tab}
-          onPress={() => setSelectedTab(tab)}
-          className={`px-4 py-2 rounded-full`}
-          style={{
-            backgroundColor:
-              selectedTab === tab
-                ? theme.tintColor
-                : theme.secondaryBackgroundColor,
-          }}
-        >
-          <Text
+      {tabs.map((tab) => {
+        const isSelected = selectedTab === tab;
+        return (
+          <TouchableOpacity
+            key={tab}
+            onPress={() => setSelectedTab(tab)}
+            className={`px-4 py-2 rounded-full`}
             style={{
-              color:
-                selectedTab === tab
-                  ? theme.tintTextColor
-                  : theme.mutedForegroundColor,
+              backgroundColor: getBackgroundColor(isSelected),
             }}
           >
-            {tab}
-          </Text>
-        </TouchableOpacity>
-      ))}
+            <Text
+              style={{
+                color: getTextColor(isSelected),
+                fontWeight: isSelected ? "bold" : "normal",
+              }}
+            >
+              {tab}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };

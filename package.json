@@ -18,6 +18,7 @@
     "@biconomy/account": "^4.5.4",
     "@ethersproject/shims": "^5.7.0",
     "@privy-io/expo": "^0.22.0",
+    "@privy-io/react-auth": "^1.76.6",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "11.3.1",
     "@react-navigation/native": "^6.0.2",

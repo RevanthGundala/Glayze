@@ -17,7 +17,6 @@ import { useSearch } from "@/hooks/use-search";
 import { Input } from "@/components/ui/Input";
 import { Menu } from "@/components/menu";
 import { Route } from "@/utils/types";
-import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/ThemeContext";
 
 const SearchScreen = () => {
@@ -159,13 +158,7 @@ const SearchBar = React.forwardRef<TextInput, SearchBarProps>(
           <TouchableOpacity
             onPress={handleClear}
             className="absolute right-6 top-1/2 -translate-y-1/2"
-          >
-            <Ionicons
-              name="close-circle"
-              size={24}
-              color={theme.mutedForegroundColor}
-            />
-          </TouchableOpacity>
+          ></TouchableOpacity>
         )}
       </View>
     );

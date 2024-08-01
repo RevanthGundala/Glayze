@@ -15,8 +15,8 @@ import {
 } from "@privy-io/expo";
 import { SmartAccountProvider } from "../contexts/SmartAccountContext";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
-
-const queryClient = new QueryClient();
+import { StatusBar } from "expo-status-bar";
+import { Providers } from "@/components/providers";
 
 // const projectId = process.env.EXPO_PUBLIC_WALLET_CONNECT_ID!;
 
@@ -42,24 +42,9 @@ const queryClient = new QueryClient();
 
 export default function Layout() {
   return (
-    <PostHogProvider
-      apiKey={process.env.EXPO_PUBLIC_POSTHOG_API_KEY}
-      options={{
-        host: "https://us.i.posthog.com",
-      }}
-    >
-      <ThemeProvider>
-        <PrivyProvider appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}>
-          {/* <WagmiProvider config={config}> */}
-          <QueryClientProvider client={queryClient}>
-            <SmartAccountProvider>
-              <InitialLayout />
-            </SmartAccountProvider>
-          </QueryClientProvider>
-        </PrivyProvider>
-      </ThemeProvider>
-      {/* </WagmiProvider> */}
-    </PostHogProvider>
+    <Providers>
+      <InitialLayout />
+    </Providers>
   );
 }
 
@@ -113,6 +98,10 @@ const InitialLayout = () => {
       />
       <Stack.Screen
         name="(authenticated)/profile/my-account"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="(authenticated)/profile/appearance"
         options={{ headerShown: false }}
       />
     </Stack>

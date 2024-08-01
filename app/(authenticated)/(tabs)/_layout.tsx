@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useHomeScrollY } from "@/hooks/use-home-scroll-y";
 import { Animated } from "react-native";
 import { useTheme } from "@/contexts/ThemeContext";
+import { hexToRgba } from "@/actions/hex-to-rgba";
 
 const OPAQUE_OPACITY = 1;
 const TRANSPARENT_OPACITY = 0.3;
@@ -49,7 +50,10 @@ export default function TabLayout() {
   const animatedStyles = useMemo(() => {
     const backgroundColorInterpolation = tabBarOpacity.interpolate({
       inputRange: [TRANSPARENT_OPACITY, OPAQUE_OPACITY],
-      outputRange: ["rgba(36, 36, 36, 0.3)", "rgba(36, 36, 36, 1)"],
+      outputRange: [
+        hexToRgba(theme.backgroundColor, 0.3),
+        hexToRgba(theme.backgroundColor, 1),
+      ],
     });
 
     return {

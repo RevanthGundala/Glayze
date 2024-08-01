@@ -34,9 +34,8 @@ export default function Home() {
         <Text style={{ color: theme.textColor }}>No profile data found</Text>
       </View>
     );
-
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
       <Animated.ScrollView
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],

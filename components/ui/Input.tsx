@@ -1,6 +1,7 @@
 import React, { forwardRef, useRef, useImperativeHandle } from "react";
 import { View, TextInput, TouchableWithoutFeedback } from "react-native";
 import { Image } from "expo-image";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type InputProps = {
   placeholder: string;
@@ -22,6 +23,7 @@ export const Input = forwardRef<InputHandle, InputProps>(
     ref
   ) => {
     const inputRef = useRef<TextInput | null>(null);
+    const { theme, themeName } = useTheme();
 
     useImperativeHandle(ref, () => ({
       focus: () => inputRef.current?.focus(),
@@ -32,13 +34,24 @@ export const Input = forwardRef<InputHandle, InputProps>(
       inputRef.current?.focus();
     };
 
+    const inputBackgroundColor =
+      themeName === "dark"
+        ? theme.backgroundColor
+        : theme.secondaryBackgroundColor;
+
+    const textColor = themeName === "dark" ? "#FFFFFF" : theme.textColor;
+
     return (
       <TouchableWithoutFeedback onPress={focusInput}>
-        <View className="flex flex-row items-center bg-neutral text-white rounded-lg">
+        <View
+          className="flex flex-row items-center rounded-lg border border-gray-300"
+          style={{ backgroundColor: inputBackgroundColor }}
+        >
           {search && (
             <Image
               source={require("@/assets/images/tabs/search.png")}
-              className="w-5 h-5 opacity-50 ml-4"
+              className="w-5 h-5 ml-4"
+              style={{ opacity: 0.5, tintColor: theme.mutedForegroundColor }}
             />
           )}
           <TextInput
@@ -46,18 +59,20 @@ export const Input = forwardRef<InputHandle, InputProps>(
               inputRef.current = el;
             }}
             className={
-              search
-                ? "flex-1 text-lg bg-neutral text-white p-4 rounded-lg"
-                : "flex-1 bg-neutral text-white p-4 rounded-lg"
+              search ? "flex-1 text-lg p-4 rounded-lg" : "flex-1 p-4 rounded-lg"
             }
+            style={{
+              color: textColor,
+              backgroundColor: "transparent",
+            }}
             placeholder={placeholder}
-            placeholderTextColor="#6B7280"
+            placeholderTextColor={theme.mutedForegroundColor}
             value={value}
             onChangeText={onChangeText}
             onSubmitEditing={onSubmitEditing}
             editable={!readOnly}
             selectTextOnFocus={!readOnly}
-            selectionColor="white"
+            selectionColor={theme.textColor}
           />
         </View>
       </TouchableWithoutFeedback>
