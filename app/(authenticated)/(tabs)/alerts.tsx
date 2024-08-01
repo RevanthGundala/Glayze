@@ -9,26 +9,14 @@ import React, { useState } from "react";
 import { useAlerts } from "@/hooks/use-alerts";
 import { supabase } from "@/utils/supabase";
 import { useTheme } from "@/contexts/ThemeContext";
+import { ActivityIndicator } from "react-native";
+import { Header } from "@/components/header";
 
 export default function Alerts() {
   const { data: alerts, isLoading, isError } = useAlerts();
   const { theme } = useTheme();
 
-  if (isLoading || isError || !alerts)
-    return (
-      <View
-        className="flex-1 justify-center items-center"
-        style={{ backgroundColor: theme.backgroundColor }}
-      >
-        <Text style={{ color: theme.textColor }}>
-          {isLoading
-            ? "Loading..."
-            : isError
-            ? "Error loading profile"
-            : "No profile data found"}
-        </Text>
-      </View>
-    );
+  if (isLoading) return <ActivityIndicator />;
 
   const clearAlert = async (id: number) => {
     const { error } = await supabase
@@ -57,13 +45,6 @@ export default function Alerts() {
     >
       <View className="pt-6 px-4 mb-4">
         <View className="flex-row justify-center items-center mb-4">
-          <Text
-            className="text-2xl font-bold"
-            style={{ color: theme.textColor }}
-          >
-            Alerts
-          </Text>
-
           {alerts.length > 0 && (
             <TouchableOpacity
               onPress={clearAllAlerts}
@@ -95,7 +76,7 @@ export default function Alerts() {
           ))}
         </ScrollView>
       ) : (
-        <View className="flex-1 justify-center items-center">
+        <View className="flex-1 items-center">
           <Text
             className="w-[300px] text-3xl font-semibold text-center mb-4"
             style={{ color: theme.textColor }}

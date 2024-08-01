@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useTheme } from "@/contexts/ThemeContext";
+import { colors } from "@/utils/theme";
 
 type FeedSelectorProps = {
   tabs: string[];
@@ -13,11 +14,7 @@ export const FeedSelector = ({
   selectedTab,
   setSelectedTab,
 }: FeedSelectorProps) => {
-  const { theme, themeName } = useTheme();
-
-  const getTextColor = (isSelected: boolean) => {
-    return isSelected ? theme.tintTextColor : theme.mutedForegroundColor;
-  };
+  const { theme } = useTheme();
 
   const getBackgroundColor = (isSelected: boolean) => {
     return isSelected
@@ -46,8 +43,8 @@ export const FeedSelector = ({
           >
             <Text
               style={{
-                color: getTextColor(isSelected),
-                fontWeight: isSelected ? "bold" : "normal",
+                color: colors.white,
+                fontWeight: "bold",
               }}
             >
               {tab}

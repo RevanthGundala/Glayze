@@ -34,24 +34,17 @@ export const Input = forwardRef<InputHandle, InputProps>(
       inputRef.current?.focus();
     };
 
-    const inputBackgroundColor =
-      themeName === "dark"
-        ? theme.backgroundColor
-        : theme.secondaryBackgroundColor;
-
-    const textColor = themeName === "dark" ? "#FFFFFF" : theme.textColor;
-
     return (
       <TouchableWithoutFeedback onPress={focusInput}>
         <View
           className="flex flex-row items-center rounded-lg border border-gray-300"
-          style={{ backgroundColor: inputBackgroundColor }}
+          style={{ backgroundColor: theme.backgroundColor }}
         >
           {search && (
             <Image
               source={require("@/assets/images/tabs/search.png")}
-              className="w-5 h-5 ml-4"
-              style={{ opacity: 0.5, tintColor: theme.mutedForegroundColor }}
+              className="w-5 h-5 ml-4 mt-1"
+              style={{ opacity: 0.5, tintColor: theme.textColor }}
             />
           )}
           <TextInput
@@ -62,7 +55,7 @@ export const Input = forwardRef<InputHandle, InputProps>(
               search ? "flex-1 text-lg p-4 rounded-lg" : "flex-1 p-4 rounded-lg"
             }
             style={{
-              color: textColor,
+              color: theme.textColor,
               backgroundColor: "transparent",
             }}
             placeholder={placeholder}

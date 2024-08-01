@@ -6,6 +6,7 @@ import { EmbeddedTweet } from "./twitter-theme/embedded-tweet";
 import { useEmbeddedTweet } from "@/hooks";
 import { Post } from "@/utils/types";
 import { useTheme } from "@/contexts/ThemeContext";
+import { colors } from "@/utils/theme";
 
 type PostComponentProps = {
   post: Post;
@@ -29,7 +30,7 @@ export const PostComponent = ({ post }: PostComponentProps) => {
       <Link href={`/post/${id}`} asChild>
         <TouchableWithoutFeedback>
           <View className="p-4">
-            <View className="flex-row justify-between items-center mb-2">
+            <View className="flex-row justify-between items-center">
               <View className="flex-row items-center flex-1">
                 <Image
                   source={{ uri: post.contract_creator || "" }}
@@ -38,13 +39,13 @@ export const PostComponent = ({ post }: PostComponentProps) => {
                 <View className="ml-2 flex-1">
                   <View className="flex-row justify-between items-center">
                     <Text
-                      className="font-medium"
+                      className="font-semibold"
                       style={{ color: theme.textColor }}
                     >
                       {post.contract_creator_username || "Unknown"}
                     </Text>
                     <Text
-                      className="text-lg"
+                      className="text-lg font-semibold"
                       style={{ color: theme.textColor }}
                     >
                       ${post.symbol || "N/A"}
@@ -66,14 +67,14 @@ export const PostComponent = ({ post }: PostComponentProps) => {
       </Link>
 
       {tweet && (
-        <View className="p-4">
+        <View className="px-3">
           <EmbeddedTweet tweet={tweet} />
         </View>
       )}
 
       <Link href={`/post/${id}`} asChild>
         <TouchableWithoutFeedback>
-          <View className="p-4">
+          <View className="px-4 pb-4">
             <View className="flex-row justify-between items-center mt-2">
               <Text
                 className="text-xl font-bold"
@@ -88,8 +89,8 @@ export const PostComponent = ({ post }: PostComponentProps) => {
                     color:
                       oneHour?.price_change != null &&
                       oneHour?.price_change >= 0
-                        ? theme.tintColor
-                        : "red",
+                        ? colors.greenTintColor
+                        : colors.redTintColor,
                   }}
                 >
                   1H:{" "}
@@ -102,8 +103,8 @@ export const PostComponent = ({ post }: PostComponentProps) => {
                   style={{
                     color:
                       oneDay?.price_change != null && oneDay?.price_change >= 0
-                        ? theme.tintColor
-                        : "red",
+                        ? colors.greenTintColor
+                        : colors.redTintColor,
                   }}
                 >
                   24H:{" "}

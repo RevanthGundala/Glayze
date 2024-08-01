@@ -8,8 +8,12 @@ let usePrivy: any = null;
 if (Platform.OS === "web") {
   // TODO:
   // privyModule = require("@privy-io/react-auth");
-  // Assign other exports
+  privyModule = {
+    PrivyProvider: ({ children }: { children: React.ReactNode }) => children,
+    usePrivy: () => ({}),
+  };
 } else {
+  console.log("Using Privy Mobile");
   privyModule = require("@privy-io/expo");
 }
 

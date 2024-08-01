@@ -5,6 +5,8 @@ const colors = {
   lightWhite: "rgba(255, 255, 255, .5)",
   blueTintColor: "#0281ff",
   lightPink: "#F7B5CD",
+  redTintColor: "#EA3943",
+  greenTintColor: "#16c784",
 };
 
 const fonts = {
@@ -32,7 +34,7 @@ const lightTheme = {
   borderColor: "rgba(0, 0, 0, .15)",
   tintColor: "#0281ff",
   tintTextColor: colors.white,
-  tabBarActiveTintColor: colors.black,
+  tabBarActiveTintColor: colors.blueTintColor,
   tabBarInactiveTintColor: colors.gray,
 };
 
@@ -54,4 +56,4 @@ const darkTheme = {
   tabBarInactiveTintColor: colors.lightWhite,
 };
 
-export { lightTheme, darkTheme };
+export { lightTheme, darkTheme, colors };

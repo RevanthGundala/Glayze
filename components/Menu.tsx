@@ -2,6 +2,7 @@ import { View, Text } from "react-native";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { Route } from "../utils/types";
+import { useTheme } from "@/contexts/ThemeContext";
 
 type MenuProps = {
   routes: Route[];
@@ -9,6 +10,24 @@ type MenuProps = {
 };
 
 export const Menu = ({ routes, search }: MenuProps) => {
+  const { themeName, theme } = useTheme();
+
+  const getIcon = () => {
+    if (search) {
+      if (themeName === "dark") {
+        return require("@/assets/images/search-arrow.png");
+      } else {
+        return require("@/assets/images/search-arrow-dark.png");
+      }
+    } else {
+      if (themeName === "dark") {
+        return require("@/assets/images/forward-arrow.png");
+      } else {
+        return require("@/assets/images/forward-arrow-dark.png");
+      }
+    }
+  };
+
   return (
     <View
       className={search ? "w-full px-6 space-y-2" : "w-full space-y-4 px-6"}
@@ -19,18 +38,11 @@ export const Menu = ({ routes, search }: MenuProps) => {
           className="flex-row justify-between items-center w-full py-2"
         >
           <Link href={route.href} className="flex-1">
-            <Text className={"text-white text-lg opacity-80"}>
+            <Text className={"text-lg"} style={{ color: theme.textColor }}>
               {route.name}
             </Text>
           </Link>
-          <Image
-            source={
-              search
-                ? require("@/assets/images/search-arrow.png")
-                : require("@/assets/images/forward-arrow.png")
-            }
-            className="w-4 h-4"
-          />
+          <Image source={getIcon()} className="w-4 h-4" />
         </View>
       ))}
     </View>

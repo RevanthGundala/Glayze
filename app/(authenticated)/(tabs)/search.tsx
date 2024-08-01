@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/Input";
 import { Menu } from "@/components/menu";
 import { Route } from "@/utils/types";
 import { useTheme } from "@/contexts/ThemeContext";
+import { ActivityIndicator } from "react-native";
+import { Header } from "@/components/header";
 
 const SearchScreen = () => {
   const router = useRouter();
@@ -52,16 +54,7 @@ const SearchScreen = () => {
     }
   }, [searchText]);
 
-  if (isLoading) {
-    return (
-      <View
-        className="flex-1"
-        style={{ backgroundColor: theme.backgroundColor }}
-      >
-        <Text style={{ color: theme.textColor }}>Loading...</Text>
-      </View>
-    );
-  }
+  if (isLoading) return <ActivityIndicator />;
 
   if (isError) {
     return (

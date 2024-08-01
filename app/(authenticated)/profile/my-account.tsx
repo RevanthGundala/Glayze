@@ -8,9 +8,12 @@ import { Image } from "expo-image";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { Header } from "@/components/header";
+import { SubHeader } from "@/components/sub-header";
+import { colors } from "@/utils/theme";
 
 export default function MyAccount() {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
   const address = "0x1234567890123456789012345678901234567890";
 
   const handlePress = () => {
@@ -19,15 +22,12 @@ export default function MyAccount() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
-      <BackArrow />
-      <View className="px-8 pt-4 space-y-4">
+      <View className="flex flex-row">
+        <Header backArrow />
+      </View>
+      <View className="px-8 pt-4 space-y-8">
         <View className="space-y-2">
-          <Text
-            style={{ color: theme.textColor }}
-            className="text-2xl font-bold"
-          >
-            Your Wallet
-          </Text>
+          <SubHeader title="Your Wallet" />
           <Text
             style={{ color: theme.mutedForegroundColor }}
             className="text-base font-light"
@@ -35,44 +35,33 @@ export default function MyAccount() {
             Tokens are held in an embedded self-custody crypto wallet. You will
             be able export your keys in the future.
           </Text>
-        </View>
-        <View className="space-y-2">
-          <View className="flex flex-row items-center space-x-2 py-2">
-            <Image
-              source={require("@/assets/images/eth.png")}
-              className="w-6 h-6"
-            />
-            <Text
-              style={{ color: theme.textColor }}
-              className="text-lg font-bold"
-            >
-              Ethereum
-            </Text>
+          <View className="space-y-2">
+            <View className="flex flex-row items-center space-x-2 py-2">
+              <Image
+                source={
+                  themeName === "dark"
+                    ? require("@/assets/images/eth.png")
+                    : require("@/assets/images/eth-dark.png")
+                }
+                className="w-6 h-6"
+              />
+              <Text
+                style={{ color: theme.textColor }}
+                className="text-lg font-bold"
+              >
+                Ethereum
+              </Text>
+            </View>
+            <Input placeholder={address} readOnly />
           </View>
-          <Input placeholder={address} readOnly />
-          <Button
-            buttonStyle="bg-primary w-full rounded-lg my-4"
-            onPress={handlePress}
-          >
-            <Text
-              style={{ color: theme.tintTextColor }}
-              className="text-center py-4"
-            >
-              Send USDC on Base
-            </Text>
-          </Button>
         </View>
-        <Text style={{ color: theme.textColor }} className="text-2xl font-bold">
-          Connected Accounts
-        </Text>
-        <Unlink />
+
         <View>
-          <Text
-            style={{ color: theme.textColor }}
-            className="text-2xl font-bold py-4"
-          >
-            Delete Account
-          </Text>
+          <SubHeader title="Connected Accounts" />
+          <Unlink />
+        </View>
+        <View>
+          <SubHeader title="Delete Account" />
           <DeleteAccount />
         </View>
       </View>
@@ -81,27 +70,27 @@ export default function MyAccount() {
 }
 
 const Unlink = () => {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
-  const router = useRouter();
 
   const handleLogOut = () => {
     setModalVisible(false);
   };
 
   return (
-    <View className="w-full pt-4">
+    <View className="w-full pt-2">
       <View className="flex-row justify-between items-center w-full py-2">
         <Pressable className="flex-1" onPress={() => setModalVisible(true)}>
-          <Text
-            style={{ color: theme.mutedForegroundColor }}
-            className="text-lg"
-          >
+          <Text style={{ color: theme.textColor }} className="text-lg">
             Unlink X
           </Text>
         </Pressable>
         <Image
-          source={require("@/assets/images/forward-arrow.png")}
+          source={
+            themeName === "dark"
+              ? require("@/assets/images/forward-arrow-dark.png")
+              : require("@/assets/images/forward-arrow-dark.png")
+          }
           className="w-4 h-4"
         />
       </View>
@@ -129,7 +118,8 @@ const Unlink = () => {
             <View className="flex-row justify-between">
               <Button
                 onPress={() => setModalVisible(false)}
-                buttonStyle="bg-neutral flex-1 py-3 rounded-lg mr-2"
+                buttonStyle="flex-1 py-3 rounded-lg mr-2"
+                style={{ backgroundColor: theme.tabBarInactiveTintColor }}
               >
                 <Text
                   style={{ color: theme.textColor }}
@@ -140,7 +130,8 @@ const Unlink = () => {
               </Button>
               <Button
                 onPress={handleLogOut}
-                buttonStyle="bg-primary py-3 flex-1 rounded-lg ml-2"
+                buttonStyle="py-3 flex-1 rounded-lg ml-2"
+                style={{ backgroundColor: theme.tabBarActiveTintColor }}
               >
                 <Text
                   style={{ color: theme.tintTextColor }}
@@ -167,7 +158,7 @@ const DeleteAccount = () => {
     router.push("/");
   };
   return (
-    <View>
+    <View className="w-full pt-4">
       <Pressable
         onPress={() => setModalVisible(true)}
         className="flex-row items-center space-x-2"
@@ -176,7 +167,7 @@ const DeleteAccount = () => {
           source={require("@/assets/images/trash.png")}
           className="w-5 h-5"
         />
-        <Text style={{ color: theme.tintColor }} className="text-lg">
+        <Text style={{ color: colors.redTintColor }} className="text-lg">
           Delete Account
         </Text>
       </Pressable>
@@ -210,7 +201,8 @@ const DeleteAccount = () => {
             <View className="flex-row justify-between">
               <Button
                 onPress={() => setModalVisible(false)}
-                buttonStyle="bg-neutral flex-1 py-3 rounded-lg mr-2"
+                buttonStyle="flex-1 py-3 rounded-lg mr-2"
+                style={{ backgroundColor: theme.tabBarInactiveTintColor }}
               >
                 <Text
                   style={{ color: theme.textColor }}
@@ -221,7 +213,8 @@ const DeleteAccount = () => {
               </Button>
               <Button
                 onPress={handleDelete}
-                buttonStyle="bg-red-400 py-3 flex-1 rounded-lg ml-2"
+                buttonStyle="py-3 flex-1 rounded-lg ml-2"
+                style={{ backgroundColor: colors.redTintColor }}
               >
                 <Text
                   style={{ color: theme.textColor }}

@@ -5,6 +5,9 @@ import SpaceMono from "@/assets/fonts/SpaceMono-Regular.ttf";
 import type { SharedValue } from "react-native-reanimated";
 import React, { useEffect, useRef, useState } from "react";
 import { Time } from "@/utils/types";
+import { Image } from "expo-image";
+import { colors } from "@/utils/theme";
+import { useTheme } from "../contexts/ThemeContext";
 
 type GraphProps = {
   price: number;
@@ -27,14 +30,32 @@ export const Graph = ({
 
   return (
     <View>
-      <Text className="text-white text-3xl font-bold px-12 py-2">
-        ${price} {symbol}
-      </Text>
-      {change > 0 ? (
-        <Text className="text-green-500 text-lg px-12">{change}%</Text>
-      ) : (
-        <Text className="text-red-500 text-sm px-12">{change}%</Text>
-      )}
+      <View className="px-10">
+        <Text className="text-white text-3xl font-bold py-2">
+          ${price} {symbol}
+        </Text>
+        {change >= 0 ? (
+          <View className="flex flex-row items-center space-x-1">
+            <Image
+              source={require("@/assets/images/up-arrow.png")}
+              className="w-4 h-4"
+            />
+            <Text className="text-lg" style={{ color: colors.greenTintColor }}>
+              {change}%
+            </Text>
+          </View>
+        ) : (
+          <View className="flex flex-row items-center space-x-1">
+            <Image
+              source={require("@/assets/images/down-arrow.png")}
+              className="w-4 h-4"
+            />
+            <Text className="text-lg" style={{ color: colors.redTintColor }}>
+              {change}%
+            </Text>
+          </View>
+        )}
+      </View>
       <View style={{ height: 300, padding: 12 }}>
         <CartesianChart
           data={DATA}
@@ -60,7 +81,9 @@ export const Graph = ({
             <>
               <Line
                 points={points.price}
-                color={change > 0 ? "green" : "red"}
+                color={
+                  change >= 0 ? colors.greenTintColor : colors.redTintColor
+                }
                 strokeWidth={3}
               />
               {isActive && (
@@ -88,7 +111,8 @@ export const Graph = ({
 };
 
 function ToolTip({ x, y }: { x: SharedValue<number>; y: SharedValue<number> }) {
-  return <Circle cx={x} cy={y} r={8} color="black" />;
+  const { theme } = useTheme();
+  return <Circle cx={x} cy={y} r={8} color={theme.textColor} />;
 }
 
 const DATA = Array.from({ length: 31 }, (_, i) => ({

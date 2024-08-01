@@ -5,6 +5,7 @@ import {
   View,
   ImageSourcePropType,
   ScrollView,
+  ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { BackArrow } from "@/components/ui/BackArrow";
@@ -16,9 +17,10 @@ import { usePost } from "@/hooks/use-post";
 import { usePostPrices } from "@/hooks/use-post-prices";
 import { Time } from "@/utils/types";
 import { usePosition } from "@/hooks/use-position";
+import { useTheme } from "@/contexts/ThemeContext";
+import { lightTheme, colors } from "@/utils/theme";
 
 export default function Post() {
-  const address = "0x1234567890";
   const { id } = useLocalSearchParams();
   const { data: post, isLoading, isError } = usePost(id);
   const [selectedTime, setSelectedTime] = useState<Time>("1H");
@@ -26,17 +28,21 @@ export default function Post() {
     parseInt(id as string),
     selectedTime
   );
-  const { data: position } = usePosition(post, address);
+  const { data: position } = usePosition(post, "0x1234567890");
+  const { theme } = useTheme();
 
   if (isLoading) {
-    return <Text>Loading...</Text>;
+    return <ActivityIndicator />;
   }
   if (isError || !post) {
     return <Text>Error loading post</Text>;
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: theme.backgroundColor }}
+    >
       <View className="flex flex-row justify-between items-center w-full">
         <BackArrow />
         <View className="px-6 py-4">
@@ -75,7 +81,7 @@ export default function Post() {
           createdAt={new Date(post.created_at)}
         />
       </ScrollView>
-      <BuySellButtons />
+      <BuySellButtons theme={theme} />
     </SafeAreaView>
   );
 }
@@ -133,14 +139,26 @@ const Position = ({
 
       <View className="flex-row justify-between mt-4">
         <Text className="text-gray-400 text-sm">Today's return</Text>
-        <Text className="text-green-500 text-lg">
+        <Text
+          className="text-lg"
+          style={{
+            color:
+              todaysReturn >= 0 ? colors.greenTintColor : colors.redTintColor,
+          }}
+        >
           +${todaysReturn}(+{todaysReturnPercent}%)
         </Text>
       </View>
 
       <View className="flex-row justify-between">
         <Text className="text-gray-400 text-sm">Total return</Text>
-        <Text className="text-green-500 text-lg">
+        <Text
+          className="text-lg"
+          style={{
+            color:
+              totalReturn >= 0 ? colors.greenTintColor : colors.redTintColor,
+          }}
+        >
           +${totalReturn}({totalReturnPercent}%)
         </Text>
       </View>
@@ -160,16 +178,9 @@ type StatsProps = {
   marketCap: number;
   volume: number;
   allTimeHigh: number;
-  // allTimeLow: number;
   createdAt: Date;
 };
-const Stats = ({
-  marketCap,
-  volume,
-  allTimeHigh,
-  // allTimeLow,
-  createdAt,
-}: StatsProps) => {
+const Stats = ({ marketCap, volume, allTimeHigh, createdAt }: StatsProps) => {
   type Stat = {
     title: string;
     imageKey: string;
@@ -191,11 +202,6 @@ const Stats = ({
       imageKey: "all-time-high",
       value: allTimeHigh,
     },
-    // {
-    //   title: "All Time Low",
-    //   imageKey: "all-time-low",
-    //   value: allTimeLow,
-    // },
     {
       title: "Created At",
       imageKey: "created-at",
@@ -222,7 +228,7 @@ const Stats = ({
   );
 };
 
-const BuySellButtons = () => {
+const BuySellButtons = ({ theme }: { theme: typeof lightTheme }) => {
   const router = useRouter();
   return (
     <BlurView
@@ -230,18 +236,20 @@ const BuySellButtons = () => {
       tint="dark"
       className="absolute bottom-0 left-0 right-0"
     >
-      <View className="flex-row justify-between p-4 mb-4">
+      <View className="flex-row justify-between p-4 mb-4 space-x-2">
         <Button
-          buttonStyle="flex-1 mr-2 bg-white rounded-lg py-3"
+          buttonStyle={`flex-1 rounded-lg`}
+          style={{ backgroundColor: theme.mutedForegroundColor }}
           onPress={() => router.navigate("(authenticated)/post/sell")}
         >
-          <Text className="text-black text-center font-medium">Sell</Text>
+          <Text className={`text-center font-medium py-4`}>Sell</Text>
         </Button>
         <Button
-          buttonStyle="flex-1 ml-2 bg-primary rounded-lg py-3"
+          buttonStyle={`flex-1 rounded-lg`}
+          style={{ backgroundColor: theme.tintColor }}
           onPress={() => router.navigate("(authenticated)/post/buy")}
         >
-          <Text className="text-black text-center font-medium">Buy</Text>
+          <Text className={`text-center font-medium py-4`}>Buy</Text>
         </Button>
       </View>
     </BlurView>

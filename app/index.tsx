@@ -1,10 +1,22 @@
-import React from "react";
-import { Text, SafeAreaView, View, TextInput } from "react-native";
+import React, { useEffect } from "react";
+import { Text, SafeAreaView, View, TextInput, Platform } from "react-native";
 import { Image } from "expo-image";
 import { ProgressBar } from "@/components/ui/ProgressBar";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "expo-router";
 import { useLoginWithPasskey } from "@privy-io/expo/passkey";
+import * as LocalAuthentication from "expo-local-authentication";
+import * as Linking from "expo-linking";
+import * as Notifications from "expo-notifications";
+import { authenticate } from "@/actions/authenticate";
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function Index() {
   const router = useRouter();
@@ -22,10 +34,64 @@ export default function Index() {
       console.log("Error logging in", error);
     },
   });
+  const handleLoginWithPasskey = async () => {
+    const authenticationTypes =
+      await LocalAuthentication.supportedAuthenticationTypesAsync();
+    console.log("Tupes: ", authenticationTypes);
+    const hasBiometrics = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!hasBiometrics || !isEnrolled) {
+      console.log("Biometrics not properly set up");
+
+      // Schedule a notification instead of showing an alert
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Biometric Setup Required",
+          body: "Please set up biometrics in your device settings to use passkey login.",
+          data: { openSettings: true },
+        },
+        trigger: null, // null means the notification will show immediately
+      });
+
+      return;
+    }
+
+    try {
+      const authResult = await authenticate();
+      if (authResult) {
+        console.log("Authentication successful");
+        await loginWithPasskey({
+          relyingParty: "https://glayze.app",
+        });
+      } else {
+        console.log("Authentication failed");
+        // Handle failed authentication
+      }
+    } catch (error) {
+      console.log("Error during authentication or login", error);
+      // Handle the error
+    }
+  };
+
+  // Set up a notification response handler (do this once in your app's setup)
+  Notifications.addNotificationResponseReceivedListener((response) => {
+    if (response.notification.request.content.data.openSettings) {
+      Linking.openSettings();
+    }
+  });
+
+  if (Platform.OS === "web") {
+    console.log("Web");
+  }
+
   return (
     <SafeAreaView className="flex-1">
       {/* <View className="pt-6">
-      <Image source={require("@/assets/images/iphone.png")} className="w-full h-full" />
+        <Image
+          source={require("@/assets/images/iphone.png")}
+          className="w-full h-full"
+        />
       </View> */}
 
       <View className="space-y-2">
@@ -48,11 +114,8 @@ export default function Index() {
         </Button>
         <Button
           // Keeps button disabled until the code has been sent
-          onPress={() =>
-            loginWithPasskey({
-              relyingParty: "https://glayze.app",
-            })
-          }
+          style={{ backgroundColor: "red" }}
+          onPress={handleLoginWithPasskey}
         >
           <Text>Login with passkey</Text>
         </Button>

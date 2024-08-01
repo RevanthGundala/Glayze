@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BackArrow } from "@/components/ui/BackArrow";
 import { Image } from "expo-image";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { Header } from "@/components/header";
 
 export default function Appearance() {
   const { theme, setTheme, themeName } = useTheme();
@@ -15,7 +15,9 @@ export default function Appearance() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
-      <BackArrow />
+      <View className="flex flex-row">
+        <Header backArrow />
+      </View>
       <View className="px-8 pt-4 space-y-4">
         <Text style={{ color: theme.textColor }} className="text-2xl font-bold">
           Appearance

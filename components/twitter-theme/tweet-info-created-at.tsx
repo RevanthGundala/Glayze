@@ -2,18 +2,22 @@ import React from "react";
 import { TouchableOpacity, Text, Linking } from "react-native";
 import type { EnrichedTweet } from "react-tweet";
 import { formatDate } from "./utils";
+import { useTheme } from "@/contexts/ThemeContext"; // Adjust this import path as needed
 
 export const TweetInfoCreatedAt = ({ tweet }: { tweet: EnrichedTweet }) => {
+  const { theme } = useTheme();
   const createdAt = new Date(tweet.created_at);
   const formattedCreatedAtDate = formatDate(createdAt);
 
   return (
     <TouchableOpacity
-      className="text-inherit text-xs leading-4"
+      className="text-xs leading-4"
       onPress={() => Linking.openURL(tweet.url)}
       accessibilityLabel={formattedCreatedAtDate}
     >
-      <Text className="text-inherit">{formattedCreatedAtDate}</Text>
+      <Text style={{ color: theme.mutedForegroundColor }}>
+        {formattedCreatedAtDate}
+      </Text>
     </TouchableOpacity>
   );
 };

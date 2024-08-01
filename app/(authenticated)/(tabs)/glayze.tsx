@@ -19,6 +19,8 @@ import { ScrollView } from "react-native";
 import { authenticate } from "@/actions/authenticate";
 import { Button } from "@/components/ui/Button";
 import { useTheme } from "@/contexts/ThemeContext";
+import { DEPLOYMENT_FEE } from "@/utils/constants";
+import { Header } from "@/components/header";
 
 export default function Glayze() {
   const { isLoading, smartAccount } = useSmartAccount();
@@ -28,7 +30,6 @@ export default function Glayze() {
   const router = useRouter();
   const { theme } = useTheme();
 
-  const [deployment, setDeployment] = useState(0);
   const [fee, setFee] = useState(0);
   const [total, setTotal] = useState(0);
 
@@ -68,12 +69,7 @@ export default function Glayze() {
             contentContainerStyle={{ flexGrow: 1 }}
             className="px-6 py-2"
           >
-            <Text
-              className="font-semibold text-2xl text-center"
-              style={{ color: theme.textColor }}
-            >
-              Ready to Glayze?
-            </Text>
+            <Header title="Ready to Glayze?" />
             <View className="space-y-6 mt-8">
               <View>
                 <Text className="text-lg" style={{ color: theme.textColor }}>
@@ -116,7 +112,7 @@ export default function Glayze() {
                 }}
               />
             </View>
-            <PaymentDetails deployment={deployment} fee={fee} total={total} />
+            <PaymentDetails fee={fee} total={total} />
             <Button
               buttonStyle="w-full rounded-lg my-4"
               style={{ backgroundColor: theme.tintColor }}
@@ -137,12 +133,11 @@ export default function Glayze() {
 }
 
 type PaymentDetailsProps = {
-  deployment: number;
   fee: number;
   total: number;
 };
 
-const PaymentDetails = ({ deployment, fee, total }: PaymentDetailsProps) => {
+const PaymentDetails = ({ fee, total }: PaymentDetailsProps) => {
   const { theme } = useTheme();
   return (
     <View className="mt-8 space-y-4">
@@ -151,7 +146,7 @@ const PaymentDetails = ({ deployment, fee, total }: PaymentDetailsProps) => {
       </Text>
       <View className="flex-row justify-between items-center">
         <Text style={{ color: theme.mutedForegroundColor }}>Deployment</Text>
-        <Text style={{ color: theme.textColor }}>${deployment}</Text>
+        <Text style={{ color: theme.textColor }}>${DEPLOYMENT_FEE}</Text>
       </View>
       <View className="flex-row justify-between items-center">
         <Text style={{ color: theme.mutedForegroundColor }}>Fee</Text>

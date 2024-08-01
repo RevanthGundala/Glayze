@@ -53,7 +53,7 @@ const InitialLayout = () => {
   const wallet = useEmbeddedWallet();
   const router = useRouter();
   useEffect(() => {
-    router.replace("/(authenticated)/home");
+    // router.replace("/(authenticated)/home");
     // if (!isReady) return;
     // if (isConnected(wallet)) {
     //   router.replace("/(authenticated)/home");

@@ -1,4 +1,11 @@
-import { View, Text, Modal, TouchableOpacity, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
@@ -14,17 +21,13 @@ import {
   GLAYZE_DISCORD,
   GLAYZE_PRIVACY_POLICY,
 } from "@/utils/constants";
+import { Header } from "@/components/header";
 
 export default function Profile() {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
   const { data, isLoading, isError } = useProfile();
 
-  if (isLoading)
-    return (
-      <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
-        <Text style={{ color: theme.textColor }}>Loading...</Text>
-      </View>
-    );
+  if (isLoading) return <ActivityIndicator />;
   if (isError)
     return (
       <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
@@ -84,7 +87,11 @@ export default function Profile() {
               className="mt-2 hover:pointer-cursor"
             >
               <Image
-                source={require("@/assets/images/x.png")}
+                source={
+                  themeName === "dark"
+                    ? require("@/assets/images/x.png")
+                    : require("@/assets/images/x-dark.png")
+                }
                 className="w-6 h-6"
               />
             </Link>
@@ -99,7 +106,7 @@ export default function Profile() {
 }
 
 const LogOut = () => {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
   const { logout } = usePrivy();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
@@ -114,15 +121,16 @@ const LogOut = () => {
     <View className="w-full pt-4 px-6">
       <View className="flex-row justify-between items-center w-full py-2">
         <Pressable className="flex-1" onPress={() => setModalVisible(true)}>
-          <Text
-            style={{ color: theme.mutedForegroundColor }}
-            className="text-lg"
-          >
+          <Text style={{ color: theme.textColor }} className="text-lg">
             Log Out
           </Text>
         </Pressable>
         <Image
-          source={require("@/assets/images/forward-arrow.png")}
+          source={
+            themeName === "dark"
+              ? require("@/assets/images/forward-arrow.png")
+              : require("@/assets/images/forward-arrow-dark.png")
+          }
           className="w-4 h-4"
         />
       </View>
@@ -150,7 +158,8 @@ const LogOut = () => {
             <View className="flex-row justify-between">
               <Button
                 onPress={() => setModalVisible(false)}
-                buttonStyle="bg-neutral flex-1 py-3 rounded-lg mr-2"
+                buttonStyle="flex-1 py-3 rounded-lg mr-2"
+                style={{ backgroundColor: theme.tabBarInactiveTintColor }}
               >
                 <Text
                   style={{ color: theme.textColor }}
@@ -161,7 +170,8 @@ const LogOut = () => {
               </Button>
               <Button
                 onPress={handleLogOut}
-                buttonStyle="bg-primary py-3 flex-1 rounded-lg ml-2"
+                buttonStyle="py-3 flex-1 rounded-lg ml-2"
+                style={{ backgroundColor: theme.tabBarActiveTintColor }}
               >
                 <Text
                   style={{ color: theme.tintTextColor }}
@@ -179,27 +189,32 @@ const LogOut = () => {
 };
 
 const Socials = () => {
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
 
   return (
-    <View className="mt-36">
-      <Text
-        style={{ color: theme.mutedForegroundColor }}
-        className="text-sm text-center mb-4"
-      >
+    <View className="mt-16">
+      <Text style={{ color: theme.textColor }} className="text-center mb-4">
         Connect
       </Text>
       <View className="flex-row justify-center items-center space-x-8">
         <Link href={GLAYZE_TWITTER} className="hover:pointer-cursor">
           <Image
-            source={require("@/assets/images/socials/twitter.png")}
-            className="w-6 h-6 opacity-70"
+            source={
+              themeName === "dark"
+                ? require("@/assets/images/socials/twitter.png")
+                : require("@/assets/images/socials/twitter-dark.png")
+            }
+            className="w-6 h-6"
           />
         </Link>
         <Link href={GLAYZE_DISCORD} className="hover:pointer-cursor">
           <Image
-            source={require("@/assets/images/socials/discord.png")}
-            className="w-8 h-8 opacity-70"
+            source={
+              themeName === "dark"
+                ? require("@/assets/images/socials/discord.png")
+                : require("@/assets/images/socials/discord-dark.png")
+            }
+            className="w-8 h-8"
           />
         </Link>
       </View>

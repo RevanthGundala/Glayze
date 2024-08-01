@@ -1,16 +1,26 @@
 import React from "react";
 import { View, Image } from "react-native";
 import { Link } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export const BackArrow = () => {
+  const { themeName } = useTheme();
   return (
-    <View className="px-6 py-4">
-      <Link href="../">
-        <Image
-          source={require("@/assets/images/back.png")}
-          className="w-4 h-4 opacity-80"
-        />
-      </Link>
-    </View>
+    <Link href="../">
+      <View className="p-2">
+        {/* Increased padding around the image */}
+        {themeName === "dark" ? (
+          <Image
+            source={require("@/assets/images/back.png")}
+            className="w-4 h-4"
+          />
+        ) : (
+          <Image
+            source={require("@/assets/images/back-dark.png")}
+            className="w-4 h-4"
+          />
+        )}
+      </View>
+    </Link>
   );
 };
