@@ -3,8 +3,8 @@ import { supabase } from "@/utils/supabase";
 import { User } from "@/utils/types";
 import { usePrivy } from "@/utils/privy";
 
-const fetchUser = async (address: string) => {
-  console.log("Fetching user");
+const fetchUser = async (address: string | null) => {
+  if (!address) return null;
   const { data, error } = await supabase
     .from("Users")
     .select("*")
@@ -18,7 +18,7 @@ export const useProfile = () => {
   const { user } = usePrivy();
 
   return useQuery<User | null, Error>({
-    queryKey: ["user", user.wallet.address],
-    queryFn: () => fetchUser(user.wallet.address),
+    queryKey: ["user", user?.wallet.address],
+    queryFn: () => fetchUser(user?.wallet.address),
   });
 };

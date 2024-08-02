@@ -12,7 +12,7 @@ import { Link, useRouter } from "expo-router";
 import { Route } from "../../../utils/types";
 import { Menu } from "@/components/menu";
 import { useState } from "react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/use-profile";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { usePrivy } from "@/utils/privy";

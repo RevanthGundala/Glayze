@@ -1,4 +1,5 @@
 import { Database } from "@/types/supabase";
+import type { User as PrivyExpoUser } from "@privy-io/expo";
 
 type Tables = Database["public"]["Tables"];
 export type Post = Tables["Posts"]["Row"];
@@ -26,3 +27,5 @@ export type Route = {
 };
 
 export type Time = "1H" | "1D" | "1W" | "1M" | "ALL";
+
+export type PrivyUser = PrivyExpoUser;

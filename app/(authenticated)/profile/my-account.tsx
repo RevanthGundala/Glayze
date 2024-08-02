@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, Modal, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BackArrow } from "@/components/ui/BackArrow";
-import { Input } from "@/components/ui/Input";
+import { BackArrow } from "@/components/ui/back-arrow";
+import { Input } from "@/components/ui/input";
 import { Menu } from "@/components/menu";
 import { Image } from "expo-image";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { useTheme } from "../../../contexts/ThemeContext";
 import { Header } from "@/components/header";

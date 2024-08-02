@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, SafeAreaView } from "react-native";
-import { Input } from "@/components/ui/Input";
-import { BackArrow } from "@/components/ui/BackArrow";
-import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/input";
+import { BackArrow } from "@/components/ui/back-arrow";
+import { Button } from "@/components/ui/button";
 
 export default function Wallet() {
   const address = "0x1234567890"; // TODO: Fetch from API

@@ -1,7 +1,7 @@
 import { SafeAreaView, View, Text } from "react-native";
-import { ProgressBar } from "@/components/ui/ProgressBar";
-import { BackArrow } from "@/components/ui/BackArrow";
-import { Button } from "@/components/ui/Button";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { BackArrow } from "@/components/ui/back-arrow";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { Link } from "expo-router";
 import { useLinkWithOAuth } from "@privy-io/expo";

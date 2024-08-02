@@ -1,5 +1,5 @@
-import { BackArrow } from "@/components/ui/BackArrow";
-import { Button } from "@/components/ui/Button";
+import { BackArrow } from "@/components/ui/back-arrow";
+import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import { Text, SafeAreaView, View, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";

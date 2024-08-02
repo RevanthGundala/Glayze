@@ -1,6 +1,6 @@
 import { SafeAreaView, View, Text } from "react-native";
-import { BackArrow } from "@/components/ui/BackArrow";
-import { Button } from "@/components/ui/Button";
+import { BackArrow } from "@/components/ui/back-arrow";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { useEffect, useState } from "react";

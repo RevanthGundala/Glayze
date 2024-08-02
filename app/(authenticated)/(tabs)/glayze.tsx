@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/Input";
+import { Input } from "@/components/ui/input";
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import { PaymasterMode } from "@biconomy/account";
 import abi from "../../../abi.json";
 import { ScrollView } from "react-native";
 import { authenticate } from "@/actions/authenticate";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
 import { DEPLOYMENT_FEE } from "@/utils/constants";
 import { Header } from "@/components/header";

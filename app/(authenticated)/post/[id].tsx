@@ -8,10 +8,10 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { BackArrow } from "@/components/ui/BackArrow";
+import { BackArrow } from "@/components/ui/back-arrow";
 import { Image } from "expo-image";
 import { Graph } from "@/components/graph";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { BlurView } from "expo-blur";
 import { usePost } from "@/hooks/use-post";
 import { usePostPrices } from "@/hooks/use-post-prices";

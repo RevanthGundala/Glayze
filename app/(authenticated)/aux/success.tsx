@@ -2,7 +2,7 @@ import React from "react";
 import { SafeAreaView, View, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 type SuccessProps = {
   type: "buy" | "sell";

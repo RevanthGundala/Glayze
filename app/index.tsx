@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Text, SafeAreaView, View, TextInput, Platform } from "react-native";
 import { Image } from "expo-image";
-import { ProgressBar } from "@/components/ui/ProgressBar";
-import { Button } from "@/components/ui/Button";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { useLoginWithPasskey } from "@privy-io/expo/passkey";
 import * as LocalAuthentication from "expo-local-authentication";
