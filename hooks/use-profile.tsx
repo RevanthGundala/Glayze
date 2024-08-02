@@ -14,11 +14,11 @@ const fetchUser = async (address: string | null) => {
 };
 
 export const useProfile = () => {
-  // TODO: get user address from wallet
   const { user } = usePrivy();
+  const testAddress = "0x8f27d80416B9bd94a0C4640b514DCa782A02A1D3";
 
   return useQuery<User | null, Error>({
     queryKey: ["user", user?.wallet.address],
-    queryFn: () => fetchUser(user?.wallet.address),
+    queryFn: () => fetchUser(user?.wallet.address ?? testAddress),
   });
 };

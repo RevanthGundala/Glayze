@@ -5,15 +5,15 @@ module.exports = function (api) {
     plugins: [
       "nativewind/babel",
       "react-native-reanimated/plugin",
-      [
-        "module-resolver",
-        {
-          root: ["./"],
-          alias: {
-            "@": "./",
-          },
-        },
-      ],
+      // [
+      //   "module-resolver",
+      //   {
+      //     root: ["./"],
+      //     alias: {
+      //       "@": "./",
+      //     },
+      //   },
+      // ],
     ],
   };
 };
