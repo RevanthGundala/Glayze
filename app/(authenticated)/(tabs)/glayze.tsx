@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { CONTRACT_ADDRESS } from "@/utils/constants";
 import { useRouter } from "expo-router";
-import { useSmartAccount } from "../../../contexts/smart-account-context";
+import { useSmartAccount } from "@/hooks";
 import { encodeFunctionData, parseAbi } from "viem";
 import { PaymasterMode } from "@biconomy/account";
 import abi from "../../../abi.json";

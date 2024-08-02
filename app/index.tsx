@@ -34,6 +34,7 @@ export default function Index() {
       console.log("Error logging in", error);
     },
   });
+
   const handleLoginWithPasskey = async () => {
     const authenticationTypes =
       await LocalAuthentication.supportedAuthenticationTypesAsync();

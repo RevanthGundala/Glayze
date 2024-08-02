@@ -1,42 +1,66 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { lightTheme, darkTheme } from "../utils/theme";
 
-// Define the structure of your theme
 type ThemeType = typeof lightTheme;
-
-// Define all possible theme names
 type ThemeName = string;
 
-// Create a themes object to easily add more themes in the future
 const themes: Record<ThemeName, ThemeType> = {
   light: lightTheme,
   dark: darkTheme,
-  // You can add more themes here in the future
 };
 
-interface IThemeContextType {
+interface ThemeContextType {
   theme: ThemeType;
   setTheme: (themeName: ThemeName) => void;
   themeName: ThemeName;
 }
 
-const ThemeContext = createContext<IThemeContextType>({
+const ThemeContext = createContext<ThemeContextType>({
   theme: darkTheme,
   setTheme: () => null,
   themeName: "dark",
 });
 
+const THEME_STORAGE_KEY = "@user_theme_preference";
+
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [themeName, setThemeName] = useState<ThemeName>("dark");
 
-  const setTheme = (newThemeName: ThemeName) => {
+  useEffect(() => {
+    // Load the saved theme when the component mounts
+    const loadSavedTheme = async () => {
+      try {
+        const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+        if (savedTheme !== null && themes[savedTheme]) {
+          setThemeName(savedTheme);
+        }
+      } catch (e) {
+        console.error("Failed to load the theme", e);
+      }
+    };
+
+    loadSavedTheme();
+  }, []);
+
+  const setTheme = async (newThemeName: ThemeName) => {
     if (themes[newThemeName]) {
       setThemeName(newThemeName);
+      try {
+        await AsyncStorage.setItem(THEME_STORAGE_KEY, newThemeName);
+      } catch (e) {
+        console.error("Failed to save the theme", e);
+      }
     } else {
       console.warn(
         `Theme "${newThemeName}" not found. Defaulting to dark theme.`
       );
       setThemeName("dark");
+      try {
+        await AsyncStorage.setItem(THEME_STORAGE_KEY, "dark");
+      } catch (e) {
+        console.error("Failed to save the theme", e);
+      }
     }
   };
 

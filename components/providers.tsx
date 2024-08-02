@@ -1,10 +1,10 @@
 import React from "react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { SmartAccountProvider } from "../contexts/smart-account-context";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 import { PrivyProvider } from "@/utils/privy";
 import { PostHogProvider } from "@/utils/posthog";
 import { Platform } from "react-native";
+import { UserProvider } from "@/contexts/user-context";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient();
@@ -12,7 +12,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
     <ThemeProvider>
       <ExpoWrapper>
         <QueryClientProvider client={queryClient}>
-          <SmartAccountProvider>{children}</SmartAccountProvider>
+          <UserProvider>{children}</UserProvider>
         </QueryClientProvider>
       </ExpoWrapper>
     </ThemeProvider>

@@ -15,8 +15,7 @@ const fetchSearchHistory = async (address: string) => {
   return data;
 };
 
-export function useSearch() {
-  const address = "0x1234567890abcdef1234567890abcdef12345678";
+export function useSearch(address: string) {
   return useQuery<Search[], Error>({
     queryKey: ["user", address],
     queryFn: () => fetchSearchHistory(address),

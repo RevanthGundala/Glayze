@@ -13,7 +13,7 @@ import { Route } from "../../../utils/types";
 import { Menu } from "@/components/menu";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useProfile } from "@/hooks/use-profile";
+import { useUser } from "../../../contexts/user-context";
 import { useTheme } from "../../../contexts/theme-context";
 import { usePrivy } from "@/utils/privy";
 import {
@@ -24,10 +24,18 @@ import {
 
 export default function Profile() {
   const { theme, themeName } = useTheme();
-  const { data, isLoading, isError } = useProfile();
+  const { data, isLoading, error } = useUser();
 
-  if (isLoading) return <ActivityIndicator />;
-  if (isError)
+  if (isLoading)
+    return (
+      <View
+        className="flex items-center justify-center"
+        style={{ flex: 1, backgroundColor: theme.backgroundColor }}
+      >
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  if (error)
     return (
       <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
         <Text style={{ color: theme.textColor }}>Error loading profile</Text>
@@ -40,7 +48,7 @@ export default function Profile() {
       </View>
     );
 
-  const { name, handle, profile_pic } = data;
+  const { name, handle, profile_pic } = data.db;
   const routes: Route[] = [
     {
       name: "My Account",
@@ -64,7 +72,7 @@ export default function Profile() {
             source={
               profile_pic
                 ? { uri: profile_pic }
-                : require("@/assets/images/icon.png")
+                : require("@/assets/images/tabs/profile.png")
             }
             className="w-16 h-16"
           />

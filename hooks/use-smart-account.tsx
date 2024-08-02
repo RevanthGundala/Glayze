@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
+import { useState, useEffect } from "react";
 import {
   createSmartAccountClient,
   BiconomySmartAccountV2,
@@ -13,19 +7,7 @@ import { useEmbeddedWallet, isNotCreated, isConnected } from "@privy-io/expo";
 import { createWalletClient, custom } from "viem";
 import { baseSepolia } from "viem/chains";
 
-interface SmartAccountContextType {
-  smartAccount: BiconomySmartAccountV2 | null;
-  isLoading: boolean;
-  error: Error | null;
-}
-
-const SmartAccountContext = createContext<SmartAccountContextType | undefined>(
-  undefined
-);
-
-export const SmartAccountProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const useSmartAccount = () => {
   const [smartAccount, setSmartAccount] =
     useState<BiconomySmartAccountV2 | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,17 +16,25 @@ export const SmartAccountProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     const initializeSmartAccount = async () => {
+      console.log("Initializing smart account");
+      let provider = null;
       try {
         if (!isNotCreated) {
-          await wallet.create({
+          provider = await wallet.create({
             recoveryMethod: "privy",
           });
+          console.log("provider", provider);
         } else if (!isConnected(wallet)) {
+          console.log("wallet not connected");
           throw new Error("Wallet not connected");
+        } else {
+          provider = await wallet.getProvider();
         }
-
-        const provider = await wallet.getProvider();
-
+        if (!provider) {
+          console.log("no provider");
+          throw new Error("Provider not found");
+        }
+        console.log("here");
         const walletClient = createWalletClient({
           chain: baseSepolia,
           transport: custom(provider),
@@ -56,6 +46,10 @@ export const SmartAccountProvider: React.FC<{ children: ReactNode }> = ({
           biconomyPaymasterApiKey: process.env.EXPO_PUBLIC_PAYMASTER_API_KEY!,
         });
 
+        console.log(
+          "Smart account address: ",
+          await smartAccountInstance.getAccountAddress()
+        );
         setSmartAccount(smartAccountInstance);
       } catch (err) {
         setError(
@@ -63,25 +57,12 @@ export const SmartAccountProvider: React.FC<{ children: ReactNode }> = ({
         );
       } finally {
         setIsLoading(false);
+        console.log("finally");
       }
     };
 
     initializeSmartAccount();
   }, [wallet]);
 
-  return (
-    <SmartAccountContext.Provider value={{ smartAccount, isLoading, error }}>
-      {children}
-    </SmartAccountContext.Provider>
-  );
-};
-
-export const useSmartAccount = () => {
-  const context = useContext(SmartAccountContext);
-  if (context === undefined) {
-    throw new Error(
-      "useSmartAccount must be used within a SmartAccountProvider"
-    );
-  }
-  return context;
+  return { smartAccount, isLoading, error };
 };
