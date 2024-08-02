@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import { Image } from "expo-image";
 import { Link } from "expo-router";
 import { Route } from "../utils/types";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 
 type MenuProps = {
   routes: Route[];

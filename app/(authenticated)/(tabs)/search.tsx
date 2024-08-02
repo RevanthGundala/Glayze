@@ -17,7 +17,7 @@ import { useSearch } from "@/hooks/use-search";
 import { Input } from "@/components/ui/input";
 import { Menu } from "@/components/menu";
 import { Route } from "@/utils/types";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 import { ActivityIndicator } from "react-native";
 import { Header } from "@/components/header";
 

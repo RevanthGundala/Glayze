@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Image } from "react-native";
 import { Link } from "expo-router";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 
 export const BackArrow = () => {
   const { themeName } = useTheme();

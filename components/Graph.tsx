@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Time } from "@/utils/types";
 import { Image } from "expo-image";
 import { colors } from "@/utils/theme";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme } from "../contexts/theme-context";
 
 type GraphProps = {
   price: number;

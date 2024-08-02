@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, Linking } from "react-native";
 import type { EnrichedTweet } from "react-tweet";
 import { formatNumber } from "./utils";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 
 export const TweetReplies = ({ tweet }: { tweet: EnrichedTweet }) => {
   const { theme } = useTheme();

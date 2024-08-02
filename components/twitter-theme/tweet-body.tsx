@@ -2,7 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import { type EnrichedTweet } from "react-tweet";
 import { TweetLink } from "./tweet-link";
-import { useTheme } from "@/contexts/ThemeContext"; // Adjust the import based on your project structure
+import { useTheme } from "@/contexts/theme-context"; // Adjust the import based on your project structure
 
 export const TweetBody = ({ tweet }: { tweet: EnrichedTweet }) => {
   const { theme } = useTheme();

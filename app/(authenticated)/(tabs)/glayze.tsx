@@ -11,14 +11,14 @@ import {
 import { useEffect, useState } from "react";
 import { CONTRACT_ADDRESS } from "@/utils/constants";
 import { useRouter } from "expo-router";
-import { useSmartAccount } from "../../../contexts/SmartAccountContext";
+import { useSmartAccount } from "../../../contexts/smart-account-context";
 import { encodeFunctionData, parseAbi } from "viem";
 import { PaymasterMode } from "@biconomy/account";
 import abi from "../../../abi.json";
 import { ScrollView } from "react-native";
 import { authenticate } from "@/actions/authenticate";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 import { DEPLOYMENT_FEE } from "@/utils/constants";
 import { Header } from "@/components/header";
 

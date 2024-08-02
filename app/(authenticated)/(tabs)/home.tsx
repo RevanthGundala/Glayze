@@ -6,7 +6,7 @@ import { PostComponent } from "@/components/post-component";
 import { useState } from "react";
 import { useHomeScrollY } from "@/hooks/use-home-scroll-y";
 import { usePosts } from "@/hooks/use-posts";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 import { Instagram } from "react-content-loader/native";
 
 export default function Home() {

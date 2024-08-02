@@ -5,7 +5,7 @@ import { usePostPrices } from "@/hooks";
 import { EmbeddedTweet } from "./twitter-theme/embedded-tweet";
 import { useEmbeddedTweet } from "@/hooks";
 import { Post } from "@/utils/types";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 
 type PostComponentProps = {

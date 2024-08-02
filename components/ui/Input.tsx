@@ -1,7 +1,7 @@
 import React, { forwardRef, useRef, useImperativeHandle } from "react";
 import { View, TextInput, TouchableWithoutFeedback } from "react-native";
 import { Image } from "expo-image";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 
 type InputProps = {
   placeholder: string;

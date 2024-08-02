@@ -7,7 +7,7 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Svg, Path, G } from "react-native-svg";
 import { Link } from "expo-router";
 import { Image } from "expo-image";
-import { useTheme } from "@/contexts/ThemeContext"; // Adjust this import path as needed
+import { useTheme } from "@/contexts/theme-context"; // Adjust this import path as needed
 
 type Props = {
   tweet: EnrichedTweet;

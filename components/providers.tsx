@@ -1,7 +1,7 @@
 import React from "react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { SmartAccountProvider } from "../contexts/SmartAccountContext";
-import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { SmartAccountProvider } from "../contexts/smart-account-context";
+import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 import { PrivyProvider } from "@/utils/privy";
 import { PostHogProvider } from "@/utils/posthog";
 import { Platform } from "react-native";

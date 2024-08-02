@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
-import { useTheme } from "../../../contexts/ThemeContext";
+import { useTheme } from "../../../contexts/theme-context";
 import { Header } from "@/components/header";
 
 export default function Appearance() {

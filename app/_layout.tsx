@@ -13,8 +13,8 @@ import {
   isConnected,
   useEmbeddedWallet,
 } from "@privy-io/expo";
-import { SmartAccountProvider } from "../contexts/SmartAccountContext";
-import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { SmartAccountProvider } from "../contexts/smart-account-context";
+import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 import { StatusBar } from "expo-status-bar";
 import { Providers } from "@/components/providers";
 

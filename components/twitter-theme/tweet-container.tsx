@@ -2,7 +2,7 @@ import React from "react";
 import { View } from "react-native";
 import type { ReactNode } from "react";
 import clsx from "clsx";
-import { useTheme } from "@/contexts/ThemeContext"; // Adjust this import path as needed
+import { useTheme } from "@/contexts/theme-context"; // Adjust this import path as needed
 
 type Props = { className?: string; children: ReactNode };
 

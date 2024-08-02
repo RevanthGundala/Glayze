@@ -5,12 +5,10 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import React, { useState } from "react";
 import { useAlerts } from "@/hooks/use-alerts";
 import { supabase } from "@/utils/supabase";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 import { ActivityIndicator } from "react-native";
-import { Header } from "@/components/header";
 
 export default function Alerts() {
   const { data: alerts, isLoading, isError } = useAlerts();

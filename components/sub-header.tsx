@@ -1,4 +1,4 @@
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 import { Text } from "react-native";
 
 type SubHeaderProps = {

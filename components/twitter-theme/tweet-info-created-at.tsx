@@ -2,7 +2,7 @@ import React from "react";
 import { TouchableOpacity, Text, Linking } from "react-native";
 import type { EnrichedTweet } from "react-tweet";
 import { formatDate } from "./utils";
-import { useTheme } from "@/contexts/ThemeContext"; // Adjust this import path as needed
+import { useTheme } from "@/contexts/theme-context"; // Adjust this import path as needed
 
 export const TweetInfoCreatedAt = ({ tweet }: { tweet: EnrichedTweet }) => {
   const { theme } = useTheme();

@@ -14,7 +14,7 @@ import { Menu } from "@/components/menu";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/use-profile";
-import { useTheme } from "../../../contexts/ThemeContext";
+import { useTheme } from "../../../contexts/theme-context";
 import { usePrivy } from "@/utils/privy";
 import {
   GLAYZE_TWITTER,

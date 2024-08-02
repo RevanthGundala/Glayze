@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 
 type FeedSelectorProps = {

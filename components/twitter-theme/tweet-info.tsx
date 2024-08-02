@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Linking } from "react-native";
 import { Svg, Path } from "react-native-svg";
 import type { EnrichedTweet } from "react-tweet";
 import { TweetInfoCreatedAt } from "./tweet-info-created-at";
-import { useTheme } from "@/contexts/ThemeContext"; // Adjust this import path as needed
+import { useTheme } from "@/contexts/theme-context"; // Adjust this import path as needed
 
 export const TweetInfo = ({ tweet }: { tweet: EnrichedTweet }) => {
   const { theme } = useTheme();

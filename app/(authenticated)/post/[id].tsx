@@ -17,7 +17,7 @@ import { usePost } from "@/hooks/use-post";
 import { usePostPrices } from "@/hooks/use-post-prices";
 import { Time } from "@/utils/types";
 import { usePosition } from "@/hooks/use-position";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 import { lightTheme, colors } from "@/utils/theme";
 
 export default function Post() {

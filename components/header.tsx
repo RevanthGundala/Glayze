@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { useTheme } from "../contexts/ThemeContext";
+import { useTheme } from "../contexts/theme-context";
 import { BackArrow } from "./ui/back-arrow";
 
 type HeaderProps = {

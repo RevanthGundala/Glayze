@@ -4,7 +4,7 @@ import { Svg, Path } from "react-native-svg";
 import type { EnrichedTweet } from "react-tweet";
 import { TweetActionsCopy } from "./tweet-actions-copy";
 import { formatNumber } from "./utils";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 
 export const TweetActions = ({ tweet }: { tweet: EnrichedTweet }) => {
   const { theme } = useTheme();

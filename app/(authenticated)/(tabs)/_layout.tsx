@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useHomeScrollY } from "@/hooks/use-home-scroll-y";
 import { Animated } from "react-native";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/theme-context";
 import { hexToRgba } from "@/actions/hex-to-rgba";
 
 const OPAQUE_OPACITY = 1;

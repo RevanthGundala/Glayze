@@ -7,14 +7,15 @@ import { Menu } from "@/components/menu";
 import { Image } from "expo-image";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
-import { useTheme } from "../../../contexts/ThemeContext";
+import { useTheme } from "../../../contexts/theme-context";
 import { Header } from "@/components/header";
 import { SubHeader } from "@/components/sub-header";
 import { colors } from "@/utils/theme";
+import { useProfile } from "@/hooks/use-profile";
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
-  const address = "0x1234567890123456789012345678901234567890";
+  const { data, isLoading, isError } = useProfile();
 
   const handlePress = () => {
     console.log("Hello");
@@ -52,7 +53,10 @@ export default function MyAccount() {
                 Ethereum
               </Text>
             </View>
-            <Input placeholder={address} readOnly />
+            <Input
+              placeholder={data?.address ?? "Cannot fetch address"}
+              readOnly
+            />
           </View>
         </View>
 
@@ -88,7 +92,7 @@ const Unlink = () => {
         <Image
           source={
             themeName === "dark"
-              ? require("@/assets/images/forward-arrow-dark.png")
+              ? require("@/assets/images/forward-arrow.png")
               : require("@/assets/images/forward-arrow-dark.png")
           }
           className="w-4 h-4"

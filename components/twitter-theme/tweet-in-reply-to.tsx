@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, Linking } from "react-native";
 import { type EnrichedTweet } from "react-tweet";
-import { useTheme } from "@/contexts/ThemeContext"; // Adjust this import path as needed
+import { useTheme } from "@/contexts/theme-context"; // Adjust this import path as needed
 
 export const TweetInReplyTo = ({ tweet }: { tweet: EnrichedTweet }) => {
   const { theme } = useTheme();

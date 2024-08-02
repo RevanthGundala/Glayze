@@ -3,7 +3,7 @@ import { TouchableOpacity, Text, View } from "react-native";
 import { Svg, Path } from "react-native-svg";
 // import * as Clipboard from "expo-clipboard";
 import type { EnrichedTweet } from "react-tweet";
-import { useTheme } from "@/contexts/ThemeContext"; // Adjust this import path as needed
+import { useTheme } from "@/contexts/theme-context"; // Adjust this import path as needed
 
 export const TweetActionsCopy = ({ tweet }: { tweet: EnrichedTweet }) => {
   const [copied, setCopied] = useState(false);
