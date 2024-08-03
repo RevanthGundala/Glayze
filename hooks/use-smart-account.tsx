@@ -16,25 +16,20 @@ export const useSmartAccount = () => {
 
   useEffect(() => {
     const initializeSmartAccount = async () => {
-      console.log("Initializing smart account");
       let provider = null;
       try {
         if (!isNotCreated) {
           provider = await wallet.create({
             recoveryMethod: "privy",
           });
-          console.log("provider", provider);
         } else if (!isConnected(wallet)) {
-          console.log("wallet not connected");
           throw new Error("Wallet not connected");
         } else {
           provider = await wallet.getProvider();
         }
         if (!provider) {
-          console.log("no provider");
           throw new Error("Provider not found");
         }
-        console.log("here");
         const walletClient = createWalletClient({
           chain: baseSepolia,
           transport: custom(provider),
@@ -57,7 +52,6 @@ export const useSmartAccount = () => {
         );
       } finally {
         setIsLoading(false);
-        console.log("finally");
       }
     };
 

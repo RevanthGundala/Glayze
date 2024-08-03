@@ -16,6 +16,8 @@ if (Platform.OS === "web") {
     PrivyProvider: ({ children }: { children: React.ReactNode }) => children,
     usePrivy: () => ({}),
   };
+  PrivyProvider = privyModule.PrivyProvider;
+  usePrivy = privyModule.usePrivy;
 } else {
   //   console.log("Using Privy Mobile");
   //   privyModule = require("@privy-io/expo");

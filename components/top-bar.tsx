@@ -11,9 +11,9 @@ export const TopBar = () => {
       className="flex-row justify-between items-center px-4 py-2"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <Link href="/aux/wallet">
+      <Link href="/aux/profile">
         <Image
-          source={require("@/assets/images/aux/wallet.png")}
+          source={require("@/assets/images/aux/profile.png")}
           className="w-6 h-6"
           style={{ opacity: 0.8, tintColor: theme.mutedForegroundColor }}
         />

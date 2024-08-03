@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { CONTRACT_ADDRESS } from "@/utils/constants";
+import { CONTRACT_ADDRESS, CREATE_POST_PRODUCT_ID } from "@/utils/constants";
 import { useRouter } from "expo-router";
 import { useSmartAccount } from "@/hooks";
 import { encodeFunctionData, parseAbi } from "viem";
@@ -21,38 +21,50 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/theme-context";
 import { DEPLOYMENT_FEE } from "@/utils/constants";
 import { Header } from "@/components/header";
+import { requestPurchase, useIAP } from "react-native-iap";
 
 export default function Glayze() {
+  const {
+    connected,
+    products,
+    promotedProductsIOS,
+    subscriptions,
+    purchaseHistory,
+    availablePurchases,
+    currentPurchase,
+    currentPurchaseError,
+    initConnectionError,
+    finishTransaction,
+    getProducts,
+    getSubscriptions,
+    getAvailablePurchases,
+    getPurchaseHistory,
+  } = useIAP();
   const { isLoading, smartAccount } = useSmartAccount();
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [url, setUrl] = useState("");
   const router = useRouter();
   const { theme } = useTheme();
-
-  const [fee, setFee] = useState(0);
-  const [total, setTotal] = useState(0);
-
-  const handleSwipe = async () => {
-    if (!smartAccount) console.log("No smart account");
-    const encodedCall = encodeFunctionData({
-      abi,
-      functionName: "createPost",
-      args: [name, symbol, url],
-    });
-
-    const tx = {
-      to: CONTRACT_ADDRESS,
-      data: encodedCall,
-    };
-
-    const amountInWei = await smartAccount?.getGasEstimate([tx, tx], {
-      paymasterServiceData: {
-        mode: PaymasterMode.SPONSORED,
-      },
-    });
-
-    console.log(amountInWei?.toString());
+  const handlePurchase = async () => {
+    await getProducts({ skus: [CREATE_POST_PRODUCT_ID] });
+    console.log(products);
+    // if (!smartAccount) console.log("No smart account");
+    // const encodedCall = encodeFunctionData({
+    //   abi,
+    //   functionName: "createPost",
+    //   args: [name, symbol, url],
+    // });
+    // const tx = {
+    //   to: CONTRACT_ADDRESS,
+    //   data: encodedCall,
+    // };
+    // const amountInWei = await smartAccount?.getGasEstimate([tx, tx], {
+    //   paymasterServiceData: {
+    //     mode: PaymasterMode.SPONSORED,
+    //   },
+    // });
+    // console.log(amountInWei?.toString());
   };
 
   return (
@@ -112,17 +124,17 @@ export default function Glayze() {
                 }}
               />
             </View>
-            <PaymentDetails fee={fee} total={total} />
+            <PaymentDetails />
             <Button
               buttonStyle="w-full rounded-lg my-4"
               style={{ backgroundColor: theme.tintColor }}
-              onPress={authenticate}
+              onPress={handlePurchase}
             >
               <Text
                 className="text-center font-semibold py-4"
                 style={{ color: theme.tintTextColor }}
               >
-                Pay ${total}
+                Pay $1.09
               </Text>
             </Button>
           </ScrollView>
@@ -132,12 +144,7 @@ export default function Glayze() {
   );
 }
 
-type PaymentDetailsProps = {
-  fee: number;
-  total: number;
-};
-
-const PaymentDetails = ({ fee, total }: PaymentDetailsProps) => {
+const PaymentDetails = () => {
   const { theme } = useTheme();
   return (
     <View className="mt-8 space-y-4">
@@ -150,11 +157,11 @@ const PaymentDetails = ({ fee, total }: PaymentDetailsProps) => {
       </View>
       <View className="flex-row justify-between items-center">
         <Text style={{ color: theme.mutedForegroundColor }}>Fee</Text>
-        <Text style={{ color: theme.textColor }}>${fee}</Text>
+        <Text style={{ color: theme.textColor }}>$0.09</Text>
       </View>
       <View className="flex-row justify-between items-center">
         <Text style={{ color: theme.mutedForegroundColor }}>Total</Text>
-        <Text style={{ color: theme.textColor }}>${total}</Text>
+        <Text style={{ color: theme.textColor }}>$1.09</Text>
       </View>
     </View>
   );

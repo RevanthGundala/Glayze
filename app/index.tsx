@@ -5,20 +5,10 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { lightTheme as theme } from "@/utils/theme";
+import appleIcon from "@/assets/images/socials/apple.png";
 
 export default function Index() {
   const router = useRouter();
-
-  if (Platform.OS === "web") {
-    console.log("Only available on iOS!");
-    return (
-      <View className="flex-1 bg-black">
-        <View className="flex justify-center items-center h-32 w-32 rounded-full bg-white">
-          <Button>Download on the App store</Button>
-        </View>
-      </View>
-    );
-  }
 
   return (
     <SafeAreaView className="flex-1 bg-white">

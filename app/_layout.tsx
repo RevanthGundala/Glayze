@@ -13,10 +13,19 @@ import {
   isConnected,
   useEmbeddedWallet,
 } from "@privy-io/expo";
-import { SmartAccountProvider } from "../contexts/smart-account-context";
-import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 import { StatusBar } from "expo-status-bar";
 import { Providers } from "@/components/providers";
+import { NativeWindStyleSheet } from "nativewind";
+import { Platform } from "react-native";
+import { View, Image, Text } from "react-native";
+import appleIcon from "@/assets/images/socials/apple.png";
+import icon from "@/assets/images/icon.png";
+import { lightTheme as theme } from "@/utils/theme";
+import { Button } from "@/components/ui/button";
+
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
 
 // const projectId = process.env.EXPO_PUBLIC_WALLET_CONNECT_ID!;
 
@@ -41,6 +50,31 @@ import { Providers } from "@/components/providers";
 // });
 
 export default function Layout() {
+  const router = useRouter();
+  if (Platform.OS === "web") {
+    console.log("Only available on iOS!");
+    return (
+      <View className="flex-1 bg-black">
+        <View className="mt-40">
+          <Image source={icon} className="w-1/2 h-1/2" />
+        </View>
+        <View className="flex items-center justify-center mt-20">
+          <Button
+            className="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
+            style={{
+              backgroundColor: theme.secondaryTextColor,
+            }}
+            onPress={() => router.push("/")}
+          >
+            <Image source={appleIcon} className="w-4 h-4 mr-3" />
+            <Text className="text-center" style={{ color: theme.textColor }}>
+              Download on the App store
+            </Text>
+          </Button>
+        </View>
+      </View>
+    );
+  }
   return (
     <Providers>
       <InitialLayout />
@@ -53,7 +87,7 @@ const InitialLayout = () => {
   const wallet = useEmbeddedWallet();
   const router = useRouter();
   useEffect(() => {
-    // router.replace("/(authenticated)/home");
+    router.replace("/(authenticated)/home");
     // if (!isReady) return;
     // if (isConnected(wallet)) {
     //   router.replace("/(authenticated)/home");
@@ -83,7 +117,15 @@ const InitialLayout = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="(authenticated)/aux/wallet"
+        name="(authenticated)/aux/profile"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="(authenticated)/aux/send"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="(authenticated)/aux/receive"
         options={{ headerShown: false }}
       />
       <Stack.Screen

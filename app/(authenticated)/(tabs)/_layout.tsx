@@ -138,12 +138,12 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="wallet"
         options={{
-          title: "Profile",
+          title: "Wallet",
           tabBarIcon: ({ color }) => (
             <Image
-              source={require("@/assets/images/tabs/profile.png")}
+              source={require("@/assets/images/tabs/wallet.png")}
               style={{ width: 28, height: 28, tintColor: color }}
             />
           ),

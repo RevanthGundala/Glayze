@@ -21,34 +21,35 @@ import {
   GLAYZE_DISCORD,
   GLAYZE_PRIVACY_POLICY,
 } from "@/utils/constants";
+import { Header } from "@/components/header";
 
 export default function Profile() {
   const { theme, themeName } = useTheme();
-  const { data, isLoading, error } = useUser();
+  // const { data, isLoading, error } = useUser();
 
-  if (isLoading)
-    return (
-      <View
-        className="flex items-center justify-center"
-        style={{ flex: 1, backgroundColor: theme.backgroundColor }}
-      >
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  if (error)
-    return (
-      <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
-        <Text style={{ color: theme.textColor }}>Error loading profile</Text>
-      </View>
-    );
-  if (!data)
-    return (
-      <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
-        <Text style={{ color: theme.textColor }}>No profile data found</Text>
-      </View>
-    );
+  // if (isLoading)
+  //   return (
+  //     <View
+  //       className="flex items-center justify-center"
+  //       style={{ flex: 1, backgroundColor: theme.backgroundColor }}
+  //     >
+  //       <ActivityIndicator size="large" />
+  //     </View>
+  //   );
+  // if (error)
+  //   return (
+  //     <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
+  //       <Text style={{ color: theme.textColor }}>Error loading profile</Text>
+  //     </View>
+  //   );
+  // if (!data)
+  //   return (
+  //     <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
+  //       <Text style={{ color: theme.textColor }}>No profile data found</Text>
+  //     </View>
+  //   );
 
-  const { name, handle, profile_pic } = data.db;
+  // const { name, handle, profile_pic } = data.db!;
   const routes: Route[] = [
     {
       name: "My Account",
@@ -66,13 +67,16 @@ export default function Profile() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
+      <View className="flex flex-row">
+        <Header backArrow />
+      </View>
       <View className="mt-16 items-center">
         <View className="items-center py-8 space-y-4">
-          <Image
+          {/* <Image
             source={
               profile_pic
                 ? { uri: profile_pic }
-                : require("@/assets/images/tabs/profile.png")
+                : require("@/assets/images/aux/profile.png")
             }
             className="w-16 h-16"
           />
@@ -102,7 +106,7 @@ export default function Profile() {
                 className="w-6 h-6"
               />
             </Link>
-          </View>
+          </View> */}
           <Menu routes={routes} />
           <LogOut />
           <Socials />

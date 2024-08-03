@@ -10,7 +10,7 @@ export const SubHeader = ({ title }: SubHeaderProps) => {
   return (
     <Text
       style={{ color: theme.textColor, fontWeight: theme.boldFont }}
-      className="text-2xl"
+      className="text-xl"
     >
       {title}
     </Text>

@@ -239,17 +239,27 @@ const BuySellButtons = ({ theme }: { theme: typeof lightTheme }) => {
       <View className="flex-row justify-between p-4 mb-4 space-x-2">
         <Button
           buttonStyle={`flex-1 rounded-lg`}
-          style={{ backgroundColor: theme.mutedForegroundColor }}
+          style={{ backgroundColor: theme.tabBarInactiveTintColor }}
           onPress={() => router.navigate("(authenticated)/post/sell")}
         >
-          <Text className={`text-center font-medium py-4`}>Sell</Text>
+          <Text
+            className={`text-center font-medium py-4`}
+            style={{ color: colors.white }}
+          >
+            Sell
+          </Text>
         </Button>
         <Button
           buttonStyle={`flex-1 rounded-lg`}
-          style={{ backgroundColor: theme.tintColor }}
+          style={{ backgroundColor: theme.tabBarActiveTintColor }}
           onPress={() => router.navigate("(authenticated)/post/buy")}
         >
-          <Text className={`text-center font-medium py-4`}>Buy</Text>
+          <Text
+            className={`text-center font-semibold py-4`}
+            style={{ color: colors.white }}
+          >
+            Buy
+          </Text>
         </Button>
       </View>
     </BlurView>
