@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useHomeScrollY } from "@/hooks/use-home-scroll-y";
 import { Animated } from "react-native";
 import { useTheme } from "@/contexts/theme-context";
-import { hexToRgba } from "@/actions/hex-to-rgba";
+import { hexToRgba } from "@/utils/helpers";
 
 const OPAQUE_OPACITY = 1;
 const TRANSPARENT_OPACITY = 0.3;

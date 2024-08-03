@@ -1,6 +1,5 @@
 import { registerRootComponent } from "expo";
 import { ExpoRoot } from "expo-router";
-import { withIAPContext } from "react-native-iap";
 
 // Import required polyfills first
 import "fast-text-encoding";
@@ -14,6 +13,4 @@ function App() {
   );
 }
 
-const AppWithIAP = withIAPContext(App);
-
-registerRootComponent(AppWithIAP);
+registerRootComponent(App);

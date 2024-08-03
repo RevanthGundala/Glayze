@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { BackArrow } from "@/components/ui/back-arrow";
 import { Button } from "@/components/ui/button";
 import { useReferral } from "@/hooks";
-import { share } from "@/actions/share";
+import { share } from "@/utils/helpers";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 

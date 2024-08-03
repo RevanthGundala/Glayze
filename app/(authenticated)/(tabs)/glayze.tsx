@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   Platform,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CONTRACT_ADDRESS, CREATE_POST_PRODUCT_ID } from "@/utils/constants";
 import { useRouter } from "expo-router";
 import { useSmartAccount } from "@/hooks";
@@ -16,56 +16,69 @@ import { encodeFunctionData, parseAbi } from "viem";
 import { PaymasterMode } from "@biconomy/account";
 import abi from "../../../abi.json";
 import { ScrollView } from "react-native";
-import { authenticate } from "@/actions/authenticate";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/theme-context";
 import { DEPLOYMENT_FEE } from "@/utils/constants";
 import { Header } from "@/components/header";
-import { requestPurchase, useIAP } from "react-native-iap";
+// import { useProduct } from "@/hooks";
+// import Purchases from "react-native-purchases";
 
 export default function Glayze() {
-  const {
-    connected,
-    products,
-    promotedProductsIOS,
-    subscriptions,
-    purchaseHistory,
-    availablePurchases,
-    currentPurchase,
-    currentPurchaseError,
-    initConnectionError,
-    finishTransaction,
-    getProducts,
-    getSubscriptions,
-    getAvailablePurchases,
-    getPurchaseHistory,
-  } = useIAP();
-  const { isLoading, smartAccount } = useSmartAccount();
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState("");
   const [url, setUrl] = useState("");
   const router = useRouter();
   const { theme } = useTheme();
-  const handlePurchase = async () => {
-    await getProducts({ skus: [CREATE_POST_PRODUCT_ID] });
-    console.log(products);
-    // if (!smartAccount) console.log("No smart account");
-    // const encodedCall = encodeFunctionData({
-    //   abi,
-    //   functionName: "createPost",
-    //   args: [name, symbol, url],
-    // });
-    // const tx = {
-    //   to: CONTRACT_ADDRESS,
-    //   data: encodedCall,
-    // };
-    // const amountInWei = await smartAccount?.getGasEstimate([tx, tx], {
-    //   paymasterServiceData: {
-    //     mode: PaymasterMode.SPONSORED,
-    //   },
-    // });
-    // console.log(amountInWei?.toString());
-  };
+  // const {
+  //   data: product,
+  //   isLoading,
+  //   isError,
+  // } = useProduct(CREATE_POST_PRODUCT_ID);
+
+  // const handlePurchase = useCallback(async () => {
+  //   if (!product) {
+  //     console.log("Error", "Product not available for purchase.");
+  //     return;
+  //   }
+
+  //   try {
+  //     const { customerInfo } = await Purchases.purchaseStoreProduct(product);
+  //     if (
+  //       typeof customerInfo.entitlements.active["my_entitlement_identifier"] !==
+  //       "undefined"
+  //     ) {
+  //       console.log("Success", "Purchase successful!");
+  //       // Here you can proceed with creating the post using smart contract
+  //       // createPost();
+  //     } else {
+  //       console.log(
+  //         "Error",
+  //         "Purchase completed, but entitlement not found. Please contact support."
+  //       );
+  //     }
+  //   } catch (e: any) {
+  //     if (!e.userCancelled) {
+  //       console.error("Purchase error:", e);
+  //       console.log("Error", "An error occurred during purchase.");
+  //     }
+  //   }
+  // }, [product]);
+  // if (!smartAccount) console.log("No smart account");
+  // const encodedCall = encodeFunctionData({
+  //   abi,
+  //   functionName: "createPost",
+  //   args: [name, symbol, url],
+  // });
+  // const tx = {
+  //   to: CONTRACT_ADDRESS,
+  //   data: encodedCall,
+  // };
+  // const amountInWei = await smartAccount?.getGasEstimate([tx, tx], {
+  //   paymasterServiceData: {
+  //     mode: PaymasterMode.SPONSORED,
+  //   },
+  // });
+  // console.log(amountInWei?.toString());
 
   return (
     <SafeAreaView
@@ -99,10 +112,10 @@ export default function Glayze() {
               </View>
               <View>
                 <Text className="text-lg" style={{ color: theme.textColor }}>
-                  Symbol
+                  Ticker Symbol
                 </Text>
                 <Input
-                  placeholder="ELON"
+                  placeholder="$ELON"
                   value={symbol}
                   onChangeText={setSymbol}
                   style={{
@@ -128,7 +141,7 @@ export default function Glayze() {
             <Button
               buttonStyle="w-full rounded-lg my-4"
               style={{ backgroundColor: theme.tintColor }}
-              onPress={handlePurchase}
+              // onPress={handlePurchase}
             >
               <Text
                 className="text-center font-semibold py-4"

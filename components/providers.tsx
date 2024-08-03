@@ -5,21 +5,24 @@ import { PrivyProvider } from "@/utils/privy";
 import { PostHogProvider } from "@/utils/posthog";
 import { Platform } from "react-native";
 import { UserProvider } from "@/contexts/user-context";
+// import { PurchasesProvider } from "@/contexts/purchase-context";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient();
   return (
+    // <PurchasesProvider>
     <ThemeProvider>
-      <ExpoWrapper>
+      <PlatformWrapper>
         <QueryClientProvider client={queryClient}>
           <UserProvider>{children}</UserProvider>
         </QueryClientProvider>
-      </ExpoWrapper>
+      </PlatformWrapper>
     </ThemeProvider>
+    // </PurchasesProvider>
   );
 };
 
-const ExpoWrapper = ({ children }: { children: React.ReactNode }) => {
+const PlatformWrapper = ({ children }: { children: React.ReactNode }) => {
   // TODO:
   if (Platform.OS === "web") {
     return <>{children}</>;

@@ -5,7 +5,6 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { lightTheme as theme } from "@/utils/theme";
-import appleIcon from "@/assets/images/socials/apple.png";
 
 export default function Index() {
   const router = useRouter();
