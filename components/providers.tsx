@@ -1,16 +1,24 @@
 import React from "react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { ThemeProvider, useTheme } from "@/contexts/theme-context";
+import { ThemeProvider } from "@/contexts/theme-context";
 import { PrivyProvider } from "@/utils/privy";
 import { PostHogProvider } from "@/utils/posthog";
 import { Platform } from "react-native";
 import { UserProvider } from "@/contexts/user-context";
-// import { PurchasesProvider } from "@/contexts/purchase-context";
+import Purchases from "react-native-purchases";
+import { useEffect } from "react";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient();
+  useEffect(() => {
+    Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
+    Purchases.configure({
+      apiKey: process.env.EXPO_PUBLIC_PURCHASES_APPLE_API_KEY!,
+      appUserID: null,
+      useAmazon: false,
+    });
+  }, []);
   return (
-    // <PurchasesProvider>
     <ThemeProvider>
       <PlatformWrapper>
         <QueryClientProvider client={queryClient}>
@@ -18,7 +26,6 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
         </QueryClientProvider>
       </PlatformWrapper>
     </ThemeProvider>
-    // </PurchasesProvider>
   );
 };
 
