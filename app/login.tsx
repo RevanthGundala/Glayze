@@ -16,25 +16,29 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Image } from "expo-image";
-import {
-  OAuthProviderType,
-  useLoginWithEmail,
-  useLoginWithOAuth,
-} from "@privy-io/expo";
 import { useRouter } from "expo-router";
+import Toast from "react-native-toast-message";
+import { SocialProvider } from "@dynamic-labs/client";
+import { client } from "@/entrypoint";
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const { sendCode } = useLoginWithEmail({
-    onSendCodeSuccess(args) {
-      console.log(args);
+
+  const handleEmailLogin = async () => {
+    try {
+      if (!client) console.log("Client not initialized");
+      await client?.auth.email.sendOTP(email);
       router.push("/confirm-email?email=" + email);
-    },
-    onError(error) {
+    } catch (error) {
+      Toast.show({
+        text1: "Error sending email",
+        text2: "Please try again",
+        type: "error",
+      });
       console.log(error);
-    },
-  });
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -80,7 +84,7 @@ export default function Login() {
                         ? theme.tabBarActiveTintColor
                         : theme.tabBarInactiveTintColor,
                   }}
-                  onPress={() => sendCode({ email })}
+                  onPress={handleEmailLogin}
                 >
                   <Text
                     className="text-center font-semibold"
@@ -97,8 +101,6 @@ export default function Login() {
               </View>
               <View>
                 <SignUpWithOAuth provider="google" />
-              </View>
-              <View>
                 <SignUpWithOAuth provider="apple" />
               </View>
             </View>
@@ -109,26 +111,34 @@ export default function Login() {
   );
 }
 
-const SignUpWithOAuth = ({ provider }: { provider: OAuthProviderType }) => {
+const SignUpWithOAuth = ({ provider }: { provider: SocialProvider }) => {
   const router = useRouter();
-  const { login, state } = useLoginWithOAuth({
-    onSuccess(user, isNewUser) {
-      console.log(user, isNewUser);
-      router.push("/(authenticated)/home");
-    },
-    onError(error) {
+
+  const handleLoginWithOauth = async () => {
+    try {
+      console.log("Logging in with oauth");
+      await client.auth.social.connect({
+        provider,
+        redirectPathname: "/(authenticated)/home",
+      });
+    } catch (error) {
       console.log(error);
-    },
-  });
+      Toast.show({
+        text1: "Error Logging in",
+        text2: "Please try again",
+        type: "error",
+      });
+    }
+  };
 
   return (
-    <View className="flex items-center justify-center">
+    <View className="flex items-center justify-center pb-3">
       <Button
         className="w-full rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
         style={{
           backgroundColor: theme.secondaryTextColor,
         }}
-        onPress={() => login({ provider })}
+        onPress={handleLoginWithOauth}
       >
         <Image source={socialIcons[provider]} className="w-4 h-4 mr-3" />
         <Text className="text-center" style={{ color: theme.textColor }}>

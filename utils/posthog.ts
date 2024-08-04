@@ -6,7 +6,6 @@ let PostHogProvider: any = null;
 
 if (Platform.OS === "web") {
   // TODO:
-  // privyModule = require("@privy-io/react-auth");
   posthogModule = {
     PostHogProvider: ({ children }: { children: React.ReactNode }) => children,
   };

@@ -14,30 +14,93 @@ import { Button } from "@/components/ui/button";
 import { lightTheme as theme } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { useState } from "react";
-import { useLoginWithEmail } from "@privy-io/expo";
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
+import { client } from "@/entrypoint";
+import Toast from "react-native-toast-message";
+import { baseSepolia } from "viem/chains";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import {
+  createSmartAccountClient,
+  walletClientToSmartAccountSigner,
+} from "permissionless";
+import { signerToSimpleSmartAccount } from "permissionless/accounts";
+import { createPimlicoPaymasterClient } from "permissionless/clients/pimlico";
+import { http } from "viem";
+import { PublicClient } from "viem";
+import {
+  BASE_SEPOLIA_FACTORY_ADDRESS,
+  BASE_SEPOLIA_ENTRYPOINT_ADDRESS,
+} from "@/utils/constants";
 
 export default function ConfirmEmail() {
   const router = useRouter();
   const { email } = useLocalSearchParams();
   const [code, setCode] = useState("");
-  const { loginWithCode } = useLoginWithEmail({
-    onSendCodeSuccess(args) {
-      console.log(args);
-    },
-    onLoginSuccess(args) {
-      console.log(args);
+  const { wallets } = useReactiveClient(client);
+
+  const handleConfirmCode = async () => {
+    try {
+      if (!client) {
+        console.log("Client not initialized");
+        return;
+      }
+      await client.auth.email.verifyOTP(code);
+      const wallet = await wallets.embedded.createWallet();
+      const publicViemClient = client.viem.createPublicClient({
+        chain: baseSepolia,
+      });
+      const walletViemClient = client.viem.createWalletClient({
+        wallet,
+      });
+
+      const signer = walletClientToSmartAccountSigner(walletViemClient);
+
+      const simpleAccount = await signerToSimpleSmartAccount(
+        publicViemClient as PublicClient,
+        {
+          signer,
+          factoryAddress: BASE_SEPOLIA_FACTORY_ADDRESS,
+          entryPoint: BASE_SEPOLIA_ENTRYPOINT_ADDRESS,
+        }
+      );
+
+      const cloudPaymaster = createPimlicoPaymasterClient({
+        chain: baseSepolia,
+        transport: http(process.env.EXPO_PUBLIC_BASE_SEPOLIA_PAYMASTER_KEY),
+        entryPoint: BASE_SEPOLIA_ENTRYPOINT_ADDRESS,
+      });
+
+      const smartAccountClient = createSmartAccountClient({
+        account: simpleAccount,
+        chain: baseSepolia,
+        bundlerTransport: http(
+          process.env.EXPO_PUBLIC_BASE_SEPOLIA_PAYMASTER_KEY
+        ),
+        // IMPORTANT: Set up Cloud Paymaster to sponsor your transaction
+        middleware: {
+          sponsorUserOperation: cloudPaymaster.sponsorUserOperation,
+        },
+      });
+
+      console.log("address: ", await smartAccountClient.getAddress());
 
       router.push("/(authenticated)/home");
-    },
-    onError(error) {
+    } catch (error) {
       console.log(error);
-    },
-  });
+      Toast.show({
+        text1: "Error verifying code",
+        text2: "Please try again",
+        type: "error",
+        autoHide: true,
+      });
+    }
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-white">
+      <Toast />
       <View className="flex flex-row">
         <Header backArrow />
       </View>
@@ -49,8 +112,7 @@ export default function ConfirmEmail() {
       </View>
       <View className="flex flex-row justify-center items-center pt-12 px-6">
         <Text style={{ color: theme.textColor }}>
-          An email has been sent to {email}. Please enter the code below to
-          continue.
+          An email was sent to {email}. Please enter the code below to continue.
         </Text>
       </View>
       <KeyboardAvoidingView
@@ -82,7 +144,7 @@ export default function ConfirmEmail() {
                       ? theme.tabBarActiveTintColor
                       : theme.tabBarInactiveTintColor,
                 }}
-                onPress={() => loginWithCode({ code, email: email as string })}
+                onPress={handleConfirmCode}
               >
                 <Text
                   className="text-center font-semibold"

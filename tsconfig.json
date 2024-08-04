@@ -3,7 +3,6 @@
   "compilerOptions": {
     "jsx": "react-native",
     "strict": true,
-    "moduleResolution": "Bundler",
     "module": "ESNext",
     "paths": {
       "@/*": ["./*"]

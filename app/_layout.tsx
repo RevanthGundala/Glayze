@@ -1,19 +1,6 @@
-import "@walletconnect/react-native-compat";
 import { Stack } from "expo-router/stack";
 import { useEffect } from "react";
 import { useRouter } from "expo-router";
-import { PostHogProvider } from "posthog-react-native";
-import { WagmiProvider } from "wagmi";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { defaultWagmiConfig } from "@web3modal/wagmi-react-native";
-import { sepolia, base, baseSepolia } from "wagmi/chains";
-import {
-  PrivyProvider,
-  usePrivy,
-  isConnected,
-  useEmbeddedWallet,
-} from "@privy-io/expo";
-import { StatusBar } from "expo-status-bar";
 import { Providers } from "@/components/providers";
 import { NativeWindStyleSheet } from "nativewind";
 import { Platform } from "react-native";
@@ -22,77 +9,70 @@ import appleIcon from "@/assets/images/socials/apple.png";
 import icon from "@/assets/images/icon.png";
 import { lightTheme as theme } from "@/utils/theme";
 import { Button } from "@/components/ui/button";
+import { client } from "@/entrypoint";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
 });
 
-// const projectId = process.env.EXPO_PUBLIC_WALLET_CONNECT_ID!;
-
-// // TODO: Update metadata
-// const metadata = {
-//   name: "AppKit RN",
-//   description: "AppKit RN Example",
-//   url: "https://walletconnect.com",
-//   icons: ["https://avatars.githubusercontent.com/u/37784886"],
-//   redirect: {
-//     native: "YOUR_APP_SCHEME://",
-//     universal: "YOUR_APP_UNIVERSAL_LINK.com",
-//   },
-// };
-
-// const chains = [sepolia, base] as const;
-
-// const config = defaultWagmiConfig({
-//   projectId,
-//   metadata,
-//   chains,
-// });
-
 export default function Layout() {
-  const router = useRouter();
-  if (Platform.OS === "web") {
-    console.log("Only available on iOS!");
+  console.log("Entering Layout component");
+  try {
+    const router = useRouter();
+    if (Platform.OS === "web") {
+      console.log("Only available on iOS!");
+      return (
+        <View className="flex-1 bg-black">
+          <View className="mt-40">
+            <Image source={icon} className="w-1/2 h-1/2" />
+          </View>
+          <View className="flex items-center justify-center mt-20">
+            <Button
+              className="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
+              style={{
+                backgroundColor: theme.secondaryTextColor,
+              }}
+              onPress={() => router.push("/")}
+            >
+              <Image source={appleIcon} className="w-4 h-4 mr-3" />
+              <Text className="text-center" style={{ color: theme.textColor }}>
+                Download on the App store
+              </Text>
+            </Button>
+          </View>
+        </View>
+      );
+    }
+    console.log("Rendering Layout for non-web platform");
     return (
-      <View className="flex-1 bg-black">
-        <View className="mt-40">
-          <Image source={icon} className="w-1/2 h-1/2" />
-        </View>
-        <View className="flex items-center justify-center mt-20">
-          <Button
-            className="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
-            style={{
-              backgroundColor: theme.secondaryTextColor,
-            }}
-            onPress={() => router.push("/")}
-          >
-            <Image source={appleIcon} className="w-4 h-4 mr-3" />
-            <Text className="text-center" style={{ color: theme.textColor }}>
-              Download on the App store
-            </Text>
-          </Button>
-        </View>
+      <>
+        <client.reactNative.WebView />
+        <Providers>
+          <InitialLayout />
+        </Providers>
+      </>
+    );
+  } catch (error) {
+    console.error("Error rendering Layout:", error);
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text>An error occurred. Please check the console for details.</Text>
       </View>
     );
   }
-  return (
-    <Providers>
-      <InitialLayout />
-    </Providers>
-  );
 }
 
 const InitialLayout = () => {
-  const { isReady } = usePrivy();
-  const wallet = useEmbeddedWallet();
   const router = useRouter();
+
   useEffect(() => {
+    // console.log("initial layout");
     router.replace("/(authenticated)/home");
     // if (!isReady) return;
     // if (isConnected(wallet)) {
     //   router.replace("/(authenticated)/home");
     // }
-  }, [isReady, wallet]);
+  }, []);
 
   return (
     <Stack>

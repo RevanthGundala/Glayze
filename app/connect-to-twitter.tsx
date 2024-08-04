@@ -3,22 +3,15 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { Link } from "expo-router";
-import { useLinkWithOAuth } from "@privy-io/expo";
 import { useTheme } from "@/contexts/theme-context";
 import { Header } from "@/components/header";
 
 export default function ConnectToTwitter() {
   const router = useRouter();
-  const { link, state } = useLinkWithOAuth();
   const { theme } = useTheme();
 
   const handleConnect = async () => {
     console.log("clicked");
-    const user = await link({
-      provider: "twitter",
-      redirectUri: "https://glayze.app/api/twitter/callback",
-    });
-    console.log("user: ", user);
   };
   return (
     <SafeAreaView

@@ -2,20 +2,18 @@ import { SafeAreaView, View, Text } from "react-native";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { useUser } from "@/contexts/user-context";
 import { useTheme } from "@/contexts/theme-context";
 
 export default function End() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { data } = useUser();
 
   return (
     <SafeAreaView
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <View className="mt-16 space-y-4 items-center">
+      {/* <View className="mt-16 space-y-4 items-center">
         <Text className="w-[250px] text-3xl font-semibold text-white text-center">
           You're ready to start trading!
         </Text>
@@ -44,7 +42,7 @@ export default function End() {
             </Text>
           </Button>
         </View>
-      </View>
+      </View> */}
     </SafeAreaView>
   );
 }

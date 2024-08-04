@@ -11,11 +11,9 @@ import { useTheme } from "../../../contexts/theme-context";
 import { Header } from "@/components/header";
 import { SubHeader } from "@/components/sub-header";
 import { colors } from "@/utils/theme";
-import { useUser } from "@/contexts/user-context";
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
-  const { data } = useUser();
 
   const handlePress = () => {
     console.log("Hello");
@@ -53,10 +51,10 @@ export default function MyAccount() {
                 Ethereum
               </Text>
             </View>
-            <Input
+            {/* <Input
               placeholder={data?.db?.address ?? "Cannot fetch address"}
               readOnly
-            />
+            /> */}
           </View>
         </View>
 

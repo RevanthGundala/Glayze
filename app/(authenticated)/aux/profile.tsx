@@ -13,9 +13,7 @@ import { Route } from "../../../utils/types";
 import { Menu } from "@/components/menu";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useUser } from "../../../contexts/user-context";
-import { useTheme } from "../../../contexts/theme-context";
-import { usePrivy } from "@/utils/privy";
+import { useTheme } from "@/contexts/theme-context";
 import {
   GLAYZE_TWITTER,
   GLAYZE_DISCORD,
@@ -118,13 +116,11 @@ export default function Profile() {
 
 const LogOut = () => {
   const { theme, themeName } = useTheme();
-  const { logout } = usePrivy();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
 
   const handleLogOut = () => {
     setModalVisible(false);
-    logout();
     router.replace("/");
   };
 

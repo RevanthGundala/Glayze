@@ -6,3 +6,7 @@ export const GLAYZE_PRIVACY_POLICY =
 export const DEPLOYMENT_FEE = "1.00";
 export const CREATE_POST_PRODUCT_ID = "app.glayze.createpost";
 export const TRANSACTION_PRODUCT_ID = "app.glayze.transaction";
+export const BASE_SEPOLIA_FACTORY_ADDRESS =
+  "0x15Ba39375ee2Ab563E8873C8390be6f2E2F50232";
+export const BASE_SEPOLIA_ENTRYPOINT_ADDRESS =
+  "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789";

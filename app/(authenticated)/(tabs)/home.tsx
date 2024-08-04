@@ -14,7 +14,6 @@ export default function Home() {
   const tabs = ["Trending", "New", "Top"];
   const scrollY = useHomeScrollY();
   const { theme } = useTheme();
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
       <Animated.ScrollView

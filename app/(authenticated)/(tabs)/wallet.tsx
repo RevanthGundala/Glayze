@@ -13,9 +13,7 @@ import { Post, Route } from "../../../utils/types";
 import { Menu } from "@/components/menu";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useUser } from "../../../contexts/user-context";
 import { useTheme } from "../../../contexts/theme-context";
-import { usePrivy } from "@/utils/privy";
 import {
   GLAYZE_TWITTER,
   GLAYZE_DISCORD,
@@ -81,8 +79,8 @@ export default function Wallet() {
                 $1000
               </Text>
             </View>
-            <View className="flex flex-row justify-between">
-              <TouchableOpacity onPress={() => router.push("/aux/send")}>
+            <View className="flex flex-row justify-center">
+              {/* <TouchableOpacity onPress={() => router.push("/aux/send")}>
                 <View className="flex flex-col items-center space-y-2">
                   <Image
                     source={
@@ -96,7 +94,7 @@ export default function Wallet() {
                     Send
                   </Text>
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
               <TouchableOpacity onPress={() => router.push("/aux/receive")}>
                 <View className="flex flex-col items-center space-y-2">
                   <Image
