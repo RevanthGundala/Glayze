@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.glayze",
-      "associatedDomains": ["webcredentials:https://glayze.app"]
+      "associatedDomains": ["applinks:glayze.app", "webcredentials:glayze.app"]
     },
     "android": {
       "adaptiveIcon": {

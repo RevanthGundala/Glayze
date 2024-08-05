@@ -7,11 +7,12 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
   Platform,
+  TouchableOpacity,
+  Modal,
 } from "react-native";
 import { useCallback, useEffect, useState } from "react";
 import { CONTRACT_ADDRESS, CREATE_POST_PRODUCT_ID } from "@/utils/constants";
 import { useRouter } from "expo-router";
-import { useSmartAccount } from "@/hooks";
 import { encodeFunctionData, parseAbi } from "viem";
 import { PaymasterMode } from "@biconomy/account";
 import abi from "../../../abi.json";
@@ -22,6 +23,8 @@ import { DEPLOYMENT_FEE } from "@/utils/constants";
 import { Header } from "@/components/header";
 // import { useProduct } from "@/hooks";
 // import Purchases from "react-native-purchases";
+import { useRef } from "react";
+import { colors } from "@/utils/theme";
 
 export default function Glayze() {
   const [name, setName] = useState("");
@@ -29,17 +32,24 @@ export default function Glayze() {
   const [url, setUrl] = useState("");
   const router = useRouter();
   const { theme } = useTheme();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [auraAmount, setAuraAmount] = useState(0);
   // const {
   //   data: product,
   //   isLoading,
   //   isError,
   // } = useProduct(CREATE_POST_PRODUCT_ID);
 
-  // const handlePurchase = useCallback(async () => {
-  //   if (!product) {
-  //     console.log("Error", "Product not available for purchase.");
-  //     return;
-  //   }
+  const handlePurchase = async () => {
+    // if (!product) {
+    //   console.log("Error", "Product not available for purchase.");
+    //   return;
+    // }
+  };
+
+  const handleAuraPurchase = async () => {
+    console.log("Aura purchase");
+  };
 
   //   try {
   //     const { customerInfo } = await Purchases.purchaseStoreProduct(product);
@@ -141,7 +151,7 @@ export default function Glayze() {
             <Button
               buttonStyle="w-full rounded-lg my-4"
               style={{ backgroundColor: theme.tintColor }}
-              // onPress={handlePurchase}
+              onPress={() => setModalVisible(true)}
             >
               <Text
                 className="text-center font-semibold py-4"
@@ -150,6 +160,90 @@ export default function Glayze() {
                 Pay $1.09
               </Text>
             </Button>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => setModalVisible(false)}
+            >
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => setModalVisible(false)}
+                className="flex-1 justify-end bg-black/50"
+              >
+                <View
+                  style={{ backgroundColor: theme.backgroundColor }}
+                  className="rounded-t-3xl p-6 h-[250px]"
+                >
+                  <Text
+                    style={{ color: theme.textColor }}
+                    className="text-lg font-medium text-center"
+                  >
+                    Use your $AURA
+                  </Text>
+                  <Text
+                    style={{ color: theme.mutedForegroundColor }}
+                    className="text-center py-4"
+                  >
+                    Use $AURA to pay for transaction fees.
+                  </Text>
+                  <View className="flex-row items-center justify-between mb-4">
+                    <View className="flex-1 mr-2">
+                      <Input
+                        style={{
+                          color: theme.textColor,
+                          backgroundColor: theme.secondaryBackgroundColor,
+                        }}
+                        placeholder={"5"}
+                        value={auraAmount.toString()}
+                        onChangeText={(text) => setAuraAmount(Number(text))}
+                      />
+                    </View>
+                    <TouchableOpacity
+                      className="absolute right-4 transform -translate-y-1/2 rounded-full py-2 px-3 border"
+                      style={{
+                        backgroundColor: theme.backgroundColor,
+                        borderColor: theme.mutedForegroundColor,
+                      }}
+                      onPress={() => setAuraAmount(0)}
+                    >
+                      <Text
+                        className="text-sm"
+                        style={{ color: theme.textColor }}
+                      >
+                        MAX
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View className="flex-row justify-between">
+                    <Button
+                      onPress={() => setModalVisible(false)}
+                      buttonStyle="flex-1 py-3 rounded-lg mr-2"
+                      style={{ backgroundColor: theme.tabBarInactiveTintColor }}
+                    >
+                      <Text
+                        style={{ color: colors.white }}
+                        className="text-center"
+                      >
+                        Back
+                      </Text>
+                    </Button>
+                    <Button
+                      onPress={handlePurchase}
+                      buttonStyle="py-3 flex-1 rounded-lg ml-2"
+                      style={{ backgroundColor: theme.tintColor }}
+                    >
+                      <Text
+                        style={{ color: colors.white }}
+                        className="font-semibold text-center"
+                      >
+                        Apply $AURA
+                      </Text>
+                    </Button>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </Modal>
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>

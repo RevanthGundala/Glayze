@@ -3,6 +3,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { PostHogProvider } from "@/utils/posthog";
 import { Platform } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Purchases from "react-native-purchases";
 import { useEffect } from "react";
 
@@ -17,7 +18,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
   //   });
   // }, []);
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider>
         {/* <PlatformWrapper> */}
         <QueryClientProvider client={queryClient}>
@@ -25,7 +26,7 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
         </QueryClientProvider>
         {/* </PlatformWrapper> */}
       </ThemeProvider>
-    </>
+    </GestureHandlerRootView>
   );
 };
 

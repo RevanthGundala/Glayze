@@ -67,7 +67,7 @@ const InitialLayout = () => {
 
   useEffect(() => {
     // console.log("initial layout");
-    router.replace("/(authenticated)/home");
+    // router.replace("/(authenticated)/home");
     // if (!isReady) return;
     // if (isConnected(wallet)) {
     //   router.replace("/(authenticated)/home");

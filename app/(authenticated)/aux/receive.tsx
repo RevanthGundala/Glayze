@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Header } from "@/components/header";
 import { useTheme } from "@/contexts/theme-context";
 import { share } from "@/utils/helpers";
-
+  
 export default function Receive() {
   const address = "0x1234567890"; // TODO: Fetch from API
   const { theme } = useTheme();

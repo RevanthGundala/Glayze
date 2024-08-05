@@ -20,22 +20,17 @@ export const TweetHeader = ({ tweet, components }: Props) => {
 
   return (
     <View className="flex pb-3 overflow-hidden">
-      <View className="flex-row items-start px-4 pt-2">
-        <Link href={tweet.url} className="relative w-12 mr-3">
-          <View
-            className={clsx(
-              "h-full w-full absolute overflow-hidden rounded-full",
-              user.profile_image_shape === "Square" && "rounded-sm"
-            )}
-          >
+      <View className="flex-row items-start pt-2">
+        <Link href={tweet.url} className="mr-3">
+          <View className="w-12 h-12 rounded-full overflow-hidden">
             <Image
-              source={{ uri: user.profile_image_url_https }}
+              source={{
+                uri: user.profile_image_url_https,
+              }}
               alt={user.name}
-              className="w-full h-full"
+              style={{ width: 48, height: 48 }}
+              contentFit="cover"
             />
-          </View>
-          <View className="h-full w-full absolute overflow-hidden rounded-full">
-            <View className="h-full w-full transition-colors duration-200 shadow-inner hover:bg-black/15"></View>
           </View>
         </Link>
         <View className="flex-1">

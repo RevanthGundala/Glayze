@@ -39,7 +39,7 @@ export default function Login() {
       console.log(error);
     }
   };
-
+  client.ui.auth.show();
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex flex-row">
@@ -102,6 +102,9 @@ export default function Login() {
               <View>
                 <SignUpWithOAuth provider="google" />
                 <SignUpWithOAuth provider="apple" />
+              </View>
+              <View className="items-center">
+                <Text style={{ color: theme.mutedForegroundColor }}>or</Text>
               </View>
             </View>
           </ScrollView>

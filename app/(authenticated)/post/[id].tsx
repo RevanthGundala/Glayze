@@ -65,7 +65,7 @@ export default function Post() {
         />
         <Position
           marketValue={position?.marketValue ?? 0}
-          tokens={position?.tokens ?? 0}
+          shares={position?.shares ?? 0}
           averageCost={position?.averageCost ?? 0}
           firstBought={position?.firstBought ?? new Date()}
           todaysReturn={position?.todaysReturn ?? 0}
@@ -88,7 +88,7 @@ export default function Post() {
 
 type PositionProps = {
   marketValue: number;
-  tokens: number;
+  shares: number;
   averageCost: number;
   firstBought: Date;
   todaysReturn: number;
@@ -99,7 +99,7 @@ type PositionProps = {
 
 const Position = ({
   marketValue,
-  tokens,
+  shares,
   averageCost,
   firstBought,
   todaysReturn,
@@ -107,38 +107,70 @@ const Position = ({
   todaysReturnPercent,
   totalReturnPercent,
 }: PositionProps) => {
+  const { theme } = useTheme();
   return (
     <View className="p-6">
-      <Text className="text-white text-2xl font-semibold mb-4">
+      <Text
+        className="text-2xl font-semibold mb-4"
+        style={{ color: theme.textColor }}
+      >
         Your Position
       </Text>
 
       <View className="flex-row justify-between mb-2">
         <View className="flex-1">
-          <Text className="text-gray-400 text-sm">Market Value</Text>
-          <Text className="text-white text-lg">${marketValue}</Text>
+          <Text
+            className="text-sm"
+            style={{ color: theme.mutedForegroundColor }}
+          >
+            Market Value
+          </Text>
+          <Text className="text-lg" style={{ color: theme.textColor }}>
+            ${marketValue}
+          </Text>
         </View>
         <View className="flex-1 items-end">
-          <Text className="text-gray-400 text-sm">Tokens</Text>
-          <Text className="text-white text-lg">{tokens}</Text>
+          <Text
+            className="text-sm"
+            style={{ color: theme.mutedForegroundColor }}
+          >
+            Shares
+          </Text>
+          <Text className="text-lg" style={{ color: theme.textColor }}>
+            ${shares}
+          </Text>
         </View>
       </View>
 
       <View className="flex-row justify-between mb-2">
         <View className="flex-1">
-          <Text className="text-gray-400 text-sm">Average Cost</Text>
-          <Text className="text-white text-lg">${averageCost}</Text>
+          <Text
+            className="text-sm"
+            style={{ color: theme.mutedForegroundColor }}
+          >
+            Average Cost
+          </Text>
+          <Text className="text-lg" style={{ color: theme.textColor }}>
+            ${averageCost}
+          </Text>
         </View>
         <View className="flex-1 items-end">
-          <Text className="text-gray-400 text-sm">First Bought</Text>
-          <Text className="text-white text-lg">
+          <Text
+            className="text-sm"
+            style={{ color: theme.mutedForegroundColor }}
+          >
+            First Bought
+          </Text>
+          <Text className="text-lg" style={{ color: theme.textColor }}>
             {firstBought.toLocaleDateString()}
           </Text>
         </View>
       </View>
 
       <View className="flex-row justify-between mt-4">
-        <Text className="text-gray-400 text-sm">Today's return</Text>
+        <Text className="text-sm" style={{ color: theme.mutedForegroundColor }}>
+          Today's return
+        </Text>
         <Text
           className="text-lg"
           style={{
@@ -151,7 +183,9 @@ const Position = ({
       </View>
 
       <View className="flex-row justify-between">
-        <Text className="text-gray-400 text-sm">Total return</Text>
+        <Text className="text-sm" style={{ color: theme.mutedForegroundColor }}>
+          Total return
+        </Text>
         <Text
           className="text-lg"
           style={{
@@ -166,12 +200,20 @@ const Position = ({
   );
 };
 
-const imageMap: Record<string, ImageSourcePropType> = {
+const darkImageMap: Record<string, ImageSourcePropType> = {
   "market-cap": require("@/assets/images/stats/market-cap.png"),
   volume: require("@/assets/images/stats/volume.png"),
   "all-time-high": require("@/assets/images/stats/all-time-high.png"),
-  "all-time-low": require("@/assets/images/stats/all-time-low.png"),
+  // "all-time-low": require("@/assets/images/stats/all-time-low.png"),
   "created-at": require("@/assets/images/stats/created-at.png"),
+};
+
+const lightImageMap: Record<string, ImageSourcePropType> = {
+  "market-cap": require("@/assets/images/stats/market-cap-dark.png"),
+  volume: require("@/assets/images/stats/volume-dark.png"),
+  "all-time-high": require("@/assets/images/stats/all-time-high-dark.png"),
+  // "all-time-low": require("@/assets/images/stats/all-time-low-dark.png"),
+  "created-at": require("@/assets/images/stats/created-at-dark.png"),
 };
 
 type StatsProps = {
@@ -181,6 +223,7 @@ type StatsProps = {
   createdAt: Date;
 };
 const Stats = ({ marketCap, volume, allTimeHigh, createdAt }: StatsProps) => {
+  const { theme, themeName } = useTheme();
   type Stat = {
     title: string;
     imageKey: string;
@@ -211,17 +254,33 @@ const Stats = ({ marketCap, volume, allTimeHigh, createdAt }: StatsProps) => {
 
   return (
     <View className="p-6">
-      <Text className="text-white text-2xl font-semibold mb-4">Stats</Text>
+      <Text
+        className="text-2xl font-semibold mb-4"
+        style={{ color: theme.textColor }}
+      >
+        Stats
+      </Text>
       {stats.map((stat) => (
         <View
           key={stat.title}
           className="flex flex-row justify-between items-center mb-4"
         >
           <View className="flex flex-row items-center space-x-4">
-            <Image source={imageMap[stat.imageKey]} className="w-5 h-5" />
-            <Text className="text-white text-lg">{stat.title}</Text>
+            <Image
+              source={
+                themeName === "dark"
+                  ? darkImageMap[stat.imageKey]
+                  : lightImageMap[stat.imageKey]
+              }
+              className="w-5 h-5"
+            />
+            <Text className="text-lg" style={{ color: theme.textColor }}>
+              {stat.title}
+            </Text>
           </View>
-          <Text className="text-white text-lg">{stat.value}</Text>
+          <Text className="text-lg" style={{ color: theme.textColor }}>
+            {stat.value}
+          </Text>
         </View>
       ))}
     </View>

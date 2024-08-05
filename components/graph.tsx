@@ -27,11 +27,14 @@ export const Graph = ({
   const times: Time[] = ["1H", "1D", "1W", "1M", "ALL"];
   const font = useFont(SpaceMono, 12);
   const { state, isActive } = useChartPressState({ x: 0, y: { price: 0 } });
-
+  const { theme } = useTheme();
   return (
     <View>
       <View className="px-10">
-        <Text className="text-white text-3xl font-bold py-2">
+        <Text
+          className="text-3xl font semi-bold py-2"
+          style={{ color: theme.textColor }}
+        >
           ${price} {symbol}
         </Text>
         {change >= 0 ? (
@@ -64,13 +67,13 @@ export const Graph = ({
           axisOptions={{
             font,
             tickCount: 5,
-            labelColor: "white",
+            labelColor: theme.textColor,
             lineColor: {
               grid: {
                 x: 0,
-                y: "gray",
+                y: theme.mutedForegroundColor,
               },
-              frame: "white",
+              frame: theme.secondaryTextColor,
             },
             formatYLabel: (num) => `$${num}`,
             formatXLabel: () => "",
@@ -97,9 +100,12 @@ export const Graph = ({
         {times.map((time, i) => (
           <Pressable key={i} onPress={() => setSelectedTime(time)}>
             <Text
-              className={`${
-                time === selectedTime ? "text-white" : "text-gray-500"
-              }`}
+              style={{
+                color:
+                  time === selectedTime
+                    ? theme.textColor
+                    : theme.mutedForegroundColor,
+              }}
             >
               {time}
             </Text>

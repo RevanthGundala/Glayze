@@ -39,8 +39,7 @@ const SearchScreen = () => {
   const clearSearchHistory = async () => {
     const { error } = await supabase
       .from("Search")
-      .update({ show: false })
-      .eq("show", true)
+      .delete()
       .eq("address", address);
     if (error) {
       console.error("Error clearing all alerts", error);
