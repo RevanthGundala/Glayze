@@ -38,10 +38,12 @@ export const BaseWallet = () => {
     } else {
       console.log("Linking");
       const subscription = Linking.addEventListener("url", async ({ url }) => {
+        console.log(url);
         try {
           const { handleResponse } = await import(
             "@mobile-wallet-protocol/client/dist/core/communicator/handleResponse"
           );
+          console.log(url);
           const handled = handleResponse(url);
           console.log(handled);
           if (!handled) {
