@@ -19,6 +19,7 @@ import { Time } from "@/utils/types";
 import { usePosition } from "@/hooks/use-position";
 import { useTheme } from "@/contexts/theme-context";
 import { lightTheme, colors } from "@/utils/theme";
+import { Header } from "@/components/header";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
@@ -44,7 +45,29 @@ export default function Post() {
       style={{ backgroundColor: theme.backgroundColor }}
     >
       <View className="flex flex-row justify-between items-center w-full">
-        <BackArrow />
+        <Header backArrow />
+        <View className="absolute right-32 flex-row justify-center items-center">
+          <View
+            className="border rounded-full overflow-hidden p-1"
+            style={{ borderColor: theme.mutedForegroundColor }}
+          >
+            <Image
+              // source={{ uri: post.contract_creator || "" }}
+              source={require("@/assets/images/icon.png")}
+              className="w-6 h-6"
+            />
+          </View>
+          <View className="ml-2 flex-1">
+            <View className="flex-row justify-between items-center">
+              <Text className="text-sm" style={{ color: theme.textColor }}>
+                ${post.symbol || "N/A"}
+              </Text>
+            </View>
+            <Text style={{ color: theme.mutedForegroundColor }}>
+              {post.name || "N/A"}
+            </Text>
+          </View>
+        </View>
         <View className="px-6 py-4">
           {/* <Image
             source={require("@/assets/images/share.png")}
@@ -201,19 +224,19 @@ const Position = ({
 };
 
 const darkImageMap: Record<string, ImageSourcePropType> = {
-  "market-cap": require("@/assets/images/stats/market-cap.png"),
-  volume: require("@/assets/images/stats/volume.png"),
-  "all-time-high": require("@/assets/images/stats/all-time-high.png"),
+  "market-cap": require("@/assets/images/dark/market-cap.png"),
+  volume: require("@/assets/images/dark/volume.png"),
+  "all-time-high": require("@/assets/images/dark/all-time-high.png"),
   // "all-time-low": require("@/assets/images/stats/all-time-low.png"),
-  "created-at": require("@/assets/images/stats/created-at.png"),
+  "created-at": require("@/assets/images/dark/created-at.png"),
 };
 
 const lightImageMap: Record<string, ImageSourcePropType> = {
-  "market-cap": require("@/assets/images/stats/market-cap-dark.png"),
-  volume: require("@/assets/images/stats/volume-dark.png"),
-  "all-time-high": require("@/assets/images/stats/all-time-high-dark.png"),
+  "market-cap": require("@/assets/images/light/market-cap.png"),
+  volume: require("@/assets/images/light/volume.png"),
+  "all-time-high": require("@/assets/images/light/all-time-high.png"),
   // "all-time-low": require("@/assets/images/stats/all-time-low-dark.png"),
-  "created-at": require("@/assets/images/stats/created-at-dark.png"),
+  "created-at": require("@/assets/images/light/created-at.png"),
 };
 
 type StatsProps = {

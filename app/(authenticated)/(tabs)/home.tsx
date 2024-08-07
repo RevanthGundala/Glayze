@@ -2,21 +2,29 @@ import { Text, View, SafeAreaView } from "react-native";
 import { TopBar } from "@/components/top-bar";
 import { FeedSelector } from "@/components/feed-selector";
 import { Animated } from "react-native";
-import { PostComponent } from "@/components/post-component";
 import { useState } from "react";
 import { useHomeScrollY } from "@/hooks/use-home-scroll-y";
-import { usePosts } from "@/hooks/use-posts";
 import { useTheme } from "@/contexts/theme-context";
-import { Instagram } from "react-content-loader/native";
+import { PostSection } from "@/components/post-section";
+import { useScrollToTop } from "@react-navigation/native";
+import { useRef, useEffect } from "react";
 
 export default function Home() {
   const [selectedTab, setSelectedTab] = useState("Trending");
   const tabs = ["Trending", "New", "Top"];
   const scrollY = useHomeScrollY();
+  const ref = useRef(null);
+  useScrollToTop(ref);
   const { theme } = useTheme();
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
       <Animated.ScrollView
+        contentContainerStyle={{
+          paddingBottom: 40, // Adjust this value based on your tab bar height
+          paddingTop: 16, // Add some top padding as well
+        }}
+        ref={ref}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
@@ -34,33 +42,3 @@ export default function Home() {
     </SafeAreaView>
   );
 }
-
-type PostSectionProps = {
-  selectedTab: string;
-};
-
-const PostSection = ({ selectedTab }: PostSectionProps) => {
-  const { theme } = useTheme();
-  const { data: posts, isLoading, isError } = usePosts(selectedTab);
-
-  return (
-    <View>
-      {isLoading ? (
-        // Render multiple Instagram loaders to simulate loading multiple posts
-        Array.from({ length: 3 }).map((_, index) => (
-          <Instagram
-            key={index}
-            backgroundColor={theme.backgroundColor}
-            foregroundColor={theme.secondaryBackgroundColor}
-          />
-        ))
-      ) : posts && posts.length > 0 ? (
-        posts.map((post, i) => <PostComponent key={i} post={post} />)
-      ) : (
-        <Text style={{ color: theme.textColor }}>
-          {isError ? "Error loading posts" : "No posts yet!"}
-        </Text>
-      )}
-    </View>
-  );
-};

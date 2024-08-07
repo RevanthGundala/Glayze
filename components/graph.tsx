@@ -32,25 +32,25 @@ export const Graph = ({
     <View>
       <View className="px-10">
         <Text
-          className="text-3xl font semi-bold py-2"
+          className="text-3xl font-semibold py-2"
           style={{ color: theme.textColor }}
         >
-          ${price} {symbol}
+          ${price}
         </Text>
         {change >= 0 ? (
           <View className="flex flex-row items-center space-x-1">
             <Image
-              source={require("@/assets/images/up-arrow.png")}
+              source={require("@/assets/images/aux/up-arrow.png")}
               className="w-4 h-4"
             />
             <Text className="text-lg" style={{ color: colors.greenTintColor }}>
-              {change}%
+              {change.toFixed(2)}%
             </Text>
           </View>
         ) : (
           <View className="flex flex-row items-center space-x-1">
             <Image
-              source={require("@/assets/images/down-arrow.png")}
+              source={require("@/assets/images/aux/down-arrow.png")}
               className="w-4 h-4"
             />
             <Text className="text-lg" style={{ color: colors.redTintColor }}>

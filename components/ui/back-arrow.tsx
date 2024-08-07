@@ -8,15 +8,14 @@ export const BackArrow = () => {
   return (
     <Link href="../">
       <View className="p-2">
-        {/* Increased padding around the image */}
         {themeName === "dark" ? (
           <Image
-            source={require("@/assets/images/back.png")}
+            source={require("@/assets/images/dark/back.png")}
             className="w-4 h-4"
           />
         ) : (
           <Image
-            source={require("@/assets/images/back-dark.png")}
+            source={require("@/assets/images/light/back.png")}
             className="w-4 h-4"
           />
         )}

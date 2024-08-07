@@ -1,13 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 import type { EnrichedTweet } from "react-tweet";
 
-const fetchTweet = async (url: string | null) => {
-  const baseUrl = "https://glayze.app";
+export const fetchTweet = async (
+  url: string | null
+): Promise<EnrichedTweet | null> => {
   try {
     if (!url) return null;
     const id = url.split("/").pop();
     if (!id) return null;
-    const response = await fetch(`${baseUrl}/api/twitter/tweet/${id}`);
+    const response = await fetch(
+      `${process.env.EXPO_PUBLIC_API_URL}/api/twitter/tweet/${id}`
+    );
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Failed to fetch tweet");

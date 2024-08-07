@@ -24,7 +24,7 @@ export const FeedSelector = ({
 
   return (
     <View
-      className={`flex-row justify-around py-4 border-b-2`}
+      className={`flex-row justify-around py-4 border-b`}
       style={{
         borderColor: theme.borderColor,
         backgroundColor: theme.backgroundColor,

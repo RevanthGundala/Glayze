@@ -89,8 +89,11 @@ const ReferralCard = ({ amount }: ReferralCardProps) => {
   const { theme } = useTheme();
   return (
     <View
-      className="p-6 rounded-3xl my-8"
-      style={{ backgroundColor: theme.borderColor }}
+      className="p-6 rounded-3xl my-8 border"
+      style={{
+        backgroundColor: theme.backgroundColor,
+        borderColor: theme.textColor,
+      }}
     >
       <Text className="text-xl mb-3" style={{ color: theme.textColor }}>
         Current Balance

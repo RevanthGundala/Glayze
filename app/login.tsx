@@ -18,8 +18,9 @@ import { useState } from "react";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
-import { SocialProvider } from "@dynamic-labs/client";
+// import { SocialProvider } from "@dynamic-labs/client";
 import { client } from "@/entrypoint";
+import { BaseWallet } from "@/components/base-wallet";
 
 export default function Login() {
   const router = useRouter();
@@ -39,9 +40,11 @@ export default function Login() {
       console.log(error);
     }
   };
-  client.ui.auth.show();
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: theme.backgroundColor }}
+    >
       <View className="flex flex-row">
         <Header backArrow />
       </View>
@@ -50,11 +53,8 @@ export default function Login() {
         style={{ flex: 1 }}
       >
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-          <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            className="px-6 py-2"
-          >
-            <View className="space-y-6 mt-8">
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-6">
+            <View className="space-y-4">
               <View className="flex flex-row justify-center items-center px-6 pb-6">
                 <Image
                   source={require("@/assets/images/icon.png")}
@@ -71,7 +71,7 @@ export default function Login() {
                   onChangeText={setEmail}
                   style={{
                     color: theme.textColor,
-                    backgroundColor: theme.mutedForegroundColor,
+                    backgroundColor: theme.backgroundColor,
                   }}
                 />
               </View>
@@ -99,12 +99,15 @@ export default function Login() {
               <View className="items-center">
                 <Text style={{ color: theme.mutedForegroundColor }}>or</Text>
               </View>
-              <View>
+              {/* <View>
                 <SignUpWithOAuth provider="google" />
                 <SignUpWithOAuth provider="apple" />
               </View>
               <View className="items-center">
                 <Text style={{ color: theme.mutedForegroundColor }}>or</Text>
+              </View> */}
+              <View>
+                <BaseWallet />
               </View>
             </View>
           </ScrollView>
@@ -145,7 +148,7 @@ const SignUpWithOAuth = ({ provider }: { provider: SocialProvider }) => {
       >
         <Image source={socialIcons[provider]} className="w-4 h-4 mr-3" />
         <Text className="text-center" style={{ color: theme.textColor }}>
-          Login With {capitalizeFirstLetter(provider)}
+          Login With {provider.charAt(0).toUpperCase() + provider.slice(1)}
         </Text>
       </Button>
       {/* {state.status === "loading" && <ActivityIndicator />} */}
@@ -156,8 +159,4 @@ const SignUpWithOAuth = ({ provider }: { provider: SocialProvider }) => {
 const socialIcons = {
   google: require("../assets/images/socials/google.png"),
   apple: require("../assets/images/socials/apple.png"),
-};
-
-const capitalizeFirstLetter = (string: string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
 };

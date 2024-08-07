@@ -15,15 +15,15 @@ export const Menu = ({ routes, search }: MenuProps) => {
   const getIcon = () => {
     if (search) {
       if (themeName === "dark") {
-        return require("@/assets/images/search-arrow.png");
+        return require("@/assets/images/dark/search-arrow.png");
       } else {
-        return require("@/assets/images/search-arrow-dark.png");
+        return require("@/assets/images/light/search-arrow.png");
       }
     } else {
       if (themeName === "dark") {
-        return require("@/assets/images/forward-arrow.png");
+        return require("@/assets/images/dark/forward-arrow.png");
       } else {
-        return require("@/assets/images/forward-arrow-dark.png");
+        return require("@/assets/images/light/forward-arrow.png");
       }
     }
   };

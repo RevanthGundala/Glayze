@@ -4,7 +4,6 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { useHomeScrollY } from "@/hooks/use-home-scroll-y";
 import { Animated } from "react-native";
 import { useTheme } from "@/contexts/theme-context";
-import { hexToRgba } from "@/utils/helpers";
 
 const OPAQUE_OPACITY = 1;
 const TRANSPARENT_OPACITY = 0.3;
@@ -15,6 +14,13 @@ export default function TabLayout() {
   const lastScrollY = useRef(0);
   const scrollVelocity = useRef(0);
   const { theme } = useTheme();
+
+  const hexToRgba = (hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
 
   useEffect(() => {
     const listener = homeScrollY.addListener(({ value }) => {

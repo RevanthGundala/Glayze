@@ -35,9 +35,9 @@
     },
     "plugins": [
       [
-        "expo-router",
+        "expo-image-picker",
         {
-          "origin": "https://glayze.app"
+          "photosPermission": "The app accesses your photos."
         }
       ],
       "expo-secure-store",

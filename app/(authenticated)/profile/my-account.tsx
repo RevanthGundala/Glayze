@@ -14,6 +14,7 @@ import { colors } from "@/utils/theme";
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
+  const address = "0x1234567890";
 
   const handlePress = () => {
     console.log("Hello");
@@ -31,16 +32,16 @@ export default function MyAccount() {
             style={{ color: theme.mutedForegroundColor }}
             className="text-base font-light"
           >
-            Tokens are held in an embedded self-custody crypto wallet. You will
-            be able export your keys in the future.
+            Shares are held in a self-custody ETH wallet. You can export your
+            keys at any time.
           </Text>
           <View className="space-y-2">
             <View className="flex flex-row items-center space-x-2 py-2">
               <Image
                 source={
                   themeName === "dark"
-                    ? require("@/assets/images/eth.png")
-                    : require("@/assets/images/eth-dark.png")
+                    ? require("@/assets/images/dark/eth.png")
+                    : require("@/assets/images/light/eth.png")
                 }
                 className="w-6 h-6"
               />
@@ -51,10 +52,19 @@ export default function MyAccount() {
                 Ethereum
               </Text>
             </View>
-            {/* <Input
-              placeholder={data?.db?.address ?? "Cannot fetch address"}
-              readOnly
-            /> */}
+            <Input placeholder={address ?? "Cannot fetch address"} readOnly />
+            <Button
+              buttonStyle="w-full rounded-lg"
+              onPress={() => {}}
+              style={{ backgroundColor: theme.tabBarActiveTintColor }}
+            >
+              <Text
+                className="text-center py-4 font-bold"
+                style={{ color: colors.white }}
+              >
+                Export Keys
+              </Text>
+            </Button>
           </View>
         </View>
 
@@ -90,8 +100,8 @@ const Unlink = () => {
         <Image
           source={
             themeName === "dark"
-              ? require("@/assets/images/forward-arrow.png")
-              : require("@/assets/images/forward-arrow-dark.png")
+              ? require("@/assets/images/dark/forward-arrow.png")
+              : require("@/assets/images/light/forward-arrow.png")
           }
           className="w-4 h-4"
         />
@@ -166,7 +176,7 @@ const DeleteAccount = () => {
         className="flex-row items-center space-x-2"
       >
         <Image
-          source={require("@/assets/images/trash.png")}
+          source={require("@/assets/images/aux/trash.png")}
           className="w-5 h-5"
         />
         <Text style={{ color: colors.redTintColor }} className="text-lg">
@@ -186,7 +196,7 @@ const DeleteAccount = () => {
         >
           <View
             style={{ backgroundColor: theme.backgroundColor }}
-            className="rounded-t-3xl p-6 h-[200px]"
+            className="rounded-t-3xl p-6 h-[250px]"
           >
             <Text
               style={{ color: theme.textColor }}

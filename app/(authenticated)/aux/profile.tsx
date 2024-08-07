@@ -58,8 +58,8 @@ export default function Profile() {
       href: "/(authenticated)/profile/appearance",
     },
     {
-      name: "Privacy and Security",
-      href: GLAYZE_PRIVACY_POLICY,
+      name: "Privacy and Legal",
+      href: "/(authenticated)/profile/privacy-and-legal",
     },
   ];
 
@@ -135,8 +135,8 @@ const LogOut = () => {
         <Image
           source={
             themeName === "dark"
-              ? require("@/assets/images/forward-arrow.png")
-              : require("@/assets/images/forward-arrow-dark.png")
+              ? require("@/assets/images/dark/forward-arrow.png")
+              : require("@/assets/images/light/forward-arrow.png")
           }
           className="w-4 h-4"
         />
@@ -208,8 +208,8 @@ const Socials = () => {
           <Image
             source={
               themeName === "dark"
-                ? require("@/assets/images/socials/twitter.png")
-                : require("@/assets/images/socials/twitter-dark.png")
+                ? require("@/assets/images/dark/twitter.png")
+                : require("@/assets/images/light/twitter.png")
             }
             className="w-6 h-6"
           />
@@ -218,8 +218,8 @@ const Socials = () => {
           <Image
             source={
               themeName === "dark"
-                ? require("@/assets/images/socials/discord.png")
-                : require("@/assets/images/socials/discord-dark.png")
+                ? require("@/assets/images/dark/discord.png")
+                : require("@/assets/images/light/discord.png")
             }
             className="w-8 h-8"
           />

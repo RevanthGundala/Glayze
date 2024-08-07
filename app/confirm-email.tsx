@@ -29,16 +29,12 @@ import { signerToSimpleSmartAccount } from "permissionless/accounts";
 import { createPimlicoPaymasterClient } from "permissionless/clients/pimlico";
 import { http } from "viem";
 import { PublicClient } from "viem";
-import {
-  BASE_SEPOLIA_FACTORY_ADDRESS,
-  BASE_SEPOLIA_ENTRYPOINT_ADDRESS,
-} from "@/utils/constants";
 
 export default function ConfirmEmail() {
   const router = useRouter();
   const { email } = useLocalSearchParams();
   const [code, setCode] = useState("");
-  const { wallets } = useReactiveClient(client);
+  const { auth, wallets } = useReactiveClient(client);
 
   const handleConfirmCode = async () => {
     try {
@@ -47,6 +43,9 @@ export default function ConfirmEmail() {
         return;
       }
       await client.auth.email.verifyOTP(code);
+      if (auth.authenticatedUser?.email === email) {
+        router.push("/(authenticated)/home");
+      }
       const wallet = await wallets.embedded.createWallet();
       const publicViemClient = client.viem.createPublicClient({
         chain: baseSepolia,
@@ -61,15 +60,15 @@ export default function ConfirmEmail() {
         publicViemClient as PublicClient,
         {
           signer,
-          factoryAddress: BASE_SEPOLIA_FACTORY_ADDRESS,
-          entryPoint: BASE_SEPOLIA_ENTRYPOINT_ADDRESS,
+          factoryAddress: process.env.EXPO_PUBLIC_BASE_FACTORY_ADDRESS!,
+          entryPoint: process.env.EXPO_PUBLIC_BASE_ENTRYPOINT_ADDRESS,
         }
       );
 
       const cloudPaymaster = createPimlicoPaymasterClient({
         chain: baseSepolia,
         transport: http(process.env.EXPO_PUBLIC_BASE_SEPOLIA_PAYMASTER_KEY),
-        entryPoint: BASE_SEPOLIA_ENTRYPOINT_ADDRESS,
+        entryPoint: process.env.EXPO_PUBLIC_BASE_SEPOLIA_ENTRYPOINT_ADDRESS,
       });
 
       const smartAccountClient = createSmartAccountClient({

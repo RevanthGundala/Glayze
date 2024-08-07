@@ -19,7 +19,7 @@ export default function Index() {
       </View>
       <View className="pt-2 px-4">
         <Image
-          source={require("@/assets/images/iphone.png")}
+          source={require("@/assets/images/aux/iphone.png")}
           style={{
             width: 450,
             height: 450,
@@ -57,7 +57,7 @@ export default function Index() {
               Get Started For Free
             </Text>
             <Image
-              source={require("@/assets/images/forward-arrow.png")}
+              source={require("@/assets/images/dark/forward-arrow.png")}
               style={{ width: 14, height: 14 }}
             />
           </View>

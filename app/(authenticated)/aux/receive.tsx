@@ -4,11 +4,36 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/header";
 import { useTheme } from "@/contexts/theme-context";
-import { share } from "@/utils/helpers";
-  
+import { colors } from "@/utils/theme";
+import * as Clipboard from "expo-clipboard";
+import Toast from "react-native-toast-message";
+
 export default function Receive() {
   const address = "0x1234567890"; // TODO: Fetch from API
   const { theme } = useTheme();
+
+  const copyToClipboard = async () => {
+    console.log("Copying to clipboard");
+    try {
+      await Clipboard.setStringAsync(address);
+      Toast.show({
+        text1: "Copied to clipboard",
+        text2: "Address copied to clipboard",
+        type: "success",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        text1: "Error copying to clipboard",
+        text2: "Please try again",
+        type: "error",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
+    }
+  };
 
   const handlePress = () => {
     // TODO: Implement referral functionality
@@ -19,6 +44,7 @@ export default function Receive() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
+      <Toast />
       <View className="flex flex-row">
         <Header backArrow />
       </View>
@@ -40,14 +66,14 @@ export default function Receive() {
         </Text>
         <Button
           buttonStyle="w-full rounded-lg"
-          onPress={() => share(address)}
+          onPress={copyToClipboard}
           style={{ backgroundColor: theme.tabBarActiveTintColor }}
         >
           <Text
             className="text-center py-4 font-bold"
-            style={{ color: theme.secondaryTextColor }}
+            style={{ color: colors.white }}
           >
-            Share
+            Copy
           </Text>
         </Button>
       </View>

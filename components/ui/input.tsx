@@ -10,6 +10,7 @@ type InputProps = {
   onSubmitEditing?: () => void;
   readOnly?: boolean;
   search?: boolean;
+  className?: string; // Add this line for custom classes
 };
 
 export type InputHandle = {
@@ -19,7 +20,15 @@ export type InputHandle = {
 
 export const Input = forwardRef<InputHandle, InputProps>(
   (
-    { placeholder, value, onChangeText, onSubmitEditing, readOnly, search },
+    {
+      placeholder,
+      value,
+      onChangeText,
+      onSubmitEditing,
+      readOnly,
+      search,
+      className,
+    },
     ref
   ) => {
     const inputRef = useRef<TextInput | null>(null);
@@ -37,8 +46,11 @@ export const Input = forwardRef<InputHandle, InputProps>(
     return (
       <TouchableWithoutFeedback onPress={focusInput}>
         <View
-          className="flex flex-row items-center rounded-lg border border-gray-300"
-          style={{ backgroundColor: theme.backgroundColor }}
+          className={`flex flex-row items-center rounded-lg border ${className}`}
+          style={{
+            backgroundColor: theme.backgroundColor,
+            borderColor: theme.mutedForegroundColor,
+          }}
         >
           {search && (
             <Image

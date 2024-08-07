@@ -48,7 +48,7 @@ export const TweetMediaVideo = ({ tweet, media }: TweetMediaVideoProps) => {
             }}
           >
             <Image
-              source={require("../../assets/images/play-button.png")}
+              source={require("../../assets/images/aux/play-button.png")}
               className="w-12 h-12"
             />
           </TouchableOpacity>

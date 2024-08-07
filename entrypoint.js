@@ -1,8 +1,15 @@
 import "fast-text-encoding";
+import "react-native-url-polyfill/auto";
+import "react-native-get-random-values";
 import { createClient } from "@dynamic-labs/client";
 import { ReactNativeExtension } from "@dynamic-labs/react-native-extension";
 import { ViemExtension } from "@dynamic-labs/viem-extension";
+import { polyfillWebCrypto } from "expo-standard-web-crypto";
+import { randomUUID } from "expo-crypto";
 import "expo-router/entry";
+
+polyfillWebCrypto();
+crypto.randomUUID = randomUUID;
 
 const environmentId =
   process.env.EXPO_PUBLIC_ENVIRONMENT_ID ||
@@ -17,8 +24,8 @@ console.log("Environment ID:", environmentId);
 
 export const client = createClient({
   environmentId,
-  appLogoUrl: "https://demo.dynamic.xyz/favicon-32x32.png",
-  appName: "Dynamic Demo",
+  appLogoUrl: "",
+  appName: "",
 })
   .extend(ReactNativeExtension())
   .extend(ViemExtension());
