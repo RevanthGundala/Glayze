@@ -7,8 +7,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { BackArrow } from "@/components/ui/back-arrow";
+import { useLocalSearchParams, useRouter, Href } from "expo-router";
 import { Image } from "expo-image";
 import { Graph } from "@/components/graph";
 import { Button } from "@/components/ui/button";
@@ -322,7 +321,7 @@ const BuySellButtons = ({ theme }: { theme: typeof lightTheme }) => {
         <Button
           buttonStyle={`flex-1 rounded-lg`}
           style={{ backgroundColor: theme.tabBarInactiveTintColor }}
-          onPress={() => router.navigate("(authenticated)/post/sell")}
+          onPress={() => router.navigate("(authenticated)/post/sell" as Href)}
         >
           <Text
             className={`text-center font-medium py-4`}
@@ -334,7 +333,7 @@ const BuySellButtons = ({ theme }: { theme: typeof lightTheme }) => {
         <Button
           buttonStyle={`flex-1 rounded-lg`}
           style={{ backgroundColor: theme.tabBarActiveTintColor }}
-          onPress={() => router.navigate("(authenticated)/post/buy")}
+          onPress={() => router.navigate("(authenticated)/post/buy" as Href)}
         >
           <Text
             className={`text-center font-semibold py-4`}

@@ -9,7 +9,7 @@ import {
   Modal,
 } from "react-native";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { Header } from "@/components/header";
@@ -37,12 +37,12 @@ export default function Buy() {
       setModalVisible(false);
       setTimeout(() => {
         router.replace(
-          "/(authenticated)/aux/success?isBuy=true&shares=100&price=0.99&symbol=GLAZE"
+          "/(authenticated)/aux/success?isBuy=true&shares=100&price=0.99&symbol=GLAZE" as Href
         );
       }, 300); // Add a small delay to ensure the modal is fully dismissed
     } catch (error) {
       console.log(error);
-      router.replace("/(authenticated)/aux/error");
+      router.replace("/(authenticated)/aux/error" as Href);
     }
   };
 

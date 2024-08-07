@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, SafeAreaView } from "react-native";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,7 @@ export default function NotFoundScreen() {
         </Text>
         <Button
           buttonStyle="rounded-full"
-          onPress={() => router.push("/(authenticated)/home")}
+          onPress={() => router.push("/(authenticated)/home" as Href)}
           style={{ backgroundColor: theme.tabBarActiveTintColor }}
         >
           <Text

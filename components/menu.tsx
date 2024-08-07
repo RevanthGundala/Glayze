@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import { Image } from "expo-image";
-import { Link } from "expo-router";
+import { Href, Link } from "expo-router";
 import { Route } from "../utils/types";
 import { useTheme } from "@/contexts/theme-context";
 
@@ -37,7 +37,7 @@ export const Menu = ({ routes, search }: MenuProps) => {
           key={i}
           className="flex-row justify-between items-center w-full py-2"
         >
-          <Link href={route.href} className="flex-1">
+          <Link href={route.href as Href} className="flex-1">
             <Text className={"text-lg"} style={{ color: theme.textColor }}>
               {route.name}
             </Text>

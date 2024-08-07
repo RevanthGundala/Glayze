@@ -9,7 +9,7 @@ import appleIcon from "@/assets/images/socials/apple.png";
 import icon from "@/assets/images/icon.png";
 import { lightTheme as theme } from "@/utils/theme";
 import { Button } from "@/components/ui/button";
-import { client } from "@/entrypoint";
+// import { client } from "@/entrypoint";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
@@ -28,7 +28,7 @@ export default function Layout() {
           </View>
           <View className="flex items-center justify-center mt-20">
             <Button
-              className="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
+              buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
               style={{
                 backgroundColor: theme.secondaryTextColor,
               }}

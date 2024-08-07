@@ -13,7 +13,7 @@ export default function Error() {
   return (
     <SafeAreaView
       className="flex-1 justify-center items-center px-6"
-      backgroundColor={theme.backgroundColor}
+      style={{ backgroundColor: theme.backgroundColor }}
     >
       <View className="items-center mb-20">
         <Image

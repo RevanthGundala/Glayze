@@ -130,7 +130,7 @@ export default function ConfirmEmail() {
             </View>
             <View className="pt-6">
               <Button
-                className="w-full rounded-full py-3"
+                buttonStyle="w-full rounded-full py-3"
                 style={{
                   backgroundColor:
                     code !== ""

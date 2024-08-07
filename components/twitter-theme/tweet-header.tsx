@@ -1,13 +1,12 @@
 import React from "react";
-import clsx from "clsx";
 import { type EnrichedTweet, type TwitterComponents } from "react-tweet";
-import { AvatarImg } from "./avatar-img";
 import { VerifiedBadge } from "./verified-badge";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text } from "react-native";
 import { Svg, Path, G } from "react-native-svg";
 import { Link } from "expo-router";
 import { Image } from "expo-image";
 import { useTheme } from "@/contexts/theme-context"; // Adjust this import path as needed
+import { Href } from "expo-router";
 
 type Props = {
   tweet: EnrichedTweet;
@@ -21,7 +20,7 @@ export const TweetHeader = ({ tweet, components }: Props) => {
   return (
     <View className="flex pb-3 overflow-hidden">
       <View className="flex-row items-start pt-2">
-        <Link href={tweet.url} className="mr-3">
+        <Link href={tweet.url as Href} className="mr-3">
           <View className="w-12 h-12 rounded-full overflow-hidden">
             <Image
               source={{
@@ -35,7 +34,7 @@ export const TweetHeader = ({ tweet, components }: Props) => {
         </Link>
         <View className="flex-1">
           <Link
-            href={tweet.url}
+            href={tweet.url as Href}
             className="no-underline text-inherit flex items-center hover:underline"
           >
             <View className="font-bold truncate overflow-hidden whitespace-nowrap">
@@ -44,7 +43,7 @@ export const TweetHeader = ({ tweet, components }: Props) => {
             <VerifiedBadge user={user} className="inline-flex" />
           </Link>
           <View className="flex-row items-center">
-            <Link href={tweet.url} className="truncate">
+            <Link href={tweet.url as Href} className="truncate">
               <Text style={{ color: theme.mutedForegroundColor }}>
                 @{user.screen_name}
               </Text>
@@ -57,15 +56,19 @@ export const TweetHeader = ({ tweet, components }: Props) => {
             >
               ·
             </Text>
-            <Link href={user.follow_url} className="font-bold hover:underline">
+            <Link
+              href={user.follow_url as Href}
+              className="font-bold hover:underline"
+            >
               <Text style={{ color: theme.tintColor }}>Follow</Text>
             </Link>
           </View>
         </View>
-        <Link href={tweet.url} className="self-start ml-2">
+        <Link href={tweet.url as Href} className="self-start ml-2">
           <Svg
             viewBox="0 0 24 24"
-            style={{ width: 24, height: 24, color: theme.mutedForegroundColor }}
+            style={{ width: 24, height: 24 }}
+            fill={theme.mutedForegroundColor}
           >
             <G>
               <Path

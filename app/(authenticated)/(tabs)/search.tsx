@@ -11,7 +11,7 @@ import {
   Platform,
   TextInput,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import { supabase } from "@/utils/supabase";
 import { useSearch } from "@/hooks/use-search";
 import { Input } from "@/components/ui/input";
@@ -33,7 +33,7 @@ const SearchScreen = () => {
 
   const handleSearch = useCallback(() => {
     const id = searchText.split("/").pop();
-    router.push(`/(authenticated)/item/${id}`);
+    router.push(`/(authenticated)/item/${id}` as Href);
   }, [searchText, router]);
 
   const clearSearchHistory = async () => {

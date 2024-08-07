@@ -20,7 +20,6 @@ type GraphProps = {
 export const Graph = ({
   price,
   change,
-  symbol,
   selectedTime,
   setSelectedTime,
 }: GraphProps) => {

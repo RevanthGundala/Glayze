@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 // import { SocialProvider } from "@dynamic-labs/client";
 // import { client } from "@/entrypoint";
@@ -30,7 +30,7 @@ export default function Login() {
     try {
       // if (!client) console.log("Client not initialized");
       // await client?.auth.email.sendOTP(email);
-      router.push("/confirm-email?email=" + email);
+      router.push(("/confirm-email?email=" + email) as Href);
     } catch (error) {
       Toast.show({
         text1: "Error sending email",
@@ -77,7 +77,7 @@ export default function Login() {
               </View>
               <View>
                 <Button
-                  className="w-full rounded-full py-3"
+                  buttonStyle="w-full rounded-full py-3"
                   style={{
                     backgroundColor:
                       email !== ""
@@ -117,46 +117,46 @@ export default function Login() {
   );
 }
 
-const SignUpWithOAuth = ({ provider }: { provider: SocialProvider }) => {
-  const router = useRouter();
+// const SignUpWithOAuth = ({ provider }: { provider: SocialProvider }) => {
+//   const router = useRouter();
 
-  const handleLoginWithOauth = async () => {
-    try {
-      console.log("Logging in with oauth");
-      await client.auth.social.connect({
-        provider,
-        redirectPathname: "/(authenticated)/home",
-      });
-    } catch (error) {
-      console.log(error);
-      Toast.show({
-        text1: "Error Logging in",
-        text2: "Please try again",
-        type: "error",
-      });
-    }
-  };
+//   const handleLoginWithOauth = async () => {
+//     try {
+//       console.log("Logging in with oauth");
+//       await client.auth.social.connect({
+//         provider,
+//         redirectPathname: "/(authenticated)/home",
+//       });
+//     } catch (error) {
+//       console.log(error);
+//       Toast.show({
+//         text1: "Error Logging in",
+//         text2: "Please try again",
+//         type: "error",
+//       });
+//     }
+//   };
 
-  return (
-    <View className="flex items-center justify-center pb-3">
-      <Button
-        className="w-full rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
-        style={{
-          backgroundColor: theme.secondaryTextColor,
-        }}
-        onPress={handleLoginWithOauth}
-      >
-        <Image source={socialIcons[provider]} className="w-4 h-4 mr-3" />
-        <Text className="text-center" style={{ color: theme.textColor }}>
-          Login With {provider.charAt(0).toUpperCase() + provider.slice(1)}
-        </Text>
-      </Button>
-      {/* {state.status === "loading" && <ActivityIndicator />} */}
-    </View>
-  );
-};
+//   return (
+//     <View className="flex items-center justify-center pb-3">
+//       <Button
+//         buttonStyle="w-full rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
+//         style={{
+//           backgroundColor: theme.secondaryTextColor,
+//         }}
+//         onPress={handleLoginWithOauth}
+//       >
+//         <Image source={socialIcons[provider]} className="w-4 h-4 mr-3" />
+//         <Text className="text-center" style={{ color: theme.textColor }}>
+//           Login With {provider.charAt(0).toUpperCase() + provider.slice(1)}
+//         </Text>
+//       </Button>
+//       {/* {state.status === "loading" && <ActivityIndicator />} */}
+//     </View>
+//   );
+// };
 
-const socialIcons = {
-  google: require("../assets/images/socials/google.png"),
-  apple: require("../assets/images/socials/apple.png"),
-};
+// const socialIcons = {
+//   google: require("../assets/images/socials/google.png"),
+//   apple: require("../assets/images/socials/apple.png"),
+// };

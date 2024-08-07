@@ -1,6 +1,6 @@
 import React from "react";
 import { SafeAreaView, View, Text, TouchableOpacity } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, Href } from "expo-router";
 import { Image } from "expo-image";
 import { Button } from "@/components/ui/button";
 import { colors } from "@/utils/theme";
@@ -38,8 +38,8 @@ export default function Success() {
         buttonStyle="py-4 px-8 rounded-full"
         onPress={() => {
           isGlayze
-            ? router.replace(`/(authenticated)/post/${id}`)
-            : router.replace("/(authenticated)/home");
+            ? router.replace(`/(authenticated)/post/${id}` as Href)
+            : router.replace("/(authenticated)/home" as Href);
         }}
         style={{ backgroundColor: theme.tabBarActiveTintColor }}
       >

@@ -2,7 +2,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { Text } from "react-native";
 
 type SubHeaderProps = {
-  title: string;
+  title: string | undefined;
 };
 
 export const SubHeader = ({ title }: SubHeaderProps) => {
@@ -12,7 +12,7 @@ export const SubHeader = ({ title }: SubHeaderProps) => {
       style={{ color: theme.textColor, fontWeight: theme.boldFont }}
       className="text-xl"
     >
-      {title}
+      {title ?? ""}
     </Text>
   );
 };

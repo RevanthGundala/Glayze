@@ -1,5 +1,11 @@
 import React, { forwardRef, useRef, useImperativeHandle } from "react";
-import { View, TextInput, TouchableWithoutFeedback } from "react-native";
+import {
+  View,
+  TextInput,
+  TouchableWithoutFeedback,
+  StyleProp,
+  TextStyle,
+} from "react-native";
 import { Image } from "expo-image";
 import { useTheme } from "@/contexts/theme-context";
 
@@ -11,6 +17,7 @@ type InputProps = {
   readOnly?: boolean;
   search?: boolean;
   className?: string; // Add this line for custom classes
+  style?: StyleProp<TextStyle>;
 };
 
 export type InputHandle = {
