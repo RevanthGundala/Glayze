@@ -24,7 +24,7 @@ export default function Layout() {
       return (
         <View className="flex-1 bg-black">
           <View className="mt-40">
-            <Image source={icon} className="w-1/2 h-1/2" />
+            <Text className="text-white font-semibold">Glayze</Text>
           </View>
           <View className="flex items-center justify-center mt-20">
             <Button

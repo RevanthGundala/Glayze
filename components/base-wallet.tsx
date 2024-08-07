@@ -32,31 +32,16 @@ export const BaseWallet = () => {
   };
 
   useEffect(() => {
-    console.log("Setting up linking");
-    const handleDeepLink = (event) => {
-      console.log("Received deep link:", event.url);
-      const handled = handleResponse(event.url);
-      console.log("Handled:", handled);
+    console.log("Linking");
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      const handled = handleResponse(url);
+      console.log(handled);
       if (!handled) {
         // handle other deeplinks
-        console.log("Unhandled deep link");
-      }
-    };
-
-    // Handle deep links when the app is already open
-    Linking.addEventListener("url", handleDeepLink);
-
-    // Handle deep links when the app is not yet open
-    Linking.getInitialURL().then((url) => {
-      if (url) {
-        console.log("Initial URL:", url);
-        handleDeepLink({ url });
       }
     });
 
-    return () => {
-      Linking.removeEventListener("url", handleDeepLink);
-    };
+    return () => subscription.remove();
   }, []);
 
   return (

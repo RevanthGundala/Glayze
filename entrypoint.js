@@ -2,8 +2,8 @@ import "fast-text-encoding";
 import "react-native-url-polyfill/auto";
 import "react-native-get-random-values";
 import { createClient } from "@dynamic-labs/client";
-import { ReactNativeExtension } from "@dynamic-labs/react-native-extension";
-import { ViemExtension } from "@dynamic-labs/viem-extension";
+// import { ReactNativeExtension } from "@dynamic-labs/react-native-extension";
+// import { ViemExtension } from "@dynamic-labs/viem-extension";
 import { polyfillWebCrypto } from "expo-standard-web-crypto";
 import { randomUUID } from "expo-crypto";
 import "expo-router/entry";
@@ -22,10 +22,10 @@ if (!environmentId) {
 console.log("Environment ID:", environmentId);
 // Leave this undefined to use the default dynamic api base url
 
-export const client = createClient({
-  environmentId,
-  appLogoUrl: "",
-  appName: "",
-})
-  .extend(ReactNativeExtension())
-  .extend(ViemExtension());
+// export const client = createClient({
+//   environmentId,
+//   appLogoUrl: "",
+//   appName: "",
+// })
+//   .extend(ReactNativeExtension())
+//   .extend(ViemExtension());

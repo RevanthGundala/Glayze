@@ -19,7 +19,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 // import { SocialProvider } from "@dynamic-labs/client";
-import { client } from "@/entrypoint";
+// import { client } from "@/entrypoint";
 import { BaseWallet } from "@/components/base-wallet";
 
 export default function Login() {
@@ -28,8 +28,8 @@ export default function Login() {
 
   const handleEmailLogin = async () => {
     try {
-      if (!client) console.log("Client not initialized");
-      await client?.auth.email.sendOTP(email);
+      // if (!client) console.log("Client not initialized");
+      // await client?.auth.email.sendOTP(email);
       router.push("/confirm-email?email=" + email);
     } catch (error) {
       Toast.show({
