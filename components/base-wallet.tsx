@@ -1,48 +1,61 @@
 import React, { useEffect } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Text, Pressable } from "react-native";
-import { handleResponse } from "@mobile-wallet-protocol/client/dist/core/communicator/handleResponse";
 import * as Linking from "expo-linking";
 import { CoinbaseWalletSDK } from "@mobile-wallet-protocol/client";
 
 export const BaseWallet = () => {
   const handleLogin = async () => {
     try {
-      console.log("Logging in with base smart wallet");
-      const sdk = new CoinbaseWalletSDK({
-        appDeeplinkUrl: "glayze://", // required
-        appName: "Glayze",
-        appChainIds: [8453], // Sepolia
-        appLogoUrl: "",
-      });
-      const provider = sdk.makeWeb3Provider();
-      const addresses = await provider.request({
-        method: "eth_requestAccounts",
-      });
-      const signedData = await provider.request({
-        method: "personal_sign",
-        params: ["0x48656c6c6f20776f726c6421", addresses[0]],
-      });
-      console.log(signedData);
+      if (Platform.OS === "web") {
+        console.log("Logging in with base smart wallet on web");
+      } else {
+        console.log("Logging in with base smart wallet on mobile");
+        const sdk = new CoinbaseWalletSDK({
+          appDeeplinkUrl: "glayze://", // required
+          appName: "Glayze",
+          appChainIds: [8453], // Sepolia
+          appLogoUrl: "",
+        });
+        const provider = sdk.makeWeb3Provider();
+        const addresses = await provider.request({
+          method: "eth_requestAccounts",
+        });
+        const signedData = await provider.request({
+          method: "personal_sign",
+          params: ["0x48656c6c6f20776f726c6421", addresses[0]],
+        });
+        console.log(signedData);
+      }
     } catch (error) {
       console.log(error);
     }
   };
-
   useEffect(() => {
-    console.log("Linking");
-    const subscription = Linking.addEventListener("url", ({ url }) => {
-      const handled = handleResponse(url);
-      console.log(handled);
-      if (!handled) {
-        // handle other deeplinks
-      }
-    });
+    if (Platform.OS === "web") {
+      // Web-specific code here, if any
+    } else {
+      console.log("Linking");
+      const subscription = Linking.addEventListener("url", async ({ url }) => {
+        try {
+          const { handleResponse } = await import(
+            "@mobile-wallet-protocol/client/dist/core/communicator/handleResponse"
+          );
+          const handled = handleResponse(url);
+          console.log(handled);
+          if (!handled) {
+            // handle other deeplinks
+          }
+        } catch (error) {
+          console.error("Failed to import or execute handleResponse:", error);
+          // Handle the error appropriately, e.g., fallback behavior or error reporting
+        }
+      });
 
-    return () => subscription.remove();
+      return () => subscription.remove();
+    }
   }, []);
-
   return (
     <Pressable
       className="pt-2 items-center justify-center"

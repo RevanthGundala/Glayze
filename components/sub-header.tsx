@@ -8,10 +8,7 @@ type SubHeaderProps = {
 export const SubHeader = ({ title }: SubHeaderProps) => {
   const { theme } = useTheme();
   return (
-    <Text
-      style={{ color: theme.textColor, fontWeight: theme.boldFont }}
-      className="text-xl"
-    >
+    <Text style={{ color: theme.textColor }} className="text-xl font-bold">
       {title ?? ""}
     </Text>
   );
