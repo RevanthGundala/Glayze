@@ -13,7 +13,7 @@ import { useRouter, Href } from "expo-router";
 //   appLogoUrl: "",
 // });
 
-const PREFIX_URL = Linking.createURL("https://glayze.app");
+const PREFIX_URL = Linking.createURL("/");
 
 // 3. Initialize SDK
 const sdk = new CoinbaseWalletSDK({

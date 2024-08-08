@@ -1,5 +1,3 @@
-import { readFileSync } from "fs";
-
 interface RequestData {
   tokenId: string;
   name: string;
@@ -59,7 +57,8 @@ async function uploadImageToPinata({
       const urlStream = await fetch(image);
       buffer = await urlStream.arrayBuffer();
     } else {
-      buffer = readFileSync(image);
+      const base64Data = image.split(",")[1];
+      buffer = Buffer.from(base64Data, "base64");
     }
 
     const blob = new Blob([buffer]);

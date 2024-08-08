@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { SplashScreen } from "expo-router";
 import { useRouter, Href } from "expo-router";
 import * as Linking from "expo-linking";
+import Purchases from "react-native-purchases";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -26,7 +27,7 @@ export default function RootLayout() {
     }
 
     prepare();
-    // router.push("/(authenticated)/home");
+    router.push("/(authenticated)/home");
   }, []);
 
   const handleUrl = async (receivedUrl: string) => {
@@ -78,6 +79,15 @@ export default function RootLayout() {
     });
 
     return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
+    Purchases.configure({
+      apiKey: process.env.EXPO_PUBLIC_PURCHASES_APPLE_API_KEY!,
+      appUserID: null,
+      useAmazon: false,
+    });
   }, []);
 
   return (

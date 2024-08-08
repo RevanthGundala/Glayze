@@ -18,14 +18,15 @@ import { useTheme } from "@/contexts/theme-context";
 import { DEPLOYMENT_FEE } from "@/utils/constants";
 import { Header } from "@/components/header";
 import { Image } from "expo-image";
-import ImagePicker from "react-native-image-crop-picker";
 import Toast from "react-native-toast-message";
 import { useForm, Controller } from "react-hook-form";
 import { colors } from "@/utils/theme";
 import { useEmbeddedTweet, usePost } from "@/hooks";
 import { fetchTweet } from "@/hooks/use-embedded-tweet";
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 // import { useProduct } from "@/hooks";
-// import Purchases from "react-native-purchases";
+import Purchases from "react-native-purchases";
 
 interface FormInput {
   name: string;
@@ -56,17 +57,15 @@ export default function Glayze() {
   // } = useProduct(CREATE_POST_PRODUCT_ID);
   const selectImage = async () => {
     try {
-      if (!ImagePicker || typeof ImagePicker.openPicker !== "function") {
-        console.error("ImagePicker or openPicker is not available");
-        return;
-      }
-      const image = await ImagePicker.openPicker({
-        width: 300,
-        height: 400,
-        cropping: true,
-        mediaType: "photo",
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
       });
-      setSelectedImage(image.path);
+      if (!result.canceled) {
+        setSelectedImage(result.assets[0].uri);
+      }
     } catch (e) {
       Toast.show({
         text1: "Cancelled",
@@ -78,25 +77,49 @@ export default function Glayze() {
 
   const handlePurchase = async (input: FormInput) => {
     try {
+      const offerings = await Purchases.getOfferings();
+      console.log(offerings);
+      if (
+        offerings.current !== null &&
+        offerings.current.availablePackages.length !== 0
+      ) {
+        // Display packages for sale
+      }
       const { name, symbol, url } = input;
       if (!name || !symbol || !url) {
         throw new Error("Name, symbol, or url is not provided.");
       }
-      // if (!product) {
-      //   console.log("Error", "Product not available for purchase.");
-      //   return;
-      // }
+
       const tokenId = url.split("/").pop();
       if (!tokenId) {
-        throw new Error("Token ID not found.");
+        throw new Error("Token ID not found in the URL.");
       }
-      const image =
-        selectedImage !== null
-          ? selectedImage
-          : (await fetchTweet(url))?.user.profile_image_url_https;
-      if (!image) {
-        throw new Error("Image not found.");
+
+      let image: string;
+      if (selectedImage !== null) {
+        const imageFile = await FileSystem.readAsStringAsync(selectedImage, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+        image = `data:image/jpeg;base64,${imageFile}`;
+      } else {
+        try {
+          const tweetData = await fetchTweet(url);
+          if (
+            !tweetData ||
+            !tweetData.user ||
+            !tweetData.user.profile_image_url_https
+          ) {
+            throw new Error("Failed to fetch tweet data or profile image.");
+          }
+          image = tweetData.user.profile_image_url_https;
+        } catch (fetchError) {
+          console.error("Error fetching tweet:", fetchError);
+          throw new Error(
+            "Failed to fetch tweet data. Please check your network connection and try again."
+          );
+        }
       }
+
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_API_URL}/api/ipfs`,
         {
@@ -109,20 +132,27 @@ export default function Glayze() {
             tokenId,
             name,
             symbol,
-            image, // TODO: get profile pic from user
+            image,
           }),
         }
       );
+
       if (!response.ok) {
-        throw new Error("Failed to upload metadata to IPFS");
+        const errorData = await response.json().catch(() => null);
+        throw new Error(
+          `Failed to upload metadata to IPFS: ${
+            errorData ? JSON.stringify(errorData) : response.statusText
+          }`
+        );
       }
+
       const data = await response.json();
-      console.log(data.metadataIpfsHash);
-    } catch (e) {
-      console.log(e);
+      console.log("Metadata IPFS Hash:", data.metadataIpfsHash);
+    } catch (error) {
+      console.error("Purchase failed:", error);
       Toast.show({
         text1: "Error",
-        text2: "Purchase failed",
+        text2: error instanceof Error ? error.message : "Purchase failed",
         type: "error",
       });
     }
@@ -275,7 +305,7 @@ export default function Glayze() {
                     required: true,
                     pattern: {
                       value:
-                        /^https:\/\/(?:www\.)?x\.com\/(?:#!\/)?(\w+)\/status(es)?\/(\d+)$/,
+                        /^https:\/\/(www\.)?(twitter|x)\.com\/[a-zA-Z0-9_]+\/status(es)?\/\d+(\?.*)?$/,
                       message: "Must be a valid Twitter post URL",
                     },
                   }}
