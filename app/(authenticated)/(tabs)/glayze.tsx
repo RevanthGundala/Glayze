@@ -56,6 +56,10 @@ export default function Glayze() {
   // } = useProduct(CREATE_POST_PRODUCT_ID);
   const selectImage = async () => {
     try {
+      if (!ImagePicker || typeof ImagePicker.openPicker !== "function") {
+        console.error("ImagePicker or openPicker is not available");
+        return;
+      }
       const image = await ImagePicker.openPicker({
         width: 300,
         height: 400,

@@ -1,12 +1,15 @@
-import { BackArrow } from "@/components/ui/back-arrow";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Text,
   SafeAreaView,
   View,
   TouchableOpacity,
   Modal,
+  Platform,
+  KeyboardAvoidingView,
+  Keyboard,
+  Animated,
 } from "react-native";
 import { Image } from "expo-image";
 import { useRouter, Href } from "expo-router";
@@ -14,13 +17,21 @@ import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { Input } from "@/components/ui/input";
+import { ShareHeader } from "@/components/share-header";
+import { useLocalSearchParams } from "expo-router";
 
 export default function Buy() {
+  const maxFontSize = 48;
+  const minFontSize = 12;
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const { name, symbol, image } = useLocalSearchParams();
   const [amount, setAmount] = useState("0");
   const router = useRouter();
   const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const [auraAmount, setAuraAmount] = useState(0);
+  const [fontSize, setFontSize] = useState(maxFontSize);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
   const updateAmount = (value: string) => {
     if (amount === "0" && value !== ".") {
       setAmount(value);
@@ -28,6 +39,48 @@ export default function Buy() {
       setAmount((prev) => prev + value);
     }
   };
+
+  const openModal = () => {
+    setModalVisible(true);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeModal = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 100,
+      useNativeDriver: true,
+    }).start(() => {
+      setModalVisible(false);
+    });
+  };
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const length = amount.length;
+    let newSize = maxFontSize - length * 1.5; // Adjust the scaling factor as needed
+    newSize = Math.max(newSize, minFontSize);
+    setFontSize(newSize);
+  }, [amount, maxFontSize, minFontSize]);
 
   const clearAmount = () => setAmount("0");
 
@@ -54,12 +107,18 @@ export default function Buy() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <View className="flex-1 px-4">
-        <View className="flex flex-row">
-          <Header backArrow />
-        </View>
+      <View className="flex-row items-center justify-between px-4 w-full">
+        <Header backArrow />
+        <ShareHeader
+          name={name as string}
+          symbol={symbol as string}
+          image={image as string}
+        />
+        <View className="w-1/5" />
+      </View>
+      <View className="flex-1 px-4 pt-2">
         <Text
-          className="text-2xl font-semibold text-center"
+          className="text-3xl font-semibold text-center"
           style={{ color: theme.textColor }}
         >
           Buy
@@ -72,14 +131,14 @@ export default function Buy() {
         </Text>
         <View className="mt-2 rounded-xl p-4">
           <Text
-            className="text-5xl font-bold text-center"
-            style={{ color: theme.textColor }}
+            className="font-bold text-center"
+            style={{ color: theme.textColor, fontSize }}
           >
             {amount}
           </Text>
         </View>
 
-        <View className="flex-row justify-between mt-6 px-4">
+        <View className="flex-row justify-between mt-2 px-4">
           {percentages.map((percent, i) => (
             <Button
               key={i}
@@ -130,12 +189,12 @@ export default function Buy() {
         <View className="mt-auto mb-10">
           <Button
             buttonStyle="w-full rounded-full"
-            onPress={() => setModalVisible(true)}
+            onPress={openModal}
             style={{ backgroundColor: theme.tabBarActiveTintColor }}
           >
             <Text
               className="text-center py-4 font-semibold text-lg"
-              style={{ color: theme.secondaryTextColor }}
+              style={{ color: colors.white }}
             >
               Buy for $0.99
             </Text>
@@ -145,73 +204,84 @@ export default function Buy() {
           animationType="slide"
           transparent={true}
           visible={modalVisible}
-          onRequestClose={() => setModalVisible(false)}
+          onRequestClose={closeModal}
         >
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => setModalVisible(false)}
-            className="flex-1 justify-end bg-black/50"
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
           >
-            <View
-              style={{ backgroundColor: theme.backgroundColor }}
-              className="rounded-t-3xl p-6 h-[300px]"
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() =>
+                isKeyboardVisible ? Keyboard.dismiss() : closeModal()
+              }
+              className="flex-1 justify-end bg-black/50"
             >
-              <Text
-                style={{ color: theme.textColor }}
-                className="text-xl font-medium text-center"
+              <View
+                style={{ backgroundColor: theme.backgroundColor }}
+                className="rounded-t-3xl p-6 h-[325px]"
               >
-                Confirm your order
-              </Text>
-              <Text
-                style={{ color: theme.mutedForegroundColor }}
-                className="py-2 text-center"
-              >
-                Use $AURA to pay for transaction fees
-              </Text>
-              <Text className="pt-4 pb-1" style={{ color: theme.textColor }}>
-                Balance: 5 $AURA
-              </Text>
-              <View className="flex-row items-center justify-between mb-4">
-                <View className="w-2/3">
-                  <Input
+                <Text
+                  style={{ color: theme.textColor }}
+                  className="text-xl font-medium text-center"
+                >
+                  Confirm your order
+                </Text>
+                <Text
+                  style={{ color: theme.mutedForegroundColor }}
+                  className="py-2 text-center"
+                >
+                  Use $AURA to pay for transaction fees
+                </Text>
+                <Text className="pt-4 pb-1" style={{ color: theme.textColor }}>
+                  Balance: 5 $AURA
+                </Text>
+                <View className="flex-row items-center justify-between mb-4">
+                  <View className="w-2/3">
+                    <Input
+                      style={{
+                        color: theme.textColor,
+                        backgroundColor: theme.secondaryBackgroundColor,
+                      }}
+                      placeholder={"0"}
+                      value={auraAmount.toString()}
+                      onChangeText={(text) => setAuraAmount(Number(text))}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <TouchableOpacity
+                    className="aboslute right-32"
                     style={{
-                      color: theme.textColor,
-                      backgroundColor: theme.secondaryBackgroundColor,
+                      backgroundColor: theme.backgroundColor,
+                      borderColor: theme.mutedForegroundColor,
                     }}
-                    placeholder={"0"}
-                    value={auraAmount.toString()}
-                    onChangeText={(text) => setAuraAmount(Number(text))}
-                  />
-                </View>
-                <TouchableOpacity
-                  className="aboslute right-32"
-                  style={{
-                    backgroundColor: theme.backgroundColor,
-                    borderColor: theme.mutedForegroundColor,
-                  }}
-                  onPress={() => setAuraAmount(0)}
-                >
-                  <Text className="text-sm" style={{ color: theme.textColor }}>
-                    MAX
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View className="mt-auto mb-4 flex-row justify-between">
-                <Button
-                  onPress={handleBuy}
-                  buttonStyle="py-3 flex-1 rounded-lg"
-                  style={{ backgroundColor: theme.tintColor }}
-                >
-                  <Text
-                    style={{ color: colors.white }}
-                    className="font-semibold text-center text-lg"
+                    onPress={() => setAuraAmount(0)}
                   >
-                    Buy for $0.99
-                  </Text>
-                </Button>
+                    <Text
+                      className="text-sm"
+                      style={{ color: theme.textColor }}
+                    >
+                      MAX
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <View className="mt-auto mb-10 flex-row justify-between">
+                  <Button
+                    onPress={handleBuy}
+                    buttonStyle="py-3 flex-1 rounded-full"
+                    style={{ backgroundColor: theme.tintColor }}
+                  >
+                    <Text
+                      style={{ color: colors.white }}
+                      className="font-semibold text-center text-lg"
+                    >
+                      Buy for $0.99
+                    </Text>
+                  </Button>
+                </View>
               </View>
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
         </Modal>
       </View>
     </SafeAreaView>

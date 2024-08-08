@@ -19,6 +19,8 @@ import { usePosition } from "@/hooks/use-position";
 import { useTheme } from "@/contexts/theme-context";
 import { lightTheme, colors } from "@/utils/theme";
 import { Header } from "@/components/header";
+import { ShareHeader } from "@/components/share-header";
+import { type Post } from "@/utils/types";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
@@ -45,28 +47,12 @@ export default function Post() {
     >
       <View className="flex flex-row justify-between items-center w-full">
         <Header backArrow />
-        <View className="absolute right-32 flex-row justify-center items-center">
-          <View
-            className="border rounded-full overflow-hidden p-1"
-            style={{ borderColor: theme.mutedForegroundColor }}
-          >
-            <Image
-              // source={{ uri: post.contract_creator || "" }}
-              source={require("@/assets/images/icon.png")}
-              className="w-6 h-6"
-            />
-          </View>
-          <View className="ml-2 flex-1">
-            <View className="flex-row justify-between items-center">
-              <Text className="text-sm" style={{ color: theme.textColor }}>
-                ${post.symbol || "N/A"}
-              </Text>
-            </View>
-            <Text style={{ color: theme.mutedForegroundColor }}>
-              {post.name || "N/A"}
-            </Text>
-          </View>
-        </View>
+        <ShareHeader
+          name={post.name}
+          symbol={post.symbol}
+          image={post.contract_creator}
+        />
+        {/* TODO: Add image */}
         <View className="px-6 py-4">
           {/* <Image
             source={require("@/assets/images/share.png")}
@@ -103,7 +89,7 @@ export default function Post() {
           createdAt={new Date(post.created_at)}
         />
       </ScrollView>
-      <BuySellButtons theme={theme} />
+      <BuySellButtons theme={theme} post={post} />
     </SafeAreaView>
   );
 }
@@ -309,7 +295,12 @@ const Stats = ({ marketCap, volume, allTimeHigh, createdAt }: StatsProps) => {
   );
 };
 
-const BuySellButtons = ({ theme }: { theme: typeof lightTheme }) => {
+type BuySellButtonsProps = {
+  theme: typeof lightTheme;
+  post: Post;
+};
+
+const BuySellButtons = ({ theme, post }: BuySellButtonsProps) => {
   const router = useRouter();
   return (
     <BlurView
@@ -321,7 +312,17 @@ const BuySellButtons = ({ theme }: { theme: typeof lightTheme }) => {
         <Button
           buttonStyle={`flex-1 rounded-lg`}
           style={{ backgroundColor: theme.tabBarInactiveTintColor }}
-          onPress={() => router.navigate("(authenticated)/post/sell" as Href)}
+          onPress={() => {
+            router.push({
+              pathname: "/(authenticated)/post/sell",
+              params: {
+                key1: post.post_id,
+                key2: post.name,
+                key3: post.symbol,
+                key4: post.contract_creator, // TODO: Add image
+              },
+            });
+          }}
         >
           <Text
             className={`text-center font-medium py-4`}
@@ -333,7 +334,17 @@ const BuySellButtons = ({ theme }: { theme: typeof lightTheme }) => {
         <Button
           buttonStyle={`flex-1 rounded-lg`}
           style={{ backgroundColor: theme.tabBarActiveTintColor }}
-          onPress={() => router.navigate("(authenticated)/post/buy" as Href)}
+          onPress={() => {
+            router.push({
+              pathname: "/(authenticated)/post/buy",
+              params: {
+                key1: post.post_id,
+                key2: post.name,
+                key3: post.symbol,
+                key4: post.contract_creator, // TODO: Add image
+              },
+            });
+          }}
         >
           <Text
             className={`text-center font-semibold py-4`}

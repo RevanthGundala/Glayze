@@ -5,6 +5,7 @@ import {
   TouchableWithoutFeedback,
   StyleProp,
   TextStyle,
+  TextInputProps,
 } from "react-native";
 import { Image } from "expo-image";
 import { useTheme } from "@/contexts/theme-context";
@@ -18,6 +19,7 @@ type InputProps = {
   search?: boolean;
   className?: string; // Add this line for custom classes
   style?: StyleProp<TextStyle>;
+  keyboardType?: TextInputProps["keyboardType"];
 };
 
 export type InputHandle = {
@@ -35,6 +37,7 @@ export const Input = forwardRef<InputHandle, InputProps>(
       readOnly,
       search,
       className,
+      keyboardType,
     },
     ref
   ) => {
@@ -85,6 +88,7 @@ export const Input = forwardRef<InputHandle, InputProps>(
             editable={!readOnly}
             selectTextOnFocus={!readOnly}
             selectionColor={theme.textColor}
+            keyboardType={keyboardType}
           />
         </View>
       </TouchableWithoutFeedback>

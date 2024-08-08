@@ -21,6 +21,8 @@ import Toast from "react-native-toast-message";
 // import { SocialProvider } from "@dynamic-labs/client";
 // import { client } from "@/entrypoint";
 import { BaseWallet } from "@/components/base-wallet";
+import * as Linking from "expo-linking";
+import { useEffect } from "react";
 
 export default function Login() {
   const router = useRouter();
@@ -40,6 +42,7 @@ export default function Login() {
       console.log(error);
     }
   };
+
   return (
     <SafeAreaView
       className="flex-1"
