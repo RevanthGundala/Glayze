@@ -50,6 +50,8 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env.development
+.env.production
 
 # typescript
 *.tsbuildinfo
