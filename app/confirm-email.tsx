@@ -17,7 +17,7 @@ import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { client } from "@/utils/client";
+// import { client } from "@/utils/client";
 import Toast from "react-native-toast-message";
 import { baseSepolia } from "viem/chains";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
@@ -37,14 +37,14 @@ export default function ConfirmEmail() {
 
   const handleConfirmCode = async () => {
     try {
-      if (!client) {
-        console.log("Client not initialized");
-        throw new Error("Authentication client not initialized");
-      }
-      await client.auth.email.verifyOTP(code);
-      if (client.auth.authenticatedUser?.email === email) {
-        router.push("/(authenticated)/home");
-      }
+      // if (!client) {
+      //   console.log("Client not initialized");
+      //   throw new Error("Authentication client not initialized");
+      // }
+      // await client.auth.email.verifyOTP(code);
+      // if (client.auth.authenticatedUser?.email === email) {
+      //   router.push("/(authenticated)/home");
+      // }
       //   const wallet = await wallets.embedded.createWallet();
       //   const publicViemClient = client.viem.createPublicClient({
       //     chain: baseSepolia,
