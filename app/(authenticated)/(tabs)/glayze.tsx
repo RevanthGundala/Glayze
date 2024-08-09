@@ -9,9 +9,10 @@ import {
   Platform,
   TouchableOpacity,
   Modal,
+  ActivityIndicator,
 } from "react-native";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import { ScrollView } from "react-native";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/theme-context";
@@ -37,6 +38,8 @@ interface FormInput {
 export default function Glayze() {
   const { theme, themeName } = useTheme();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     control,
@@ -77,14 +80,15 @@ export default function Glayze() {
 
   const handlePurchase = async (input: FormInput) => {
     try {
-      const offerings = await Purchases.getOfferings();
-      console.log(offerings);
-      if (
-        offerings.current !== null &&
-        offerings.current.availablePackages.length !== 0
-      ) {
-        // Display packages for sale
-      }
+      setIsLoading(true);
+      // const offerings = await Purchases.getOfferings();
+      // console.log(offerings);
+      // if (
+      //   offerings.current !== null &&
+      //   offerings.current.availablePackages.length !== 0
+      // ) {
+      //   // Display packages for sale
+      // }
       const { name, symbol, url } = input;
       if (!name || !symbol || !url) {
         throw new Error("Name, symbol, or url is not provided.");
@@ -148,13 +152,15 @@ export default function Glayze() {
 
       const data = await response.json();
       console.log("Metadata IPFS Hash:", data.metadataIpfsHash);
+      setIsLoading(false);
+      if (!data.postId) throw new Error("Post ID not found in the response.");
+      router.replace(
+        `/(authenticated)/aux/success?isGlayze=true&id=${data.postId}` as Href
+      );
     } catch (error) {
+      setIsLoading(false);
       console.error("Purchase failed:", error);
-      Toast.show({
-        text1: "Error",
-        text2: error instanceof Error ? error.message : "Purchase failed",
-        type: "error",
-      });
+      router.replace("/(authenticated)/aux/error" as Href);
     }
   };
   //   try {
@@ -424,7 +430,7 @@ export default function Glayze() {
                 className="text-center font-semibold py-4"
                 style={{ color: colors.white }}
               >
-                Pay $1.09
+                {isLoading ? <ActivityIndicator size="large" /> : "Pay $1.09"}
               </Text>
             </Button>
           </ScrollView>

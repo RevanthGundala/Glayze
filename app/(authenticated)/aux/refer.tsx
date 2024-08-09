@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { View, Text, SafeAreaView } from "react-native";
 import { Input } from "@/components/ui/input";
-import { BackArrow } from "@/components/ui/back-arrow";
 import { Button } from "@/components/ui/button";
 import { useReferral } from "@/hooks";
 import { share } from "@/utils/helpers";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
+import { Header } from "@/components/header";
 
 export default function Refer() {
   const [auraAmount, setAuraAmount] = useState(20); // TODO: Fetch from API
@@ -23,7 +23,9 @@ export default function Refer() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <BackArrow />
+      <View className="flex flex-row">
+        <Header backArrow />
+      </View>
       <View className="flex items-center">
         <Text
           className="font-semibold text-2xl"

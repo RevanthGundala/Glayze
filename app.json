@@ -15,7 +15,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.glayze",
-      "associatedDomains": ["applinks:glayze.app", "webcredentials:glayze.app"]
+      "associatedDomains": [
+        "applinks:glayze.app",
+        "webcredentials:glayze.app"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -54,7 +57,10 @@
             "deploymentTarget": "15.0"
           }
         }
-      ]
+      ],
+      "expo-font",
+      "expo-localization",
+      "expo-router"
     ],
     "experiments": {
       "typedRoutes": true

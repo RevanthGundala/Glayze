@@ -5,7 +5,7 @@
       {
         "appID": "6587549824.app.glayze",
         "paths": [
-          "/records/*"
+          "*"
         ]
       }
     ]

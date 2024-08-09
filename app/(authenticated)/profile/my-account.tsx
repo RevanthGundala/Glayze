@@ -133,10 +133,7 @@ const Unlink = () => {
                 buttonStyle="flex-1 py-3 rounded-lg mr-2"
                 style={{ backgroundColor: theme.tabBarInactiveTintColor }}
               >
-                <Text
-                  style={{ color: theme.textColor }}
-                  className="text-center"
-                >
+                <Text style={{ color: colors.white }} className="text-center">
                   No
                 </Text>
               </Button>
@@ -216,10 +213,7 @@ const DeleteAccount = () => {
                 buttonStyle="flex-1 py-3 rounded-lg mr-2"
                 style={{ backgroundColor: theme.tabBarInactiveTintColor }}
               >
-                <Text
-                  style={{ color: theme.textColor }}
-                  className="text-center"
-                >
+                <Text style={{ color: colors.white }} className="text-center">
                   No
                 </Text>
               </Button>
@@ -229,7 +223,7 @@ const DeleteAccount = () => {
                 style={{ backgroundColor: colors.redTintColor }}
               >
                 <Text
-                  style={{ color: theme.textColor }}
+                  style={{ color: colors.white }}
                   className="font-semibold text-center"
                 >
                   Delete

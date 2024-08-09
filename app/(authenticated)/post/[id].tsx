@@ -32,12 +32,13 @@ export default function Post() {
   );
   const { data: position } = usePosition(post, "0x1234567890");
   const { theme } = useTheme();
+  const router = useRouter();
 
   if (isLoading) {
     return <ActivityIndicator />;
   }
   if (isError || !post) {
-    return <Text>Error loading post</Text>;
+    return <Text>Error loading post.</Text>;
   }
 
   return (
@@ -48,9 +49,9 @@ export default function Post() {
       <View className="flex flex-row justify-between items-center w-full">
         <Header backArrow />
         <ShareHeader
-          name={post.name}
-          symbol={post.symbol}
-          image={post.contract_creator}
+          name={post?.name}
+          symbol={post?.symbol}
+          image={post?.contract_creator}
         />
         {/* TODO: Add image */}
         <View className="px-6 py-4">

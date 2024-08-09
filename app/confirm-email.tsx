@@ -17,7 +17,7 @@ import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-// import { client } from "@/entrypoint";
+import { client } from "@/utils/client";
 import Toast from "react-native-toast-message";
 import { baseSepolia } from "viem/chains";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
@@ -34,65 +34,65 @@ export default function ConfirmEmail() {
   const router = useRouter();
   const { email } = useLocalSearchParams();
   const [code, setCode] = useState("");
-  // const { auth, wallets } = useReactiveClient(client);
 
   const handleConfirmCode = async () => {
-    // try {
-    //   if (!client) {
-    //     console.log("Client not initialized");
-    //     return;
-    //   }
-    //   await client.auth.email.verifyOTP(code);
-    //   if (auth.authenticatedUser?.email === email) {
-    //     router.push("/(authenticated)/home");
-    //   }
-    //   const wallet = await wallets.embedded.createWallet();
-    //   const publicViemClient = client.viem.createPublicClient({
-    //     chain: baseSepolia,
-    //   });
-    //   const walletViemClient = client.viem.createWalletClient({
-    //     wallet,
-    //   });
-    //   const signer = walletClientToSmartAccountSigner(walletViemClient);
-    //   const simpleAccount = await signerToSimpleSmartAccount(
-    //     publicViemClient as PublicClient,
-    //     {
-    //       signer,
-    //       factoryAddress: process.env.EXPO_PUBLIC_BASE_FACTORY_ADDRESS!,
-    //       entryPoint: process.env.EXPO_PUBLIC_BASE_ENTRYPOINT_ADDRESS,
-    //     }
-    //   );
-    //   const cloudPaymaster = createPimlicoPaymasterClient({
-    //     chain: baseSepolia,
-    //     transport: http(process.env.EXPO_PUBLIC_BASE_SEPOLIA_PAYMASTER_KEY),
-    //     entryPoint: process.env.EXPO_PUBLIC_BASE_SEPOLIA_ENTRYPOINT_ADDRESS,
-    //   });
-    //   const smartAccountClient = createSmartAccountClient({
-    //     account: simpleAccount,
-    //     chain: baseSepolia,
-    //     bundlerTransport: http(
-    //       process.env.EXPO_PUBLIC_BASE_SEPOLIA_PAYMASTER_KEY
-    //     ),
-    //     // IMPORTANT: Set up Cloud Paymaster to sponsor your transaction
-    //     middleware: {
-    //       sponsorUserOperation: cloudPaymaster.sponsorUserOperation,
-    //     },
-    //   });
-    //   console.log("address: ", await smartAccountClient.getAddress());
-    //   router.push("/(authenticated)/home");
-    // } catch (error) {
-    //   console.log(error);
-    //   Toast.show({
-    //     text1: "Error verifying code",
-    //     text2: "Please try again",
-    //     type: "error",
-    //     autoHide: true,
-    //   });
-    // }
+    try {
+      if (!client) {
+        console.log("Client not initialized");
+        throw new Error("Authentication client not initialized");
+      }
+      await client.auth.email.verifyOTP(code);
+      if (client.auth.authenticatedUser?.email === email) {
+        router.push("/(authenticated)/home");
+      }
+      //   const wallet = await wallets.embedded.createWallet();
+      //   const publicViemClient = client.viem.createPublicClient({
+      //     chain: baseSepolia,
+      //   });
+      //   const walletViemClient = client.viem.createWalletClient({
+      //     wallet,
+      //   });
+      //   const signer = walletClientToSmartAccountSigner(walletViemClient);
+      //   const simpleAccount = await signerToSimpleSmartAccount(
+      //     publicViemClient as PublicClient,
+      //     {
+      //       signer,
+      //       factoryAddress: process.env.EXPO_PUBLIC_BASE_FACTORY_ADDRESS!,
+      //       entryPoint: process.env.EXPO_PUBLIC_BASE_ENTRYPOINT_ADDRESS,
+      //     }
+      //   );
+      //   const cloudPaymaster = createPimlicoPaymasterClient({
+      //     chain: baseSepolia,
+      //     transport: http(process.env.EXPO_PUBLIC_BASE_SEPOLIA_PAYMASTER_KEY),
+      //     entryPoint: process.env.EXPO_PUBLIC_BASE_SEPOLIA_ENTRYPOINT_ADDRESS,
+      //   });
+      //   const smartAccountClient = createSmartAccountClient({
+      //     account: simpleAccount,
+      //     chain: baseSepolia,
+      //     bundlerTransport: http(
+      //       process.env.EXPO_PUBLIC_BASE_SEPOLIA_PAYMASTER_KEY
+      //     ),
+      //     // IMPORTANT: Set up Cloud Paymaster to sponsor your transaction
+      //     middleware: {
+      //       sponsorUserOperation: cloudPaymaster.sponsorUserOperation,
+      //     },
+      //   });
+      //   console.log("address: ", await smartAccountClient.getAddress());
+      //   router.push("/(authenticated)/home");
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        text1: "Error verifying code",
+        text2: "Please try again",
+        type: "error",
+        autoHide: true,
+      });
+    }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
+      <client.reactNative.WebView />
       <Toast />
       <View className="flex flex-row">
         <Header backArrow />

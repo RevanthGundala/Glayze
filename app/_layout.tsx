@@ -27,7 +27,7 @@ export default function RootLayout() {
     }
 
     prepare();
-    router.push("/(authenticated)/home");
+    // router.push("/(authenticated)/home");
   }, []);
 
   const handleUrl = async (receivedUrl: string) => {
@@ -69,6 +69,7 @@ export default function RootLayout() {
   };
 
   useEffect(() => {
+    console.log("RootLayout useEffect running");
     const subscription = Linking.addEventListener("url", ({ url }) => {
       console.log("incoming deeplink:", url);
       try {
@@ -81,14 +82,14 @@ export default function RootLayout() {
     return () => subscription.remove();
   }, []);
 
-  useEffect(() => {
-    Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
-    Purchases.configure({
-      apiKey: process.env.EXPO_PUBLIC_PURCHASES_APPLE_API_KEY!,
-      appUserID: null,
-      useAmazon: false,
-    });
-  }, []);
+  // useEffect(() => {
+  //   Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
+  //   Purchases.configure({
+  //     apiKey: process.env.EXPO_PUBLIC_PURCHASES_APPLE_API_KEY!,
+  //     appUserID: null,
+  //     useAmazon: false,
+  //   });
+  // }, []);
 
   return (
     <Providers>

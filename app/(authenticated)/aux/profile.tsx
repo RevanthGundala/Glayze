@@ -20,6 +20,7 @@ import {
   GLAYZE_PRIVACY_POLICY,
 } from "@/utils/constants";
 import { Header } from "@/components/header";
+import { colors } from "@/utils/theme";
 
 export default function Profile() {
   const { theme, themeName } = useTheme();
@@ -168,10 +169,7 @@ const LogOut = () => {
                 buttonStyle="flex-1 py-3 rounded-lg mr-2"
                 style={{ backgroundColor: theme.tabBarInactiveTintColor }}
               >
-                <Text
-                  style={{ color: theme.textColor }}
-                  className="text-center"
-                >
+                <Text style={{ color: colors.white }} className="text-center">
                   No
                 </Text>
               </Button>

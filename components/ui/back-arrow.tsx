@@ -2,12 +2,13 @@ import React from "react";
 import { View, Image } from "react-native";
 import { Link } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
+import { TouchableOpacity } from "react-native";
 
 export const BackArrow = () => {
   const { themeName } = useTheme();
   return (
-    <Link href="../">
-      <View className="p-2">
+    <Link href="../" asChild>
+      <TouchableOpacity className="p-2">
         {themeName === "dark" ? (
           <Image
             source={require("@/assets/images/dark/back.png")}
@@ -19,7 +20,7 @@ export const BackArrow = () => {
             className="w-4 h-4"
           />
         )}
-      </View>
+      </TouchableOpacity>
     </Link>
   );
 };

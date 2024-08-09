@@ -11,7 +11,8 @@ import { useRef, useEffect } from "react";
 
 export default function Home() {
   const [selectedTab, setSelectedTab] = useState("Trending");
-  const tabs = ["Trending", "New", "Top"];
+  // const tabs = ["Trending", "New", "Top"];
+  const tabs = ["Trending", "New"];
   const scrollY = useHomeScrollY();
   const ref = useRef(null);
   useScrollToTop(ref);

@@ -28,7 +28,7 @@ export default function Success() {
         >
           {isGlayze
             ? `Successfully created $${symbol}`
-            : isBuy
+            : isBuy === "true"
             ? `Successfully bought ${shares} shares of $${symbol} for $${price}`
             : `Successfully sold ${shares} shares of $${symbol} for $${price}`}
         </Text>
