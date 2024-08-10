@@ -2,25 +2,14 @@ import React, { useEffect } from "react";
 import { Platform, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { Text, Pressable } from "react-native";
-import * as Linking from "expo-linking";
 import { CoinbaseWalletSDK } from "@mobile-wallet-protocol/client";
 import { useRouter, Href } from "expo-router";
 
-// const sdk = new CoinbaseWalletSDK({
-//   appDeeplinkUrl: "https://glayze.app", // required
-//   appName: "Glayze",
-//   appChainIds: [8453], // Sepolia
-//   appLogoUrl: "",
-// });
-
-const PREFIX_URL = Linking.createURL("/");
-
-// 3. Initialize SDK
 const sdk = new CoinbaseWalletSDK({
-  appDeeplinkUrl: PREFIX_URL,
+  appDeeplinkUrl: "https://glayze.app",
   appName: "Glayze",
   appChainIds: [8453],
-  appLogoUrl: require("@/assets/images/icon.png"),
+  appLogoUrl: "",
 });
 
 const provider = sdk.makeWeb3Provider();
@@ -36,11 +25,12 @@ export const BaseWallet = () => {
         const addresses = await provider.request({
           method: "eth_requestAccounts",
         });
+        console.log("Requested");
+        console.log("addresses", addresses);
         const signedData = await provider.request({
           method: "personal_sign",
           params: ["0x48656c6c6f20776f726c6421", addresses[0]],
         });
-        console.log("addresses", addresses);
       }
     } catch (error) {
       console.log(error);

@@ -9,7 +9,6 @@ import appleIcon from "@/assets/images/socials/apple.png";
 import icon from "@/assets/images/icon.png";
 import { lightTheme as theme } from "@/utils/theme";
 import { Button } from "@/components/ui/button";
-// import { client } from "@/entrypoint";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
@@ -60,7 +59,6 @@ const InitialLayout = () => {
 
   useEffect(() => {
     // console.log("initial layout");
-    router.replace("/home");
     // if (!isReady) return;
     // if (isConnected(wallet)) {
     //   router.replace("/home");
@@ -69,7 +67,6 @@ const InitialLayout = () => {
 
   return (
     <Stack>
-      {/* <Stack.Screen name="(root)" options={{ headerShown: false }} /> */}
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="aux/success" options={{ headerShown: false }} />
       <Stack.Screen name="aux/error" options={{ headerShown: false }} />

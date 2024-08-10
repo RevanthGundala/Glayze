@@ -13,8 +13,8 @@ if (!environmentId) {
 
 export const client = createClient({
   environmentId,
-  appLogoUrl: "https://demo.dynamic.xyz/favicon-32x32.png",
-  appName: "Dynamic Demo",
+  appLogoUrl: "",
+  appName: "",
 })
   .extend(ReactNativeExtension())
   .extend(ViemExtension());
