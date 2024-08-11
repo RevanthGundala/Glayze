@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  TouchableOpacity,
-  StyleProp,
-} from "react-native";
+import { TouchableOpacity, StyleProp } from "react-native";
 
 type ButtonProps = {
   buttonStyle?: string;
@@ -20,8 +14,8 @@ export const Button = ({
   children,
 }: ButtonProps) => {
   return (
-    <Pressable className={buttonStyle} style={style} onPress={onPress}>
+    <TouchableOpacity className={buttonStyle} style={style} onPress={onPress}>
       {children}
-    </Pressable>
+    </TouchableOpacity>
   );
 };

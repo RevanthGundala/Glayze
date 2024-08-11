@@ -32,7 +32,7 @@ export default function Error() {
 
       <Button
         buttonStyle="py-4 px-8 rounded-full"
-        onPress={() => router.replace("../")}
+        onPress={() => router.replace("/(authenticated)/(tabs)/glayze")}
         style={{ backgroundColor: theme.tabBarActiveTintColor }}
       >
         <Text

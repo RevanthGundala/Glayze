@@ -12,23 +12,38 @@ import { useRouter } from "expo-router";
 import { useTheme } from "../../../contexts/theme-context";
 import { SubHeader } from "@/components/sub-header";
 import { PostComponent } from "@/components/post-section";
-import { usePosts } from "@/hooks/use-posts";
 import { useScrollToTop } from "@react-navigation/native";
 import { useRef } from "react";
+import { client } from "@/utils/dynamic-client";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { useWallet, useBalance } from "@/hooks";
+
+// Define the type for the viewTweets state
+type ViewTweetsState = {
+  "Your Investments": boolean;
+  "X Creator Rewards": boolean;
+  "Glayze Creator Rewards": boolean;
+};
+
+// Use a type for the keys of ViewTweetsState
+type ViewTweetsSectionKey = keyof ViewTweetsState;
 
 export default function Wallet() {
+  const { wallets } = useReactiveClient(client);
+  const address = wallets.userWallets[0]?.address;
   const { theme, themeName } = useTheme();
   const ref = useRef(null);
   useScrollToTop(ref);
   const router = useRouter();
-  const { data: posts, isLoading, isError } = usePosts("New");
-  const [viewTweets, setViewTweets] = useState({
+  const [viewTweets, setViewTweets] = useState<ViewTweetsState>({
     "Your Investments": false,
     "X Creator Rewards": false,
     "Glayze Creator Rewards": false,
   });
+  const { data, isLoading, isError } = useWallet(address);
+  const { data: balance } = useBalance(address);
 
-  const toggleViewTweets = useCallback((section) => {
+  const toggleViewTweets = useCallback((section: ViewTweetsSectionKey) => {
     setViewTweets((prev) => ({
       ...prev,
       [section]: !prev[section],
@@ -36,7 +51,7 @@ export default function Wallet() {
   }, []);
 
   const renderItem = useCallback(
-    ({ item, section }) => {
+    ({ item, section }: { item: any; section: any }) => {
       if (section.type === "balance") {
         return (
           <View className="flex flex-row justify-between py-2">
@@ -75,7 +90,7 @@ export default function Wallet() {
                 className="text-5xl text-center pt-6 font-bold"
                 style={{ color: theme.textColor }}
               >
-                $1000
+                ${balance ?? 0}
               </Text>
             </View>
             <View className="flex flex-row justify-center">
@@ -99,30 +114,38 @@ export default function Wallet() {
         </View>
       ),
     },
+    // {
+    //   type: "balance",
+    //   title: "Total Return",
+    //   data: [
+    //     {
+    //       title: "Investments",
+    //       value: `$${user?.current_investments ?? 0}`,
+    //     },
+    //     {
+    //       title: "X Creator Rewards",
+    //       value: `$${user?.x_creator_rewards ?? 0}`,
+    //     },
+    //     {
+    //       title: "Glayze Creator Rewards",
+    //       value: `$${user?.glayze_creator_rewards ?? 0}`,
+    //     },
+    //   ],
+    // },
     {
-      type: "balance",
-      title: "Total Investments",
-      data: [
-        { title: "Individual Value", value: "$1000" },
-        { title: "Your Investments", value: "$1000" },
-        { title: "X Creator Rewards", value: "$1000" },
-        { title: "Glayze Creator Rewards", value: "$1000" },
-      ],
+      type: "investment",
+      title: "Holdings",
+      data: data?.holdings || [],
     },
     {
       type: "investment",
-      title: "Your Investments",
-      data: posts || [],
+      title: "X Posts",
+      data: data?.xPosts || [],
     },
     {
       type: "investment",
-      title: "X Creator Rewards",
-      data: posts || [],
-    },
-    {
-      type: "investment",
-      title: "Glayze Creator Rewards",
-      data: posts || [],
+      title: "Creations",
+      data: data?.creations || [],
     },
   ];
 

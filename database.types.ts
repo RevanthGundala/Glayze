@@ -13,13 +13,10 @@ export type Database = {
         Row: {
           ath: number | null
           contract_creator: string | null
-          contract_creator_handle: string | null
-          contract_creator_username: string | null
           created_at: string
-          market_cap: number | null
+          image_uri: string | null
           name: string | null
           post_id: number
-          price: number | null
           real_creator: string | null
           symbol: string | null
           url: string | null
@@ -28,13 +25,10 @@ export type Database = {
         Insert: {
           ath?: number | null
           contract_creator?: string | null
-          contract_creator_handle?: string | null
-          contract_creator_username?: string | null
           created_at?: string
-          market_cap?: number | null
+          image_uri?: string | null
           name?: string | null
           post_id: number
-          price?: number | null
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
@@ -43,13 +37,10 @@ export type Database = {
         Update: {
           ath?: number | null
           contract_creator?: string | null
-          contract_creator_handle?: string | null
-          contract_creator_username?: string | null
           created_at?: string
-          market_cap?: number | null
+          image_uri?: string | null
           name?: string | null
           post_id?: number
-          price?: number | null
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
@@ -90,99 +81,72 @@ export type Database = {
           content: string | null
           created_at: string
           id: number
-          show: boolean | null
         }
         Insert: {
           address?: string | null
           content?: string | null
           created_at?: string
           id?: number
-          show?: boolean | null
         }
         Update: {
           address?: string | null
           content?: string | null
           created_at?: string
           id?: number
-          show?: boolean | null
         }
         Relationships: []
       }
       Trades: {
         Row: {
-          aura_used: number | null
+          aura: number | null
           created_at: string
           is_buy: boolean | null
           post_id: number
           price: number | null
-          token_amount: number | null
+          shares: number | null
           trader: string | null
-          usdc_amount: number | null
+          usdc: number | null
         }
         Insert: {
-          aura_used?: number | null
+          aura?: number | null
           created_at?: string
           is_buy?: boolean | null
           post_id: number
           price?: number | null
-          token_amount?: number | null
+          shares?: number | null
           trader?: string | null
-          usdc_amount?: number | null
+          usdc?: number | null
         }
         Update: {
-          aura_used?: number | null
+          aura?: number | null
           created_at?: string
           is_buy?: boolean | null
           post_id?: number
           price?: number | null
-          token_amount?: number | null
+          shares?: number | null
           trader?: string | null
-          usdc_amount?: number | null
+          usdc?: number | null
         }
         Relationships: []
       }
       Users: {
         Row: {
           address: string | null
-          contract_creator_rewards: number | null
           created_at: string
-          handle: string | null
           id: number
-          name: string | null
-          num_posts: number | null
-          num_referrals: number | null
-          num_transactions: number | null
-          profile_pic: Json | null
-          real_creator_rewards: number | null
-          total_glayze_earned: number | null
+          referral_code: string | null
         }
         Insert: {
           address?: string | null
-          contract_creator_rewards?: number | null
           created_at?: string
-          handle?: string | null
           id?: number
-          name?: string | null
-          num_posts?: number | null
-          num_referrals?: number | null
-          num_transactions?: number | null
-          profile_pic?: Json | null
-          real_creator_rewards?: number | null
-          total_glayze_earned?: number | null
+          referral_code?: string | null
         }
         Update: {
           address?: string | null
-          contract_creator_rewards?: number | null
           created_at?: string
-          handle?: string | null
           id?: number
-          name?: string | null
-          num_posts?: number | null
-          num_referrals?: number | null
-          num_transactions?: number | null
-          profile_pic?: Json | null
-          real_creator_rewards?: number | null
-          total_glayze_earned?: number | null
+          referral_code?: string | null
         }
         Relationships: []
       }

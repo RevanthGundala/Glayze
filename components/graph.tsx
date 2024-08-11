@@ -12,7 +12,6 @@ import { useTheme } from "../contexts/theme-context";
 type GraphProps = {
   price: number;
   change: number;
-  symbol: string;
   selectedTime: Time;
   setSelectedTime: React.Dispatch<React.SetStateAction<Time>>;
 };

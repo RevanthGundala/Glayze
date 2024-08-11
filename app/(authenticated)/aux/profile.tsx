@@ -21,6 +21,8 @@ import {
 } from "@/utils/constants";
 import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { client } from "@/utils/dynamic-client";
 
 export default function Profile() {
   const { theme, themeName } = useTheme();
@@ -119,9 +121,11 @@ const LogOut = () => {
   const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
+  const { auth } = useReactiveClient(client);
 
   const handleLogOut = () => {
     setModalVisible(false);
+    auth.logout();
     router.replace("/");
   };
 

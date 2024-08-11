@@ -5,13 +5,23 @@ import { useRouter } from "expo-router";
 import { Link } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { Header } from "@/components/header";
+import { colors } from "@/utils/theme";
+import { client } from "@/utils/dynamic-client";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
 
 export default function ConnectToTwitter() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { auth } = useReactiveClient(client);
 
   const handleConnect = async () => {
-    console.log("clicked");
+    try {
+      await auth.social.connect({ provider: "twitter" });
+      // TODO: get user info
+      router.push("/end");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <SafeAreaView
@@ -46,13 +56,13 @@ export default function ConnectToTwitter() {
             }}
           >
             <Text
-              className="text-black text-lg font-medium px-8 py-3"
-              style={{ color: theme.textColor }}
+              className="text-lg font-medium px-8 py-3"
+              style={{ color: colors.white }}
             >
               Connect to X
             </Text>
           </Button>
-          <Link href="/end" asChild>
+          <Link href="/end">
             <Text
               className="text-center text-lg pt-4"
               style={{ color: theme.mutedForegroundColor }}

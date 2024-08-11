@@ -7,9 +7,12 @@ import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
+import { client } from "@/utils/dynamic-client";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
 
 export default function Receive() {
-  const address = "0x1234567890"; // TODO: Fetch from API
+  const { wallets } = useReactiveClient(client);
+  const address = wallets.userWallets[0]?.address;
   const { theme } = useTheme();
 
   const copyToClipboard = async () => {

@@ -19,10 +19,7 @@ export const Header = ({ title, backArrow }: HeaderProps) => {
         </View>
       )}
       {title && (
-        <Text
-          className="text-2xl"
-          style={{ color: theme.textColor, fontWeight: theme.boldFont }}
-        >
+        <Text className="text-2xl" style={{ color: theme.textColor }}>
           {title}
         </Text>
       )}

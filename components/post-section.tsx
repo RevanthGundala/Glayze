@@ -3,7 +3,7 @@ import { TouchableWithoutFeedback, View, Image, Text } from "react-native";
 import { Link } from "expo-router";
 import { usePostPrices } from "@/hooks";
 import { EmbeddedTweet } from "./twitter-theme/embedded-tweet";
-import { useEmbeddedTweet } from "@/hooks";
+import { useEmbeddedTweet, useShareInfo } from "@/hooks";
 import { Post } from "@/utils/types";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
@@ -59,6 +59,7 @@ export const PostComponent = ({
 }: PostComponentProps) => {
   const { data: oneHour } = usePostPrices(post.post_id, "1H");
   const { data: tweet, isLoading, isError } = useEmbeddedTweet(post.url);
+  const { data: shareInfo } = useShareInfo(post.post_id);
   const { theme } = useTheme();
 
   return (
@@ -79,8 +80,8 @@ export const PostComponent = ({
                   style={{ borderColor: theme.mutedForegroundColor }}
                 >
                   <Image
-                    // source={{ uri: post.contract_creator || "" }}
-                    source={require("@/assets/images/icon.png")}
+                    source={{ uri: `${post.image_uri}` || "" }}
+                    // source={require("@/assets/images/icon.png")}
                     className="w-10 h-10"
                   />
                 </View>
@@ -96,7 +97,9 @@ export const PostComponent = ({
                       className="text-xl font-semibold"
                       style={{ color: theme.textColor }}
                     >
-                      {post.price != null ? `$${post.price.toFixed(3)}` : "N/A"}
+                      {shareInfo != null
+                        ? `$${shareInfo.price.toFixed(3)}`
+                        : "N/A"}
                     </Text>
                   </View>
                   <View className="flex-row justify-between items-center mt-[-2]">

@@ -11,13 +11,22 @@ import { useTheme } from "../../../contexts/theme-context";
 import { Header } from "@/components/header";
 import { SubHeader } from "@/components/sub-header";
 import { colors } from "@/utils/theme";
+import { client } from "@/utils/dynamic-client";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { ActivityIndicator } from "react-native";
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
-  const address = "0x1234567890";
+  const { wallets, ui, sdk } = useReactiveClient(client);
+  const address = wallets.userWallets[0]?.address;
 
-  const handlePress = () => {
-    console.log("Hello");
+  if (!sdk.loaded) return <ActivityIndicator />;
+
+  const exportKeys = () => {
+    ui.wallets.revealEmbeddedWalletKey({
+      type: "private-key",
+    });
+    console.log("🔍 Exporting keys");
   };
 
   return (
@@ -55,7 +64,7 @@ export default function MyAccount() {
             <Input placeholder={address ?? "Cannot fetch address"} readOnly />
             <Button
               buttonStyle="w-full rounded-lg"
-              onPress={() => {}}
+              onPress={exportKeys}
               style={{ backgroundColor: theme.tabBarActiveTintColor }}
             >
               <Text

@@ -25,14 +25,7 @@
   },
   {
     "type": "function",
-    "name": "CONTRACT_CREATOR_FEE",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "DECIMALS",
+    "name": "GLAYZE_CREATOR_FEE",
     "inputs": [],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
@@ -115,32 +108,20 @@
   },
   {
     "type": "function",
-    "name": "buyTokens",
+    "name": "buyShares",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
-      { "name": "tokenAmount", "type": "uint256", "internalType": "uint256" },
-      { "name": "auraAmount", "type": "uint256", "internalType": "uint256" }
+      { "name": "shares", "type": "uint256", "internalType": "uint256" },
+      { "name": "aura", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "contractCreatorRemainingEarnings",
-    "inputs": [{ "name": "id", "type": "uint256", "internalType": "uint256" }],
-    "outputs": [
-      {
-        "name": "remainingEarnings",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "createPost",
     "inputs": [
+      { "name": "postId", "type": "uint256", "internalType": "uint256" },
       { "name": "name", "type": "string", "internalType": "string" },
       { "name": "symbol", "type": "string", "internalType": "string" },
       { "name": "postURI", "type": "string", "internalType": "string" }
@@ -153,7 +134,7 @@
     "name": "getBuyPrice",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
-      { "name": "tokenAmount", "type": "uint256", "internalType": "uint256" }
+      { "name": "shares", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
@@ -163,7 +144,7 @@
     "name": "getBuyPriceAfterFees",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
-      { "name": "tokenAmount", "type": "uint256", "internalType": "uint256" }
+      { "name": "shares", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
@@ -173,7 +154,7 @@
     "name": "getFeeSplit",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
-      { "name": "price", "type": "uint256", "internalType": "uint256" }
+      { "name": "totalFees", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [
       { "name": "", "type": "uint256", "internalType": "uint256" },
@@ -199,7 +180,7 @@
     "name": "getSellPrice",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
-      { "name": "tokenAmount", "type": "uint256", "internalType": "uint256" }
+      { "name": "shares", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
@@ -209,7 +190,7 @@
     "name": "getSellPriceAfterFees",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
-      { "name": "tokenAmount", "type": "uint256", "internalType": "uint256" }
+      { "name": "shares", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
@@ -222,6 +203,19 @@
       { "name": "price", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "glayzeCreatorRemainingEarnings",
+    "inputs": [{ "name": "id", "type": "uint256", "internalType": "uint256" }],
+    "outputs": [
+      {
+        "name": "remainingEarnings",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
     "stateMutability": "view"
   },
   {
@@ -243,13 +237,6 @@
   },
   {
     "type": "function",
-    "name": "postIdCounter",
-    "inputs": [],
-    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "posts",
     "inputs": [{ "name": "id", "type": "uint256", "internalType": "uint256" }],
     "outputs": [
@@ -257,7 +244,7 @@
       { "name": "symbol", "type": "string", "internalType": "string" },
       { "name": "postURI", "type": "string", "internalType": "string" },
       {
-        "name": "contractCreator",
+        "name": "glayzeCreator",
         "type": "address",
         "internalType": "address"
       },
@@ -284,11 +271,11 @@
   },
   {
     "type": "function",
-    "name": "sellTokens",
+    "name": "sellShares",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
-      { "name": "tokenAmount", "type": "uint256", "internalType": "uint256" },
-      { "name": "auraAmount", "type": "uint256", "internalType": "uint256" }
+      { "name": "shares", "type": "uint256", "internalType": "uint256" },
+      { "name": "aura", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -315,21 +302,21 @@
   },
   {
     "type": "function",
-    "name": "supportsInterface",
-    "inputs": [
-      { "name": "interfaceId", "type": "bytes4", "internalType": "bytes4" }
-    ],
-    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "tokenInfo",
+    "name": "shareInfo",
     "inputs": [{ "name": "id", "type": "uint256", "internalType": "uint256" }],
     "outputs": [
       { "name": "price", "type": "uint256", "internalType": "uint256" },
       { "name": "supply", "type": "uint256", "internalType": "uint256" }
     ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "supportsInterface",
+    "inputs": [
+      { "name": "interfaceId", "type": "bytes4", "internalType": "bytes4" }
+    ],
+    "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
     "stateMutability": "view"
   },
   {
@@ -573,19 +560,19 @@
         "internalType": "bool"
       },
       {
-        "name": "auraAmount",
+        "name": "aura",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
       },
       {
-        "name": "usdcAmount",
+        "name": "usdc",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
       },
       {
-        "name": "tokenAmount",
+        "name": "shares",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -622,19 +609,25 @@
         "internalType": "uint256"
       },
       {
-        "name": "protocolFee",
+        "name": "trader",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "isBuy",
+        "type": "bool",
+        "indexed": false,
+        "internalType": "bool"
+      },
+      {
+        "name": "aura",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
       },
       {
-        "name": "contractCreatorFee",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "realCreatorFee",
+        "name": "usdc",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -687,7 +680,7 @@
   },
   {
     "type": "error",
-    "name": "InsufficientTokenBalance",
+    "name": "InsufficientShareBalance",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
       { "name": "user", "type": "address", "internalType": "address" },
@@ -696,7 +689,7 @@
   },
   {
     "type": "error",
-    "name": "InsufficientTokenSupply",
+    "name": "InsufficientShareSupply",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
       { "name": "supply", "type": "uint256", "internalType": "uint256" }
@@ -711,6 +704,13 @@
   },
   {
     "type": "error",
+    "name": "PostAlreadyExists",
+    "inputs": [
+      { "name": "postId", "type": "uint256", "internalType": "uint256" }
+    ]
+  },
+  {
+    "type": "error",
     "name": "RealCreatorAlreadyExists",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" },
@@ -719,7 +719,7 @@
   },
   {
     "type": "error",
-    "name": "TokenAmountZero",
+    "name": "SharesZero",
     "inputs": [
       { "name": "postId", "type": "uint256", "internalType": "uint256" }
     ]

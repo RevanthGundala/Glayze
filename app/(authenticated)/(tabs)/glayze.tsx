@@ -22,12 +22,17 @@ import { Image } from "expo-image";
 import Toast from "react-native-toast-message";
 import { useForm, Controller } from "react-hook-form";
 import { colors } from "@/utils/theme";
-import { useEmbeddedTweet, usePost } from "@/hooks";
+import { useSmartAccountClient } from "@/hooks";
 import { fetchTweet } from "@/hooks/use-embedded-tweet";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 // import { useProduct } from "@/hooks";
 import Purchases from "react-native-purchases";
+import abi from "@/abi.json";
+import { Address } from "viem";
+import { supabase } from "@/utils/supabase";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { client } from "@/utils/dynamic-client";
 
 interface FormInput {
   name: string;
@@ -39,7 +44,9 @@ export default function Glayze() {
   const { theme, themeName } = useTheme();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const router = useRouter();
+  const { data: smartAccountClient, isError } = useSmartAccountClient();
   const [isLoading, setIsLoading] = useState(false);
+  const { wallets } = useReactiveClient(client);
 
   const {
     control,
@@ -78,28 +85,15 @@ export default function Glayze() {
     }
   };
 
-  const handlePurchase = async (input: FormInput) => {
+  const uploadToIpfs = async (
+    name: string,
+    symbol: string,
+    postId: string,
+    url: string
+  ) => {
     try {
-      setIsLoading(true);
-      // const offerings = await Purchases.getOfferings();
-      // console.log(offerings);
-      // if (
-      //   offerings.current !== null &&
-      //   offerings.current.availablePackages.length !== 0
-      // ) {
-      //   // Display packages for sale
-      // }
-      const { name, symbol, url } = input;
-      if (!name || !symbol || !url) {
-        throw new Error("Name, symbol, or url is not provided.");
-      }
-
-      const tokenId = url.split("/").pop();
-      if (!tokenId) {
-        throw new Error("Token ID not found in the URL.");
-      }
-
       let image: string;
+      let xUserId: string;
       if (selectedImage !== null) {
         const imageFile = await FileSystem.readAsStringAsync(selectedImage, {
           encoding: FileSystem.EncodingType.Base64,
@@ -133,7 +127,7 @@ export default function Glayze() {
             accept: "application/json",
           },
           body: JSON.stringify({
-            tokenId,
+            postId,
             name,
             symbol,
             image,
@@ -150,13 +144,69 @@ export default function Glayze() {
         );
       }
 
-      const data = await response.json();
-      console.log("Metadata IPFS Hash:", data.metadataIpfsHash);
-      setIsLoading(false);
-      if (!data.postId) throw new Error("Post ID not found in the response.");
-      router.replace(
-        `/(authenticated)/aux/success?isGlayze=true&id=${data.postId}` as Href
+      const { metadataIpfsHash, imageIpfsHash } = await response.json();
+      console.log("Metadata IPFS Hash:", metadataIpfsHash);
+      return { metadataIpfsHash, postId, name, symbol, imageIpfsHash };
+    } catch (error) {
+      console.error("Error uploading to IPFS:", error);
+      return null;
+    }
+  };
+
+  const handlePurchase = async (input: FormInput) => {
+    try {
+      setIsLoading(true);
+      if (!smartAccountClient || isError)
+        throw new Error("No smart account found.");
+
+      const { name, symbol, url } = input;
+      if (!name || !symbol || !url) {
+        throw new Error("Name, symbol, or url is not provided.");
+      }
+      const postId = url.split("/").pop();
+      if (!postId) {
+        throw new Error("Token ID not found in the URL.");
+      }
+
+      const response = await uploadToIpfs(name, symbol, postId, url);
+      if (!response) throw new Error("Failed to upload to IPFS.");
+      const { metadataIpfsHash, imageIpfsHash } = response;
+      // const offerings = await Purchases.getOfferings();
+      // console.log(offerings);
+      // if (
+      //   offerings.current !== null &&
+      //   offerings.current.availablePackages.length !== 0
+      // ) {
+      //   // Display packages for sale
+      // }
+      const txHash = await smartAccountClient.writeContract({
+        address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
+        abi,
+        functionName: "createPost",
+        args: [postId, name, symbol, metadataIpfsHash],
+      });
+      console.log("✅ Transaction successfully sponsored!");
+      console.log(
+        `🔍 View on Etherscan: https://sepolia.basescan.org/tx/${txHash}`
       );
+      const { error } = await supabase.from("Posts").insert([
+        {
+          post_id: postId,
+          name,
+          symbol,
+          url,
+          contract_creator: wallets.primary?.address,
+          real_creator: wallets.primary?.address, // TODO:
+          image_uri: imageIpfsHash,
+        },
+      ]);
+      if (error) {
+        throw new Error("Failed to create post in Supabase.");
+      }
+      setIsLoading(false);
+      // router.replace(
+      //   `/(authenticated)/aux/success?isGlayze=true&id=${data.postId}` as Href
+      // );
     } catch (error) {
       setIsLoading(false);
       console.error("Purchase failed:", error);
@@ -185,22 +235,6 @@ export default function Glayze() {
   //     }
   //   }
   // }, [product]);
-  // if (!smartAccount) console.log("No smart account");
-  // const encodedCall = encodeFunctionData({
-  //   abi,
-  //   functionName: "createPost",
-  //   args: [name, symbol, url],
-  // });
-  // const tx = {
-  //   to: CONTRACT_ADDRESS,
-  //   data: encodedCall,
-  // };
-  // const amountInWei = await smartAccount?.getGasEstimate([tx, tx], {
-  //   paymasterServiceData: {
-  //     mode: PaymasterMode.SPONSORED,
-  //   },
-  // });
-  // console.log(amountInWei?.toString());
 
   return (
     <SafeAreaView

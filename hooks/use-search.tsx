@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
 import { Search } from "@/utils/types";
 
-const fetchSearchHistory = async (address: string) => {
+const fetchSearchHistory = async (address: string | undefined) => {
+  if (!address) return null;
   const { data, error } = await supabase
     .from("Search")
     .select("*")
@@ -15,8 +16,8 @@ const fetchSearchHistory = async (address: string) => {
   return data;
 };
 
-export function useSearch(address: string) {
-  return useQuery<Search[], Error>({
+export function useSearch(address: string | undefined) {
+  return useQuery<Search[] | null, Error>({
     queryKey: ["user", address],
     queryFn: () => fetchSearchHistory(address),
   });

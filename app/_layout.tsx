@@ -1,38 +1,24 @@
 import { Slot } from "expo-router";
 import { Providers } from "@/components/providers";
 import { useEffect } from "react";
-import { SplashScreen } from "expo-router";
 import { useRouter, Href } from "expo-router";
 import * as Linking from "expo-linking";
 import Purchases from "react-native-purchases";
-import { useURL } from "@/contexts/url-context";
 import { useState } from "react";
 import { Platform } from "react-native";
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-// SplashScreen.preventAutoHideAsync();
+import { client } from "@/utils/dynamic-client";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
 
 export default function RootLayout() {
   const router = useRouter();
+  const { auth } = useReactiveClient(client);
   const url = useBetterURL();
-  // useEffect(() => {
-  //   async function prepare() {
-  //     try {
-  //       console.log("Starting preparation...");
-  //       // Pre-load fonts, make any API calls you need to do here
-  //       await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulating loading
-  //       console.log("Preparation complete");
-  //     } catch (e) {
-  //       console.error("Preparation error:", e);
-  //     } finally {
-  //       console.log("Hiding splash screen");
-  //       SplashScreen.hideAsync();
-  //     }
-  //   }
 
-  //   prepare();
-  //   // router.push("/(authenticated)/home");
-  // }, []);
+  useEffect(() => {
+    if (auth.token && !auth.authenticatedUser?.newUser) {
+      router.replace("/(authenticated)/(tabs)/home" as Href);
+    }
+  }, [auth.token, router]);
 
   const handleUrl = async (receivedUrl: string) => {
     try {
@@ -87,14 +73,14 @@ export default function RootLayout() {
   //   return () => subscription.remove();
   // }, []);
 
-  // useEffect(() => {
-  //   Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
-  //   Purchases.configure({
-  //     apiKey: process.env.EXPO_PUBLIC_PURCHASES_APPLE_API_KEY!,
-  //     appUserID: null,
-  //     useAmazon: false,
-  //   });
-  // }, []);
+  useEffect(() => {
+    Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
+    Purchases.configure({
+      apiKey: process.env.EXPO_PUBLIC_PURCHASES_APPLE_API_KEY!,
+      appUserID: null,
+      useAmazon: false,
+    });
+  }, []);
 
   return (
     <Providers>

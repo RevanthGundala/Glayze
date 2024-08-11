@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Text, SafeAreaView, View, TextInput, Platform } from "react-native";
+import React from "react";
+import { Text, SafeAreaView, View } from "react-native";
 import { Image } from "expo-image";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Button } from "@/components/ui/button";

@@ -2,19 +2,22 @@ import React, { useState } from "react";
 import { View, Text, SafeAreaView } from "react-native";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useReferral } from "@/hooks";
+import { useReferral, useAura } from "@/hooks";
 import { share } from "@/utils/helpers";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { Header } from "@/components/header";
+import { client } from "@/utils/dynamic-client";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
 
 export default function Refer() {
-  const [auraAmount, setAuraAmount] = useState(20); // TODO: Fetch from API
-  const address = "0x1234567890"; // TODO: Fetch from API
+  const { wallets } = useReactiveClient(client);
+  const address = wallets.primary?.address;
+  const { data: aura } = useAura(address);
   const { data } = useReferral(address);
   const { theme } = useTheme();
+
   const handlePress = async () => {
-    // TODO: Implement referral functionality
     await share(data?.referralLink || null);
   };
 
@@ -48,7 +51,7 @@ export default function Refer() {
           You and your friend both earn 5 $AURA when they make a transaction
           within 14 days of the invite. Use $AURA to pay for transaction fees.
         </Text>
-        <ReferralCard amount={auraAmount} />
+        <ReferralCard amount={aura || "0"} />
         <Text
           className="font-medium text-lg pb-2"
           style={{ color: theme.textColor }}
@@ -84,7 +87,7 @@ export default function Refer() {
 }
 
 type ReferralCardProps = {
-  amount: number;
+  amount: string;
 };
 
 const ReferralCard = ({ amount }: ReferralCardProps) => {

@@ -19,17 +19,18 @@ import { Menu } from "@/components/menu";
 import { Route } from "@/utils/types";
 import { useTheme } from "@/contexts/theme-context";
 import { ActivityIndicator } from "react-native";
-import { Header } from "@/components/header";
+import { client } from "@/utils/dynamic-client";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
 
 const SearchScreen = () => {
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const [routes, setRoutes] = useState<Route[]>([]);
-  const { data, isLoading, isError } = useSearch();
+  const { wallets } = useReactiveClient(client);
+  const address = wallets.primary?.address;
+  const { data, isLoading, isError } = useSearch(address);
   const searchBarRef = useRef(null);
   const { theme } = useTheme();
-
-  const address = "0x1234567890abcdef1234567890abcdef12345678";
 
   const handleSearch = useCallback(() => {
     const id = searchText.split("/").pop();

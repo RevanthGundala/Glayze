@@ -21,18 +21,23 @@ import { lightTheme, colors } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { ShareHeader } from "@/components/share-header";
 import { type Post } from "@/utils/types";
+import { useShareInfo } from "@/hooks";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { client } from "@/utils/dynamic-client";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
+  const { wallets } = useReactiveClient(client);
+  const address = wallets.primary?.address;
   const { data: post, isLoading, isError } = usePost(id);
   const [selectedTime, setSelectedTime] = useState<Time>("1H");
   const { data: postPrices } = usePostPrices(
     parseInt(id as string),
     selectedTime
   );
-  const { data: position } = usePosition(post, "0x1234567890");
   const { theme } = useTheme();
-  const router = useRouter();
+  const { data: shareInfo } = useShareInfo(parseFloat(id.toString()));
+  const { data: position } = usePosition(post, address, shareInfo?.price);
 
   if (isLoading) {
     return <ActivityIndicator />;
@@ -51,9 +56,8 @@ export default function Post() {
         <ShareHeader
           name={post?.name}
           symbol={post?.symbol}
-          image={post?.contract_creator}
+          image={post?.image_uri}
         />
-        {/* TODO: Add image */}
         <View className="px-6 py-4">
           {/* <Image
             source={require("@/assets/images/share.png")}
@@ -66,9 +70,8 @@ export default function Post() {
         contentContainerStyle={{ paddingBottom: 80 }}
       >
         <Graph
-          price={post.price ?? 0}
+          price={shareInfo?.price ?? 0}
           change={postPrices?.price_change ?? 0}
-          symbol={post.symbol ?? ""}
           selectedTime={selectedTime}
           setSelectedTime={setSelectedTime}
         />
@@ -83,7 +86,7 @@ export default function Post() {
           totalReturnPercent={position?.totalReturnPercent ?? 0}
         />
         <Stats
-          marketCap={post.market_cap ?? 0}
+          marketCap={(shareInfo && shareInfo?.price * shareInfo?.supply) ?? 0}
           volume={post.volume ?? 0}
           allTimeHigh={post.ath ?? 0}
           // allTimeLow={0}
@@ -320,7 +323,7 @@ const BuySellButtons = ({ theme, post }: BuySellButtonsProps) => {
                 key1: post.post_id,
                 key2: post.name,
                 key3: post.symbol,
-                key4: post.contract_creator, // TODO: Add image
+                key4: post.image_uri, // TODO: Add image
               },
             });
           }}
@@ -342,7 +345,7 @@ const BuySellButtons = ({ theme, post }: BuySellButtonsProps) => {
                 key1: post.post_id,
                 key2: post.name,
                 key3: post.symbol,
-                key4: post.contract_creator, // TODO: Add image
+                key4: post.image_uri, // TODO: Add image
               },
             });
           }}

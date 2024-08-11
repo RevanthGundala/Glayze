@@ -1,15 +1,19 @@
 import { Position, Post } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
+import { createPublicClient, http, Address } from "viem";
+import { baseSepolia, base } from "viem/chains";
+import { ABI } from "@/utils/constants";
 
 const calculatePosition = async (
   post: Post | null | undefined,
-  address: string
+  address: string | undefined,
+  price: number | undefined
 ): Promise<Position | null> => {
-  if (!post) return null;
+  if (!post || !address) return null;
   const { data: trades, error } = await supabase
     .from("Trades")
-    .select("usdc_amount, token_amount, created_at")
+    .select("usdc, shares, created_at")
     .eq("post_id", post.post_id)
     .eq("from", address)
     .eq("is_buy", true);
@@ -18,32 +22,45 @@ const calculatePosition = async (
     throw error;
   }
 
-  let tokens = 0; // TODO: read from chain
+  const chain = process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
+  const client = createPublicClient({
+    chain,
+    transport: http(),
+  });
+
+  const shares = parseFloat(
+    await client
+      .readContract({
+        address: process.env.CONTRACT_ADDRESS as Address,
+        abi: ABI,
+        functionName: "balanceOf",
+        args: [address as Address, BigInt(post.post_id)],
+      })
+      .toString()
+  );
   let totalValueInvested = 0;
   let firstBought = new Date();
 
   trades.forEach((trade) => {
-    tokens += trade.token_amount;
-    totalValueInvested += trade.usdc_amount;
+    totalValueInvested += trade.usdc;
     if (trade.created_at < firstBought) {
       firstBought = trade.created_at;
     }
   });
 
-  const currentPrice = post.price ?? 0;
-  const marketValue = currentPrice * tokens;
-  const averageCost = tokens > 0 ? totalValueInvested / tokens : 0;
+  const marketValue = price ? price * shares : 0;
+  const averageCost = shares > 0 ? totalValueInvested / shares : 0;
 
-  const todaysReturn = marketValue - averageCost * tokens;
+  const todaysReturn = marketValue - averageCost * shares;
   const todaysReturnPercent =
-    averageCost > 0 ? (todaysReturn / (averageCost * tokens)) * 100 : 0;
+    averageCost > 0 ? (todaysReturn / (averageCost * shares)) * 100 : 0;
 
   const totalReturn = marketValue - totalValueInvested;
   const totalReturnPercent =
     totalValueInvested > 0 ? (totalReturn / totalValueInvested) * 100 : 0;
 
   return {
-    tokens,
+    shares,
     totalValueInvested,
     marketValue,
     averageCost,
@@ -51,14 +68,17 @@ const calculatePosition = async (
     todaysReturnPercent,
     totalReturn,
     totalReturnPercent,
-    currentPrice,
     firstBought,
   };
 };
 
-export const usePosition = (post: Post | null | undefined, address: string) => {
+export const usePosition = (
+  post: Post | null | undefined,
+  address: string | undefined,
+  price: number | undefined
+) => {
   return useQuery<Position | null, Error>({
     queryKey: ["position", post?.post_id, address],
-    queryFn: () => calculatePosition(post, address),
+    queryFn: () => calculatePosition(post, address, price),
   });
 };

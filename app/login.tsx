@@ -19,21 +19,22 @@ import { Image } from "expo-image";
 import { Href, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 // import { SocialProvider } from "@dynamic-labs/client";
-import { client } from "@/utils/client";
+import { client } from "@/utils/dynamic-client";
 import { BaseWallet } from "@/components/base-wallet";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const { auth, sdk } = useReactiveClient(client);
 
+  if (!sdk.loaded) {
+    return <Text>Loading...</Text>;
+  }
   const handleEmailLogin = async () => {
     try {
       console.log("Logging in with email");
-      if (!client) {
-        console.log("Client not initialized");
-        throw new Error("Authentication client not initialized");
-      }
-      await client?.auth.email.sendOTP(email);
+      await auth.email.sendOTP(email);
       console.log("Email sent");
       router.push(("/confirm-email?email=" + email) as Href);
     } catch (error) {

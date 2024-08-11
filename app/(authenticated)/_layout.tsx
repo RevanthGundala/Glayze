@@ -56,15 +56,6 @@ export default function Layout() {
 
 const InitialLayout = () => {
   const router = useRouter();
-
-  useEffect(() => {
-    // console.log("initial layout");
-    // if (!isReady) return;
-    // if (isConnected(wallet)) {
-    //   router.replace("/home");
-    // }
-  }, []);
-
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

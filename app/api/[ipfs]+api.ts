@@ -1,5 +1,5 @@
 interface RequestData {
-  tokenId: string;
+  postId: string;
   name: string;
   symbol: string;
   image: string;
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         }
       );
 
-    return new Response(JSON.stringify({ metadataIpfsHash }), {
+    return new Response(JSON.stringify({ metadataIpfsHash, imageIpfsHash }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
 
 async function uploadImageToPinata({
   image,
-  tokenId,
+  postId,
 }: RequestData): Promise<string | null> {
   try {
     const JWT = process.env.PINATA_JWT!;
@@ -64,7 +64,7 @@ async function uploadImageToPinata({
     const blob = new Blob([buffer]);
     const file = new File([blob], "file");
     const formData = new FormData();
-    formData.append("file", file, `Image for ${tokenId}`);
+    formData.append("file", file, `Image for ${postId}`);
 
     const res = await fetch(`https://api.pinata.cloud/pinning/pinFileToIPFS`, {
       method: "POST",
@@ -74,8 +74,8 @@ async function uploadImageToPinata({
       body: formData,
     });
 
-    const data = await res.json();
-    return data.IpfsHash;
+    const { IpfsHash } = await res.json();
+    return IpfsHash;
   } catch (e) {
     console.error(e);
     return null;
@@ -83,7 +83,7 @@ async function uploadImageToPinata({
 }
 
 async function uploadMetadataToPinata(
-  { tokenId, symbol, name }: RequestData,
+  { postId, symbol, name }: RequestData,
   imageIpfsHash: string
 ): Promise<string | null> {
   try {
@@ -94,7 +94,7 @@ async function uploadMetadataToPinata(
       description: symbol,
       image: `ipfs://${imageIpfsHash}`,
       external_url: "https://glayze.app",
-      attributes: [{ trait_type: "Token ID", value: tokenId }],
+      attributes: [{ trait_type: "Token ID", value: postId }],
     };
 
     const formData = new FormData();

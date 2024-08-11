@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Post } from "@/utils/types";
+import { Feed, Post } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
 

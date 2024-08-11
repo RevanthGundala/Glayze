@@ -1,13 +1,14 @@
-import { Database } from "@/types/supabase";
+import { Database } from "../database.types";
 
-export type Tables = Database["public"]["Tables"];
+type Tables = Database["public"]["Tables"];
+export type User = Tables["Users"]["Row"];
 export type Post = Tables["Posts"]["Row"];
 export type Trade = Tables["Trades"]["Row"];
 export type Referral = Tables["Referrals"]["Row"];
 export type Search = Tables["Search"]["Row"];
 
 export type Position = {
-  tokens: number;
+  shares: number;
   totalValueInvested: number;
   marketValue: number;
   averageCost: number;
@@ -15,7 +16,6 @@ export type Position = {
   todaysReturnPercent: number;
   totalReturn: number;
   totalReturnPercent: number;
-  currentPrice: number;
   firstBought: Date;
 };
 
@@ -25,3 +25,5 @@ export type Route = {
 };
 
 export type Time = "1H" | "1D" | "1W" | "1M" | "ALL";
+
+export type Feed = "Trending" | "New" | "Top";
