@@ -7,7 +7,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 
 export default function Receive() {

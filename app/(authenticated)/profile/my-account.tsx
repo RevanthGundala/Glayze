@@ -11,7 +11,7 @@ import { useTheme } from "../../../contexts/theme-context";
 import { Header } from "@/components/header";
 import { SubHeader } from "@/components/sub-header";
 import { colors } from "@/utils/theme";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { ActivityIndicator } from "react-native";
 

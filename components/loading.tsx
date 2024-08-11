@@ -1,15 +1,23 @@
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "../contexts/theme-context";
-import { ActivityIndicator } from "react-native";
+import { ActivityIndicator, View, SafeAreaView, Text } from "react-native";
 
-export const Loading = () => {
+type LoadingProps = {
+  error: string | null;
+};
+export const Loading = ({ error }: LoadingProps) => {
   const { theme } = useTheme();
   return (
     <SafeAreaView
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <ActivityIndicator size={"large"} />
+      <View className="flex flex-row justify-center items-center">
+        {error ? (
+          <Text style={{ color: theme.textColor }}>{error}</Text>
+        ) : (
+          <ActivityIndicator size={"large"} />
+        )}
+      </View>
     </SafeAreaView>
   );
 };

@@ -7,7 +7,7 @@ import { share } from "@/utils/helpers";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { Header } from "@/components/header";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 
 export default function Refer() {

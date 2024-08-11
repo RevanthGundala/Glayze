@@ -23,7 +23,7 @@ import { ShareHeader } from "@/components/share-header";
 import { type Post } from "@/utils/types";
 import { useShareInfo } from "@/hooks";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 
 export default function Post() {
   const { id } = useLocalSearchParams();

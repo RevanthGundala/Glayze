@@ -14,7 +14,7 @@ import { SubHeader } from "@/components/sub-header";
 import { PostComponent } from "@/components/post-section";
 import { useScrollToTop } from "@react-navigation/native";
 import { useRef } from "react";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { useWallet, useBalance } from "@/hooks";
 

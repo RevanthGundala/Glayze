@@ -6,7 +6,7 @@ import { Link } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 
 export default function ConnectToTwitter() {

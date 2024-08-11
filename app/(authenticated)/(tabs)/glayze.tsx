@@ -32,7 +32,7 @@ import abi from "@/abi.json";
 import { Address } from "viem";
 import { supabase } from "@/utils/supabase";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 
 interface FormInput {
   name: string;

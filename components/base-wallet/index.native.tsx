@@ -17,21 +17,10 @@ const provider = sdk.makeWeb3Provider();
 export const BaseWallet = () => {
   const handleLogin = async () => {
     try {
-      if (Platform.OS === "web") {
-        console.log("Logging in with base smart wallet on web");
-      } else {
-        console.log("Logging in with base smart wallet on mobile");
-
-        const addresses = await provider.request({
-          method: "eth_requestAccounts",
-        });
-        console.log("Requested");
-        console.log("addresses", addresses);
-        const signedData = await provider.request({
-          method: "personal_sign",
-          params: ["0x48656c6c6f20776f726c6421", addresses[0]],
-        });
-      }
+      const addresses = await provider.request({
+        method: "eth_requestAccounts",
+      });
+      console.log("addresses", addresses);
     } catch (error) {
       console.log(error);
     }
@@ -47,7 +36,7 @@ export const BaseWallet = () => {
       >
         <View className="flex-row items-center justify-center bg-black">
           <CoinbaseWalletLogo containerClassName="pr-2.5" />
-          <Text className="text-white font-semibold">Connect Wallet</Text>
+          <Text className="text-white font-semibold">Connect</Text>
         </View>
       </View>
     </Pressable>

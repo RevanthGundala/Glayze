@@ -17,7 +17,7 @@ import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import Toast from "react-native-toast-message";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 

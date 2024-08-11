@@ -22,7 +22,7 @@ import {
 import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 
 export default function Profile() {
   const { theme, themeName } = useTheme();

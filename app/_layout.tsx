@@ -6,16 +6,41 @@ import * as Linking from "expo-linking";
 import Purchases from "react-native-purchases";
 import { useState } from "react";
 import { Platform } from "react-native";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { View, Text, Image } from "react-native";
 import { Button } from "@/components/ui/button";
-import appleIcon from "../assets/images/socials/apple.png";
+const appleIcon = require("../assets/images/socials/apple.png");
 
 export default function RootLayout() {
   const router = useRouter();
+
   const { auth } = useReactiveClient(client);
   const url = useBetterURL();
+
+  if (Platform.OS === "web") {
+    console.log("Only available on iOS!");
+    return (
+      <View className="flex-1 bg-white">
+        <View className="mt-40">
+          <Text className="text-black font-semibold text-center text-4xl">
+            Glayze
+          </Text>
+        </View>
+        <View className="flex items-center justify-center mt-20">
+          <Button
+            buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"
+            onPress={() => router.push("/")}
+          >
+            <Image source={appleIcon} className="w-4 h-4 mr-3" />
+            <Text className="text-center text-black">
+              Download on the App store
+            </Text>
+          </Button>
+        </View>
+      </View>
+    );
+  }
 
   useEffect(() => {
     if (auth.token && !auth.authenticatedUser?.newUser) {
@@ -31,7 +56,7 @@ export default function RootLayout() {
       const { handleResponse } = await import(
         "@mobile-wallet-protocol/client/dist/core/communicator/handleResponse.native"
       );
-      const handled = handleResponse("http://192.168.1.4:8081");
+      const handled = handleResponse(receivedUrl);
       console.log(handled);
       if (handled) {
         router.replace("/(authenticated)/home" as Href);
@@ -85,33 +110,11 @@ export default function RootLayout() {
     });
   }, []);
 
-  if (Platform.OS === "web") {
-    console.log("Only available on iOS!");
-    return (
-      <View className="flex-1 bg-black">
-        <View className="mt-40">
-          <Text className="text-white font-semibold">Glayze</Text>
-        </View>
-        <View className="flex items-center justify-center mt-20">
-          <Button
-            buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-blue-400"
-            onPress={() => router.push("/")}
-          >
-            <Image source={appleIcon} className="w-4 h-4 mr-3" />
-            <Text className="text-center text-white">
-              Download on the App store
-            </Text>
-          </Button>
-        </View>
-      </View>
-    );
-  } else {
-    return (
-      <Providers>
-        <Slot />
-      </Providers>
-    );
-  }
+  return (
+    <Providers>
+      <Slot />
+    </Providers>
+  );
 }
 
 const useBetterURL = (): string | null | undefined => {

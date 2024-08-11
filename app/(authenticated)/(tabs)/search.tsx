@@ -18,9 +18,9 @@ import { Input } from "@/components/ui/input";
 import { Menu } from "@/components/menu";
 import { Route } from "@/utils/types";
 import { useTheme } from "@/contexts/theme-context";
-import { ActivityIndicator } from "react-native";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { Loading } from "@/components/loading";
 
 const SearchScreen = () => {
   const router = useRouter();
@@ -31,6 +31,9 @@ const SearchScreen = () => {
   const { data, isLoading, isError } = useSearch(address);
   const searchBarRef = useRef(null);
   const { theme } = useTheme();
+
+  if (isLoading || isError)
+    return <Loading error={isError ? "Error loading profile" : undefined} />;
 
   const handleSearch = useCallback(() => {
     const id = searchText.split("/").pop();
@@ -53,30 +56,6 @@ const SearchScreen = () => {
       setSearchText("");
     }
   }, [searchText]);
-
-  if (isLoading) return <ActivityIndicator />;
-
-  if (isError) {
-    return (
-      <View
-        className="flex-1"
-        style={{ backgroundColor: theme.backgroundColor }}
-      >
-        <Text style={{ color: theme.textColor }}>Error loading profile</Text>
-      </View>
-    );
-  }
-
-  if (!data) {
-    return (
-      <View
-        className="flex-1"
-        style={{ backgroundColor: theme.backgroundColor }}
-      >
-        <Text style={{ color: theme.textColor }}>No profile data found</Text>
-      </View>
-    );
-  }
 
   return (
     <SafeAreaView

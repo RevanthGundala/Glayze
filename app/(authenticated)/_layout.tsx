@@ -2,7 +2,7 @@ import { Stack } from "expo-router/stack";
 import { NativeWindStyleSheet } from "nativewind";
 import { useEffect } from "react";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import { Href, useRouter } from "expo-router";
 
 NativeWindStyleSheet.setOutput({

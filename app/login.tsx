@@ -19,7 +19,7 @@ import { Image } from "expo-image";
 import { Href, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 // import { SocialProvider } from "@dynamic-labs/client";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import { BaseWallet } from "@/components/base-wallet";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 

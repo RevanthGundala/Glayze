@@ -12,7 +12,7 @@ import { createPimlicoPaymasterClient } from "permissionless/clients/pimlico";
 import { SmartAccountClient } from "permissionless";
 import { http, Address, createPublicClient } from "viem";
 import { baseSepolia, base } from "viem/chains";
-import { client } from "@/utils/dynamic-client";
+import { client } from "@/utils/dynamic-client.native";
 import type { Chain, Transport } from "viem";
 
 type SmartAccountClientType = SmartAccountClient<
