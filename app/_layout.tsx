@@ -8,6 +8,9 @@ import { useState } from "react";
 import { Platform } from "react-native";
 import { client } from "@/utils/dynamic-client";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { View, Text, Image } from "react-native";
+import { Button } from "@/components/ui/button";
+import appleIcon from "../assets/images/socials/apple.png";
 
 export default function RootLayout() {
   const router = useRouter();
@@ -82,11 +85,33 @@ export default function RootLayout() {
     });
   }, []);
 
-  return (
-    <Providers>
-      <Slot />
-    </Providers>
-  );
+  if (Platform.OS === "web") {
+    console.log("Only available on iOS!");
+    return (
+      <View className="flex-1 bg-black">
+        <View className="mt-40">
+          <Text className="text-white font-semibold">Glayze</Text>
+        </View>
+        <View className="flex items-center justify-center mt-20">
+          <Button
+            buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-blue-400"
+            onPress={() => router.push("/")}
+          >
+            <Image source={appleIcon} className="w-4 h-4 mr-3" />
+            <Text className="text-center text-white">
+              Download on the App store
+            </Text>
+          </Button>
+        </View>
+      </View>
+    );
+  } else {
+    return (
+      <Providers>
+        <Slot />
+      </Providers>
+    );
+  }
 }
 
 const useBetterURL = (): string | null | undefined => {

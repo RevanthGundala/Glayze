@@ -3,7 +3,7 @@ import { TouchableOpacity, StyleProp } from "react-native";
 
 type ButtonProps = {
   buttonStyle?: string;
-  style: StyleProp<any>;
+  style?: StyleProp<any>;
   onPress?: () => void;
   children?: React.ReactNode;
 };
@@ -14,7 +14,11 @@ export const Button = ({
   children,
 }: ButtonProps) => {
   return (
-    <TouchableOpacity className={buttonStyle} style={style} onPress={onPress}>
+    <TouchableOpacity
+      className={buttonStyle}
+      style={style ?? {}}
+      onPress={onPress}
+    >
       {children}
     </TouchableOpacity>
   );

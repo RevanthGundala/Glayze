@@ -1,49 +1,49 @@
-// import { Platform } from "react-native";
-// import { type BaseClient } from "@dynamic-labs/client";
+import { Platform } from "react-native";
+import { type BaseClient } from "@dynamic-labs/client";
 
-// let client: BaseClient | null = null;
+let client: BaseClient | any;
 
-// if (Platform.OS !== "web") {
-//   const { createClient } = require("@dynamic-labs/client");
-//   const {
-//     ReactNativeExtension,
-//   } = require("@dynamic-labs/react-native-extension");
-//   const { ViemExtension } = require("@dynamic-labs/viem-extension");
+if (Platform.OS !== "web") {
+  const { createClient } = require("@dynamic-labs/client");
+  const {
+    ReactNativeExtension,
+  } = require("@dynamic-labs/react-native-extension");
+  const { ViemExtension } = require("@dynamic-labs/viem-extension");
 
-//   const environmentId =
-//     process.env.EXPO_PUBLIC_ENVIRONMENT_ID ||
-//     "850b02af-863c-4826-baaf-6e77b56b0dbd";
+  const environmentId =
+    process.env.EXPO_PUBLIC_ENVIRONMENT_ID ||
+    "850b02af-863c-4826-baaf-6e77b56b0dbd";
 
-//   if (!environmentId) {
-//     throw new Error("EXPO_PUBLIC_ENVIRONMENT_ID is required");
-//   }
+  if (!environmentId) {
+    throw new Error("EXPO_PUBLIC_ENVIRONMENT_ID is required");
+  }
 
-//   console.log("environmentId: ", environmentId);
-//   client = createClient({
-//     environmentId,
-//     appLogoUrl: "",
-//     appName: "",
-//   })
-//     .extend(ReactNativeExtension())
-//     .extend(ViemExtension());
-// }
-
-// export { client };
-
-import { createClient } from "@dynamic-labs/client";
-import { ReactNativeExtension } from "@dynamic-labs/react-native-extension";
-import { ViemExtension } from "@dynamic-labs/viem-extension";
-
-const environmentId = "850b02af-863c-4826-baaf-6e77b56b0dbd";
-
-if (!environmentId) {
-  throw new Error("EXPO_PUBLIC_ENVIRONMENT_ID is required");
+  console.log("environmentId: ", environmentId);
+  client = createClient({
+    environmentId,
+    appLogoUrl: "",
+    appName: "",
+  })
+    .extend(ReactNativeExtension())
+    .extend(ViemExtension());
 }
 
-export const client = createClient({
-  environmentId,
-  appLogoUrl: "https://demo.dynamic.xyz/favicon-32x32.png",
-  appName: "Dynamic Demo",
-})
-  .extend(ReactNativeExtension())
-  .extend(ViemExtension());
+export { client };
+
+// import { createClient } from "@dynamic-labs/client";
+// import { ReactNativeExtension } from "@dynamic-labs/react-native-extension";
+// import { ViemExtension } from "@dynamic-labs/viem-extension";
+
+// const environmentId = "850b02af-863c-4826-baaf-6e77b56b0dbd";
+
+// if (!environmentId) {
+//   throw new Error("EXPO_PUBLIC_ENVIRONMENT_ID is required");
+// }
+
+// export const client = createClient({
+//   environmentId,
+//   appLogoUrl: "https://demo.dynamic.xyz/favicon-32x32.png",
+//   appName: "Dynamic Demo",
+// })
+//   .extend(ReactNativeExtension())
+//   .extend(ViemExtension());

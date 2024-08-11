@@ -1,61 +1,23 @@
 import { Stack } from "expo-router/stack";
-import { useEffect } from "react";
-import { useRouter } from "expo-router";
-import { Providers } from "@/components/providers";
 import { NativeWindStyleSheet } from "nativewind";
-import { Platform, StatusBar } from "react-native";
-import { View, Image, Text } from "react-native";
-import appleIcon from "@/assets/images/socials/apple.png";
-import icon from "@/assets/images/icon.png";
-import { lightTheme as theme } from "@/utils/theme";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { client } from "@/utils/dynamic-client";
+import { Href, useRouter } from "expo-router";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
 });
 
 export default function Layout() {
-  console.log("Entering Layout component");
-  try {
-    const router = useRouter();
-    if (Platform.OS === "web") {
-      console.log("Only available on iOS!");
-      return (
-        <View className="flex-1 bg-black">
-          <View className="mt-40">
-            <Text className="text-white font-semibold">Glayze</Text>
-          </View>
-          <View className="flex items-center justify-center mt-20">
-            <Button
-              buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
-              style={{
-                backgroundColor: theme.secondaryTextColor,
-              }}
-              onPress={() => router.push("/")}
-            >
-              <Image source={appleIcon} className="w-4 h-4 mr-3" />
-              <Text className="text-center" style={{ color: theme.textColor }}>
-                Download on the App store
-              </Text>
-            </Button>
-          </View>
-        </View>
-      );
-    }
-    console.log("Rendering Layout for non-web platform");
-    return <InitialLayout />;
-  } catch (error) {
-    console.error("Error rendering Layout:", error);
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>An error occurred. Please check the console for details.</Text>
-      </View>
-    );
-  }
-}
-
-const InitialLayout = () => {
+  const { auth } = useReactiveClient(client);
   const router = useRouter();
+  useEffect(() => {
+    if (!auth.token) {
+      console.log("No token");
+      router.replace("/" as Href);
+    }
+  }, [auth]);
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -85,4 +47,4 @@ const InitialLayout = () => {
       />
     </Stack>
   );
-};
+}
