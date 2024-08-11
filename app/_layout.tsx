@@ -42,11 +42,11 @@ export default function RootLayout() {
     );
   }
 
-  useEffect(() => {
-    if (auth.token && !auth.authenticatedUser?.newUser) {
-      router.replace("/(authenticated)/(tabs)/home" as Href);
-    }
-  }, [auth.token, router]);
+  // useEffect(() => {
+  //   if (auth.token && !auth.authenticatedUser?.newUser) {
+  //     router.replace("/(authenticated)/(tabs)/home" as Href);
+  //   }
+  // }, [auth.token, router]);
 
   const handleUrl = async (receivedUrl: string) => {
     try {

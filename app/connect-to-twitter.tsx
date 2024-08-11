@@ -8,17 +8,22 @@ import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
 import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { Loading } from "@/components/loading";
 
 export default function ConnectToTwitter() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { auth } = useReactiveClient(client);
+  const { sdk, auth } = useReactiveClient(client);
+
+  if (!sdk.loaded) return <Loading />;
 
   const handleConnect = async () => {
     try {
-      await auth.social.connect({ provider: "twitter" });
+      await auth.social.connect({
+        provider: "twitter",
+        redirectPathname: "/end",
+      });
       // TODO: get user info
-      router.push("/end");
     } catch (error) {
       console.log(error);
     }

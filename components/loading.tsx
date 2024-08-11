@@ -2,7 +2,7 @@ import { useTheme } from "../contexts/theme-context";
 import { ActivityIndicator, View, SafeAreaView, Text } from "react-native";
 
 type LoadingProps = {
-  error: string | null;
+  error?: string | null;
 };
 export const Loading = ({ error }: LoadingProps) => {
   const { theme } = useTheme();
