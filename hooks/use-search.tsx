@@ -1,24 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
-import { Search } from "@/utils/types";
 
-const fetchSearchHistory = async (address: string | undefined) => {
-  if (!address) return null;
+const fetchSearchHistory = async (
+  dynamicId: string | undefined
+): Promise<string[] | null> => {
+  if (!dynamicId) return null;
   const { data, error } = await supabase
     .from("Search")
-    .select("*")
-    .eq("address", address);
+    .select("content")
+    .eq("dynamic_id", dynamicId);
 
   if (error) {
-    throw new Error(`Error fetching referrals: ${error.message}`);
+    throw new Error(`Error fetching search history: ${error.message}`);
   }
 
-  return data;
+  return data
+    .filter((item): item is { content: string } => item.content !== null)
+    .map((item) => item.content);
 };
 
-export function useSearch(address: string | undefined) {
-  return useQuery<Search[] | null, Error>({
-    queryKey: ["user", address],
-    queryFn: () => fetchSearchHistory(address),
+export function useSearch(dynamicId: string | undefined) {
+  return useQuery<string[] | null, Error>({
+    queryKey: ["search-history", dynamicId],
+    queryFn: () => fetchSearchHistory(dynamicId),
   });
 }

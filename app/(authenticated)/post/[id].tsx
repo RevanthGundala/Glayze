@@ -24,9 +24,11 @@ import { type Post } from "@/utils/types";
 import { useShareInfo } from "@/hooks";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { client } from "@/utils/dynamic-client.native";
+import { Loading } from "@/components/loading";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
+  console.log("id", id);
   const { wallets } = useReactiveClient(client);
   const address = wallets.primary?.address;
   const { data: post, isLoading, isError } = usePost(id);
@@ -39,12 +41,8 @@ export default function Post() {
   const { data: shareInfo } = useShareInfo(parseFloat(id.toString()));
   const { data: position } = usePosition(post, address, shareInfo?.price);
 
-  if (isLoading) {
-    return <ActivityIndicator />;
-  }
-  if (isError || !post) {
-    return <Text>Error loading post.</Text>;
-  }
+  if (isLoading || isError || !post)
+    return <Loading error={isError ? "Error loading post" : null} />;
 
   return (
     <SafeAreaView

@@ -8,7 +8,6 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
-  ActivityIndicator,
 } from "react-native";
 import { Header } from "@/components/header";
 import { lightTheme as theme } from "@/utils/theme";
@@ -22,6 +21,7 @@ import Toast from "react-native-toast-message";
 import { client } from "@/utils/dynamic-client.native";
 import { BaseWallet } from "@/components/base-wallet";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { ProgressBar } from "@/components/ui/progress-bar";
 
 export default function Login() {
   const router = useRouter();
@@ -102,9 +102,12 @@ export default function Login() {
                   </Text>
                 </Button>
               </View>
-              <View className="items-center">
-                <Text style={{ color: theme.mutedForegroundColor }}>or</Text>
+              <View className="pt-8">
+                <ProgressBar sections={3} currentSection={1} />
               </View>
+              {/* <View className="items-center">
+                <Text style={{ color: theme.mutedForegroundColor }}>or</Text>
+              </View> */}
               {/* <View>
                 <SignUpWithOAuth provider="google" />
                 <SignUpWithOAuth provider="apple" />
@@ -112,9 +115,9 @@ export default function Login() {
               <View className="items-center">
                 <Text style={{ color: theme.mutedForegroundColor }}>or</Text>
               </View> */}
-              <View>
+              {/* <View>
                 <BaseWallet />
-              </View>
+              </View> */}
             </View>
           </ScrollView>
         </TouchableWithoutFeedback>

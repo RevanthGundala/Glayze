@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,6 @@ import {
   TextInput,
 } from "react-native";
 import { useRouter, Href } from "expo-router";
-import { supabase } from "@/utils/supabase";
 import { useSearch } from "@/hooks/use-search";
 import { Input } from "@/components/ui/input";
 import { Menu } from "@/components/menu";
@@ -21,33 +20,24 @@ import { useTheme } from "@/contexts/theme-context";
 import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { Loading } from "@/components/loading";
+import { addToSearchHistory, deleteSearchHistory } from "@/utils/helpers";
 
 const SearchScreen = () => {
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const [routes, setRoutes] = useState<Route[]>([]);
-  const { wallets } = useReactiveClient(client);
-  const address = wallets.primary?.address;
-  const { data, isLoading, isError } = useSearch(address);
+  const { auth, sdk } = useReactiveClient(client);
+  const dynamicId = auth.authenticatedUser?.userId;
+  const { data, isLoading, isError } = useSearch(dynamicId);
   const searchBarRef = useRef(null);
   const { theme } = useTheme();
 
-  if (isLoading || isError)
-    return <Loading error={isError ? "Error loading profile" : undefined} />;
-
-  const handleSearch = useCallback(() => {
-    const id = searchText.split("/").pop();
-    router.push(`/(authenticated)/item/${id}` as Href);
-  }, [searchText, router]);
+  const handleSearch = async () => {
+    await addToSearchHistory(dynamicId, searchText);
+  };
 
   const clearSearchHistory = async () => {
-    const { error } = await supabase
-      .from("Search")
-      .delete()
-      .eq("address", address);
-    if (error) {
-      console.error("Error clearing all alerts", error);
-    }
+    await deleteSearchHistory(dynamicId);
   };
 
   const handleOutsideClick = useCallback(() => {
@@ -56,6 +46,21 @@ const SearchScreen = () => {
       setSearchText("");
     }
   }, [searchText]);
+
+  useEffect(() => {
+    if (!isLoading && data) {
+      const newRoutes = data.map((searchItem) => ({
+        name: searchItem,
+        href: `post/${searchItem.split("/").pop()}` as Href,
+      }));
+      console.log(newRoutes);
+      setRoutes(newRoutes);
+    }
+  }, [data, isLoading]);
+
+  if (!sdk.loaded || isLoading || isError) {
+    return <Loading error={isError ? "Error loading profile" : null} />;
+  }
 
   return (
     <SafeAreaView

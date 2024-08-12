@@ -13,5 +13,9 @@ export const client = createClient({
   appLogoUrl: "https://demo.dynamic.xyz/favicon-32x32.png",
   appName: "Dynamic Demo",
 })
-  .extend(ReactNativeExtension())
+  .extend(
+    ReactNativeExtension({
+      appOrigin: "https://glayze.app",
+    })
+  )
   .extend(ViemExtension());

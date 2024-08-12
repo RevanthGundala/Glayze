@@ -22,7 +22,7 @@ import { Image } from "expo-image";
 import Toast from "react-native-toast-message";
 import { useForm, Controller } from "react-hook-form";
 import { colors } from "@/utils/theme";
-import { useSmartAccountClient } from "@/hooks";
+import { useSmartAccountClient, useRealCreator } from "@/hooks";
 import { fetchTweet } from "@/hooks/use-embedded-tweet";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
@@ -47,6 +47,8 @@ export default function Glayze() {
   const { data: smartAccountClient, isError } = useSmartAccountClient();
   const [isLoading, setIsLoading] = useState(false);
   const { wallets } = useReactiveClient(client);
+  const [xUserId, setXUserId] = useState<number | null>(null);
+  const { data: realCreator } = useRealCreator(xUserId);
 
   const {
     control,
@@ -60,11 +62,6 @@ export default function Glayze() {
     },
   });
 
-  // const {
-  //   data: product,
-  //   isLoading,
-  //   isError,
-  // } = useProduct(CREATE_POST_PRODUCT_ID);
   const selectImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
@@ -93,7 +90,6 @@ export default function Glayze() {
   ) => {
     try {
       let image: string;
-      let xUserId: string;
       if (selectedImage !== null) {
         const imageFile = await FileSystem.readAsStringAsync(selectedImage, {
           encoding: FileSystem.EncodingType.Base64,
@@ -110,6 +106,8 @@ export default function Glayze() {
             throw new Error("Failed to fetch tweet data or profile image.");
           }
           image = tweetData.user.profile_image_url_https;
+          console.log(tweetData.user.id_str);
+          setXUserId(parseInt(tweetData.user.id_str));
         } catch (fetchError) {
           console.error("Error fetching tweet:", fetchError);
           throw new Error(
@@ -189,15 +187,29 @@ export default function Glayze() {
       console.log(
         `🔍 View on Etherscan: https://sepolia.basescan.org/tx/${txHash}`
       );
+      if (realCreator) {
+        const txHash = await smartAccountClient.writeContract({
+          address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
+          abi,
+          functionName: "setRealCreator",
+          args: [postId, realCreator],
+        });
+        console.log("✅ Transaction successfully sponsored!");
+        console.log(
+          `🔍 View on Etherscan: https://sepolia.basescan.org/tx/${txHash}`
+        );
+      }
       const { error } = await supabase.from("Posts").insert([
         {
-          post_id: postId,
+          post_id: parseInt(postId),
           name,
           symbol,
           url,
           contract_creator: wallets.primary?.address,
-          real_creator: wallets.primary?.address, // TODO:
+          real_creator: realCreator,
           image_uri: imageIpfsHash,
+          volume: 0,
+          ath: 0,
         },
       ]);
       if (error) {
@@ -213,28 +225,6 @@ export default function Glayze() {
       router.replace("/(authenticated)/aux/error" as Href);
     }
   };
-  //   try {
-  //     const { customerInfo } = await Purchases.purchaseStoreProduct(product);
-  //     if (
-  //       typeof customerInfo.entitlements.active["my_entitlement_identifier"] !==
-  //       "undefined"
-  //     ) {
-  //       console.log("Success", "Purchase successful!");
-  //       // Here you can proceed with creating the post using smart contract
-  //       // createPost();
-  //     } else {
-  //       console.log(
-  //         "Error",
-  //         "Purchase completed, but entitlement not found. Please contact support."
-  //       );
-  //     }
-  //   } catch (e: any) {
-  //     if (!e.userCancelled) {
-  //       console.error("Purchase error:", e);
-  //       console.log("Error", "An error occurred during purchase.");
-  //     }
-  //   }
-  // }, [product]);
 
   return (
     <SafeAreaView

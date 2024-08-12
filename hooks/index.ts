@@ -12,4 +12,5 @@ export { useWallet } from "./use-wallet";
 export { useBalance } from "./use-balance";
 export { useShareInfo } from "./use-share-info";
 export { useAura } from "./use-aura";
+export { useRealCreator } from "./use-real-creator";
 // export { useProduct } from "./use-product";

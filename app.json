@@ -15,11 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.glayze",
-      "associatedDomains": [
-        "applinks:www.glayze.app",
-        "applinks:glayze.app",
-        "webcredentials:glayze.app"
-      ],
+      "associatedDomains": ["applinks:glayze.app", "webcredentials:glayze.app"],
       "infoPlist": {
         "NSFaceIDUsageDescription": "Allow Glayze to use Face ID."
       }

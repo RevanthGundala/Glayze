@@ -1,11 +1,4 @@
-import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, Modal, TouchableOpacity, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { Link, useRouter } from "expo-router";
@@ -14,104 +7,81 @@ import { Menu } from "@/components/menu";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/theme-context";
-import {
-  GLAYZE_TWITTER,
-  GLAYZE_DISCORD,
-  GLAYZE_PRIVACY_POLICY,
-} from "@/utils/constants";
+import { GLAYZE_TWITTER, GLAYZE_DISCORD } from "@/utils/constants";
 import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { client } from "@/utils/dynamic-client.native";
 
+const routes: Route[] = [
+  {
+    name: "My Account",
+    href: "/(authenticated)/profile/my-account",
+  },
+  {
+    name: "Appearance",
+    href: "/(authenticated)/profile/appearance",
+  },
+  {
+    name: "Privacy and Legal",
+    href: "/(authenticated)/profile/privacy-and-legal",
+  },
+];
+
 export default function Profile() {
   const { theme, themeName } = useTheme();
-  // const { data, isLoading, error } = useUser();
-
-  // if (isLoading)
-  //   return (
-  //     <View
-  //       className="flex items-center justify-center"
-  //       style={{ flex: 1, backgroundColor: theme.backgroundColor }}
-  //     >
-  //       <ActivityIndicator size="large" />
-  //     </View>
-  //   );
-  // if (error)
-  //   return (
-  //     <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
-  //       <Text style={{ color: theme.textColor }}>Error loading profile</Text>
-  //     </View>
-  //   );
-  // if (!data)
-  //   return (
-  //     <View style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
-  //       <Text style={{ color: theme.textColor }}>No profile data found</Text>
-  //     </View>
-  //   );
-
-  // const { name, handle, profile_pic } = data.db!;
-  const routes: Route[] = [
-    {
-      name: "My Account",
-      href: "/(authenticated)/profile/my-account",
-    },
-    {
-      name: "Appearance",
-      href: "/(authenticated)/profile/appearance",
-    },
-    {
-      name: "Privacy and Legal",
-      href: "/(authenticated)/profile/privacy-and-legal",
-    },
-  ];
+  const { auth } = useReactiveClient(client);
+  console.log(JSON.stringify(auth.authenticatedUser, null, 2));
+  const name =
+    auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthDisplayName ??
+    "Anon";
+  const handle =
+    auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthUsername ?? "Anon";
+  const image =
+    auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0];
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
       <View className="flex flex-row">
         <Header backArrow />
       </View>
-      <View className="mt-16 items-center">
-        <View className="items-center py-8 space-y-4">
-          {/* <Image
-            source={
-              profile_pic
-                ? { uri: profile_pic }
-                : require("@/assets/images/aux/profile.png")
-            }
-            className="w-16 h-16"
+      <View className="items-center space-y-4">
+        {image ? (
+          <Image source={{ uri: image }} className="w-20 h-20 rounded-full" />
+        ) : (
+          <Image
+            source={require("@/assets/images/aux/profile.png")}
+            className="w-20 h-20"
+            style={{ opacity: 0.8, tintColor: theme.mutedForegroundColor }}
           />
-          <View className="pb-8 items-center">
-            <Text
-              style={{ color: theme.textColor }}
-              className="text-2xl font-semibold"
-            >
-              {name}
-            </Text>
-            <Text
-              style={{ color: theme.mutedForegroundColor }}
-              className="text-lg"
-            >
-              @{handle}
-            </Text>
-            <Link
-              href={`https://x.com/${handle}`}
-              className="mt-2 hover:pointer-cursor"
-            >
-              <Image
-                source={
-                  themeName === "dark"
-                    ? require("@/assets/images/x.png")
-                    : require("@/assets/images/x-dark.png")
-                }
-                className="w-6 h-6"
-              />
-            </Link>
-          </View> */}
-          <Menu routes={routes} />
-          <LogOut />
-          <Socials />
+        )}
+        <View className="pb-8 items-center">
+          <Text
+            style={{ color: theme.textColor }}
+            className="text-xl font-semibold"
+          >
+            {name}
+          </Text>
+          <Text
+            style={{ color: theme.mutedForegroundColor }}
+            className="text-lg"
+          >
+            @{handle}
+          </Text>
+          <Link href={`https://x.com/${handle}`} className="mt-3">
+            <Image
+              source={
+                themeName === "dark"
+                  ? require("@/assets/images/dark/x.png")
+                  : require("@/assets/images/light/x.png")
+              }
+              className="w-6 h-6"
+            />
+          </Link>
         </View>
+        <Menu routes={routes} />
+        <LogOut />
+        <Socials />
       </View>
     </SafeAreaView>
   );
@@ -123,9 +93,9 @@ const LogOut = () => {
   const router = useRouter();
   const { auth } = useReactiveClient(client);
 
-  const handleLogOut = () => {
+  const handleLogOut = async () => {
     setModalVisible(false);
-    auth.logout();
+    await auth.logout();
     router.replace("/");
   };
 

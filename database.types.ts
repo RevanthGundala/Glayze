@@ -77,22 +77,19 @@ export type Database = {
       }
       Search: {
         Row: {
-          address: string | null
           content: string | null
           created_at: string
-          id: number
+          dynamic_id: string
         }
         Insert: {
-          address?: string | null
           content?: string | null
           created_at?: string
-          id?: number
+          dynamic_id: string
         }
         Update: {
-          address?: string | null
           content?: string | null
           created_at?: string
-          id?: number
+          dynamic_id?: string
         }
         Relationships: []
       }
@@ -133,20 +130,23 @@ export type Database = {
         Row: {
           address: string | null
           created_at: string
-          id: number
+          dynamic_id: string
           referral_code: string | null
+          x_user_id: number | null
         }
         Insert: {
           address?: string | null
           created_at?: string
-          id?: number
+          dynamic_id: string
           referral_code?: string | null
+          x_user_id?: number | null
         }
         Update: {
           address?: string | null
           created_at?: string
-          id?: number
+          dynamic_id?: string
           referral_code?: string | null
+          x_user_id?: number | null
         }
         Relationships: []
       }

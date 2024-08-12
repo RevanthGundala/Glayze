@@ -20,13 +20,16 @@ import { Image } from "expo-image";
 import { client } from "@/utils/dynamic-client.native";
 import Toast from "react-native-toast-message";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { Loading } from "@/components/loading";
+import { upsertUser } from "@/utils/helpers";
 
 export default function ConfirmEmail() {
   const router = useRouter();
   const { email } = useLocalSearchParams();
   const [code, setCode] = useState("");
   const { sdk, auth } = useReactiveClient(client);
-  if (!sdk.loaded) return <Text>Loading...</Text>;
+
+  if (!sdk.loaded) return <Loading />;
 
   const handleConfirmCode = async () => {
     try {
@@ -57,7 +60,9 @@ export default function ConfirmEmail() {
       </View>
       <View className="flex flex-row justify-center items-center pt-12 px-6">
         <Text style={{ color: theme.textColor }}>
-          An email was sent to {email}. Please enter the code below to continue.
+          An email was sent to{" "}
+          <Text style={{ fontWeight: "bold" }}>{email}</Text>. Please enter the
+          code below to continue.
         </Text>
       </View>
       <KeyboardAvoidingView

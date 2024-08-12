@@ -12,10 +12,6 @@ export default function RootLayoutNav() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="end" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="coinbase-wallet-sdk"
-        options={{ headerShown: false }}
-      />
     </Stack>
   );
 }

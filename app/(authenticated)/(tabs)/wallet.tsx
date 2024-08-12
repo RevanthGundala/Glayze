@@ -1,11 +1,5 @@
-import React, { useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ActivityIndicator,
-  SectionList,
-} from "react-native";
+import React, { useState, useCallback, useRef } from "react";
+import { View, Text, TouchableOpacity, SectionList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -13,19 +7,17 @@ import { useTheme } from "../../../contexts/theme-context";
 import { SubHeader } from "@/components/sub-header";
 import { PostComponent } from "@/components/post-section";
 import { useScrollToTop } from "@react-navigation/native";
-import { useRef } from "react";
 import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { useWallet, useBalance } from "@/hooks";
+import { Loading } from "@/components/loading";
 
-// Define the type for the viewTweets state
 type ViewTweetsState = {
   "Your Investments": boolean;
   "X Creator Rewards": boolean;
   "Glayze Creator Rewards": boolean;
 };
 
-// Use a type for the keys of ViewTweetsState
 type ViewTweetsSectionKey = keyof ViewTweetsState;
 
 export default function Wallet() {
@@ -41,7 +33,11 @@ export default function Wallet() {
     "Glayze Creator Rewards": false,
   });
   const { data, isLoading, isError } = useWallet(address);
-  const { data: balance } = useBalance(address);
+  const {
+    data: balance,
+    isLoading: isBalanceLoading,
+    isError: isBalanceError,
+  } = useBalance(address);
 
   const toggleViewTweets = useCallback((section: ViewTweetsSectionKey) => {
     setViewTweets((prev) => ({
@@ -114,24 +110,6 @@ export default function Wallet() {
         </View>
       ),
     },
-    // {
-    //   type: "balance",
-    //   title: "Total Return",
-    //   data: [
-    //     {
-    //       title: "Investments",
-    //       value: `$${user?.current_investments ?? 0}`,
-    //     },
-    //     {
-    //       title: "X Creator Rewards",
-    //       value: `$${user?.x_creator_rewards ?? 0}`,
-    //     },
-    //     {
-    //       title: "Glayze Creator Rewards",
-    //       value: `$${user?.glayze_creator_rewards ?? 0}`,
-    //     },
-    //   ],
-    // },
     {
       type: "investment",
       title: "Holdings",
@@ -149,8 +127,12 @@ export default function Wallet() {
     },
   ];
 
-  if (isLoading || isError) {
-    return <ActivityIndicator />;
+  if (isLoading || isBalanceLoading || isError || isBalanceError) {
+    return (
+      <Loading
+        error={isError || isBalanceError ? "Error loading data" : null}
+      />
+    );
   }
 
   return (
@@ -158,13 +140,13 @@ export default function Wallet() {
       <SectionList
         className="p-6"
         contentContainerStyle={{
-          paddingBottom: 80, // Adjust this value based on your tab bar height
-          paddingTop: 24, // Add some top padding as well
+          paddingBottom: 80,
+          paddingTop: 24,
         }}
         ref={ref}
         sections={sections}
         renderItem={renderItem}
-        stickySectionHeadersEnabled={false} // Disable sticky headers by default
+        stickySectionHeadersEnabled={false}
         renderSectionHeader={({ section }) => {
           if (section.type === "balance" || section.type === "investment") {
             return (

@@ -8,13 +8,15 @@ import {
 import { useAlerts } from "@/hooks/use-alerts";
 import { supabase } from "@/utils/supabase";
 import { useTheme } from "@/contexts/theme-context";
-import { ActivityIndicator } from "react-native";
+import { Loading } from "@/components/loading";
 
 export default function Alerts() {
   const { data: alerts, isLoading, isError } = useAlerts();
   const { theme } = useTheme();
 
-  if (isLoading) return <ActivityIndicator />;
+  if (isLoading || isError) {
+    return <Loading error={isError ? "Error loading profile" : null} />;
+  }
 
   const clearAlert = async (id: number) => {
     const { error } = await supabase

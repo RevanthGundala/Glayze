@@ -121,5 +121,5 @@ function ToolTip({ x, y }: { x: SharedValue<number>; y: SharedValue<number> }) {
 
 const DATA = Array.from({ length: 31 }, (_, i) => ({
   timestamp: i,
-  price: 40 + 30 * Math.random(),
+  price: 30 * Math.random(),
 }));

@@ -11,7 +11,8 @@ const fetchPost = async (id: string | string[] | null | undefined) => {
     .single();
 
   if (error) {
-    throw new Error(`Error fetching referrals: ${error.message}`);
+    console.log(error);
+    throw new Error(`Error fetching posts: ${error.message}`);
   }
 
   return data;

@@ -8,18 +8,19 @@ import { useState } from "react";
 import { Platform } from "react-native";
 import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { View, Text, Image } from "react-native";
+import { View, Text } from "react-native";
 import { Button } from "@/components/ui/button";
-const appleIcon = require("../assets/images/socials/apple.png");
+import { Image } from "expo-image";
+import appleIcon from "../assets/images/socials/apple.png";
 
 export default function RootLayout() {
   const router = useRouter();
 
   const { auth } = useReactiveClient(client);
   const url = useBetterURL();
-
+  console.log("Here");
   if (Platform.OS === "web") {
-    console.log("Only available on iOS!");
+    console.log("Showing web layout");
     return (
       <View className="flex-1 bg-white">
         <View className="mt-40">
@@ -32,9 +33,18 @@ export default function RootLayout() {
             buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"
             onPress={() => router.push("/")}
           >
-            <Image source={appleIcon} className="w-4 h-4 mr-3" />
+            <Image
+              source={require("@/assets/images/light/back.png")}
+              style={{ width: 100, height: 100 }}
+              contentFit="contain"
+              onLoadStart={() => console.log("Loading")}
+              onLoadEnd={() => console.log("Loaded")}
+              onError={(e) => {
+                console.log(e);
+              }}
+            />
             <Text className="text-center text-black">
-              Download on the App store
+              Download Glayze on the App store
             </Text>
           </Button>
         </View>
@@ -42,49 +52,49 @@ export default function RootLayout() {
     );
   }
 
-  // useEffect(() => {
-  //   if (auth.token && !auth.authenticatedUser?.newUser) {
-  //     router.replace("/(authenticated)/(tabs)/home" as Href);
-  //   }
-  // }, [auth.token, router]);
-
-  const handleUrl = async (receivedUrl: string) => {
-    try {
-      if (Platform.OS === "web") return; // TODO: Handle web
-      console.log("Linking url");
-      console.log("url: ", receivedUrl);
-      const { handleResponse } = await import(
-        "@mobile-wallet-protocol/client/dist/core/communicator/handleResponse.native"
-      );
-      const handled = handleResponse(receivedUrl);
-      console.log(handled);
-      if (handled) {
-        router.replace("/(authenticated)/home" as Href);
-      } else {
-        console.log("Unhandled deeplink:", receivedUrl);
-      }
-      return handled;
-    } catch (error) {
-      console.error("Error handling URL:", error);
-      // Implement proper error handling here
-    }
-  };
-
   useEffect(() => {
-    console.log("RootLayout useEffect running");
-    if (!url) console.log("No url");
-    else {
-      const { hostname, path, queryParams } = Linking.parse(url);
-      console.log(
-        `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(
-          queryParams
-        )}`
-      );
-      handleUrl(url).then((handled) => {
-        console.log("handled", handled);
-      });
+    if (auth.token && !auth.authenticatedUser?.newUser) {
+      router.replace("/(authenticated)/(tabs)/home" as Href);
     }
-  }, [url]);
+  }, [auth.token, router]);
+
+  // const handleUrl = async (receivedUrl: string) => {
+  //   try {
+  //     if (Platform.OS === "web") return; // TODO: Handle web
+  //     console.log("Linking url");
+  //     console.log("url: ", receivedUrl);
+  //     const { handleResponse } = await import(
+  //       "@mobile-wallet-protocol/client/dist/core/communicator/handleResponse.native"
+  //     );
+  //     const handled = handleResponse(receivedUrl);
+  //     console.log(handled);
+  //     if (handled) {
+  //       router.replace("/(authenticated)/home" as Href);
+  //     } else {
+  //       console.log("Unhandled deeplink:", receivedUrl);
+  //     }
+  //     return handled;
+  //   } catch (error) {
+  //     console.error("Error handling URL:", error);
+  //     // Implement proper error handling here
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   console.log("RootLayout useEffect running");
+  //   if (!url) console.log("No url");
+  //   else {
+  //     const { hostname, path, queryParams } = Linking.parse(url);
+  //     console.log(
+  //       `Linked to app with hostname: ${hostname}, path: ${path} and data: ${JSON.stringify(
+  //         queryParams
+  //       )}`
+  //     );
+  //     handleUrl(url).then((handled) => {
+  //       console.log("handled", handled);
+  //     });
+  //   }
+  // }, [url]);
 
   // useEffect(() => {
   //   const subscription = Linking.addEventListener("url", ({ url }) => {
@@ -101,14 +111,14 @@ export default function RootLayout() {
   //   return () => subscription.remove();
   // }, []);
 
-  useEffect(() => {
-    Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
-    Purchases.configure({
-      apiKey: process.env.EXPO_PUBLIC_PURCHASES_APPLE_API_KEY!,
-      appUserID: null,
-      useAmazon: false,
-    });
-  }, []);
+  // useEffect(() => {
+  //   Purchases.setLogLevel(Purchases.LOG_LEVEL.DEBUG);
+  //   Purchases.configure({
+  //     apiKey: process.env.EXPO_PUBLIC_PURCHASES_APPLE_API_KEY!,
+  //     appUserID: null,
+  //     useAmazon: false,
+  //   });
+  // }, []);
 
   return (
     <Providers>

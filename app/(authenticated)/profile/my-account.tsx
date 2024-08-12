@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Pressable, Modal, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BackArrow } from "@/components/ui/back-arrow";
 import { Input } from "@/components/ui/input";
-import { Menu } from "@/components/menu";
 import { Image } from "expo-image";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
@@ -14,19 +12,23 @@ import { colors } from "@/utils/theme";
 import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { ActivityIndicator } from "react-native";
+import { Loading } from "@/components/loading";
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
   const { wallets, ui, sdk } = useReactiveClient(client);
+  const [isLoading, setIsLoading] = useState(false);
   const address = wallets.userWallets[0]?.address;
 
-  if (!sdk.loaded) return <ActivityIndicator />;
+  if (!sdk.loaded) return <Loading />;
 
   const exportKeys = () => {
+    setIsLoading(true);
     ui.wallets.revealEmbeddedWalletKey({
       type: "private-key",
     });
     console.log("🔍 Exporting keys");
+    setIsLoading(false);
   };
 
   return (
@@ -34,7 +36,7 @@ export default function MyAccount() {
       <View className="flex flex-row">
         <Header backArrow />
       </View>
-      <View className="px-8 pt-4 space-y-8">
+      <View className="px-8 pt-4 space-y-4">
         <View className="space-y-2">
           <SubHeader title="Your Wallet" />
           <Text
@@ -44,7 +46,7 @@ export default function MyAccount() {
             Shares are held in a self-custody ETH wallet. You can export your
             keys at any time.
           </Text>
-          <View className="space-y-2">
+          {/* <View className="space-y-2">
             <View className="flex flex-row items-center space-x-2 py-2">
               <Image
                 source={
@@ -71,14 +73,10 @@ export default function MyAccount() {
                 className="text-center py-4 font-bold"
                 style={{ color: colors.white }}
               >
-                Export Keys
+                {isLoading ? <ActivityIndicator /> : " Export Keys"}
               </Text>
             </Button>
-          </View>
-        </View>
-
-        <View>
-          <SubHeader title="Connected Accounts" />
+          </View> */}
           <Unlink />
         </View>
         <View>
@@ -93,6 +91,7 @@ export default function MyAccount() {
 const Unlink = () => {
   const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
+  const { auth, ui } = useReactiveClient(client);
 
   const handleLogOut = () => {
     setModalVisible(false);
@@ -101,9 +100,9 @@ const Unlink = () => {
   return (
     <View className="w-full pt-2">
       <View className="flex-row justify-between items-center w-full py-2">
-        <Pressable className="flex-1" onPress={() => setModalVisible(true)}>
+        <Pressable className="flex-1" onPress={() => ui.userProfile.show()}>
           <Text style={{ color: theme.textColor }} className="text-lg">
-            Unlink X
+            Wallet
           </Text>
         </Pressable>
         <Image
@@ -115,55 +114,75 @@ const Unlink = () => {
           className="w-4 h-4"
         />
       </View>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => setModalVisible(false)}
-          className="flex-1 justify-end bg-black/50"
-        >
-          <View
-            style={{ backgroundColor: theme.backgroundColor }}
-            className="rounded-t-3xl p-6 h-44"
-          >
-            <Text
-              style={{ color: theme.textColor }}
-              className="text-lg font-medium mb-6 text-center"
-            >
-              Unlink your X Account?
-            </Text>
-            <View className="flex-row justify-between">
-              <Button
-                onPress={() => setModalVisible(false)}
-                buttonStyle="flex-1 py-3 rounded-lg mr-2"
-                style={{ backgroundColor: theme.tabBarInactiveTintColor }}
-              >
-                <Text style={{ color: colors.white }} className="text-center">
-                  No
-                </Text>
-              </Button>
-              <Button
-                onPress={handleLogOut}
-                buttonStyle="py-3 flex-1 rounded-lg ml-2"
-                style={{ backgroundColor: theme.tabBarActiveTintColor }}
-              >
-                <Text
-                  style={{ color: theme.tintTextColor }}
-                  className="text-center"
-                >
-                  Unlink
-                </Text>
-              </Button>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </View>
   );
+
+  // return (
+  //   <View className="w-full pt-2">
+  //     <View className="flex-row justify-between items-center w-full py-2">
+  //       <Pressable className="flex-1" onPress={() => handleLogOut()}>
+  //         <Text style={{ color: theme.textColor }} className="text-lg">
+  //           Unlink X
+  //         </Text>
+  //       </Pressable>
+  //       <Image
+  //         source={
+  //           themeName === "dark"
+  //             ? require("@/assets/images/dark/forward-arrow.png")
+  //             : require("@/assets/images/light/forward-arrow.png")
+  //         }
+  //         className="w-4 h-4"
+  //       />
+  //     </View>
+  //     <Modal
+  //       animationType="slide"
+  //       transparent={true}
+  //       visible={modalVisible}
+  //       onRequestClose={() => setModalVisible(false)}
+  //     >
+  //       <TouchableOpacity
+  //         activeOpacity={1}
+  //         onPress={() => setModalVisible(false)}
+  //         className="flex-1 justify-end bg-black/50"
+  //       >
+  //         <View
+  //           style={{ backgroundColor: theme.backgroundColor }}
+  //           className="rounded-t-3xl p-6 h-44"
+  //         >
+  //           <Text
+  //             style={{ color: theme.textColor }}
+  //             className="text-lg font-medium mb-6 text-center"
+  //           >
+  //             Unlink your X Account?
+  //           </Text>
+  //           <View className="flex-row justify-between">
+  //             <Button
+  //               onPress={() => setModalVisible(false)}
+  //               buttonStyle="flex-1 py-3 rounded-lg mr-2"
+  //               style={{ backgroundColor: theme.tabBarInactiveTintColor }}
+  //             >
+  //               <Text style={{ color: colors.white }} className="text-center">
+  //                 No
+  //               </Text>
+  //             </Button>
+  //             <Button
+  //               onPress={handleLogOut}
+  //               buttonStyle="py-3 flex-1 rounded-lg ml-2"
+  //               style={{ backgroundColor: theme.tabBarActiveTintColor }}
+  //             >
+  //               <Text
+  //                 style={{ color: theme.tintTextColor }}
+  //                 className="text-center"
+  //               >
+  //                 Unlink
+  //               </Text>
+  //             </Button>
+  //           </View>
+  //         </View>
+  //       </TouchableOpacity>
+  //     </Modal>
+  //   </View>
+  // );
 };
 
 const DeleteAccount = () => {

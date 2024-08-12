@@ -1,7 +1,7 @@
 import { SafeAreaView, View, Text } from "react-native";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { Link } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { Header } from "@/components/header";
@@ -9,21 +9,39 @@ import { colors } from "@/utils/theme";
 import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { Loading } from "@/components/loading";
+import { upsertUser } from "@/utils/helpers";
 
 export default function ConnectToTwitter() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { sdk, auth } = useReactiveClient(client);
+  const { sdk, auth, wallets } = useReactiveClient(client);
+  const pathname = usePathname();
 
   if (!sdk.loaded) return <Loading />;
+
+  const completeUserFlow = async () => {
+    try {
+      const xUserId = auth.authenticatedUser?.verifiedCredentials?.[2]?.id
+        ? parseInt(auth.authenticatedUser?.verifiedCredentials?.[2]?.id)
+        : null;
+      await upsertUser(auth.authenticatedUser?.userId, {
+        xUserId,
+        address: wallets.userWallets[0]?.address,
+        referralCode: "test",
+      });
+      router.push("/end");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleConnect = async () => {
     try {
       await auth.social.connect({
         provider: "twitter",
-        redirectPathname: "/end",
+        redirectPathname: pathname,
       });
-      // TODO: get user info
+      await completeUserFlow();
     } catch (error) {
       console.log(error);
     }
@@ -67,14 +85,14 @@ export default function ConnectToTwitter() {
               Connect to X
             </Text>
           </Button>
-          <Link href="/end">
+          <Button onPress={completeUserFlow}>
             <Text
               className="text-center text-lg pt-4"
               style={{ color: theme.mutedForegroundColor }}
             >
               I'll do this later
             </Text>
-          </Link>
+          </Button>
         </View>
       </View>
       <ProgressBar sections={3} currentSection={2} />
