@@ -27,8 +27,8 @@ export async function POST(request: Request) {
     );
     console.log(metadataIpfsHash);
     if (!metadataIpfsHash)
-      return new Response(
-        JSON.stringify({ error: "Failed to upload metadata" }),
+      return Response.json(
+        { error: "Failed to upload metadata" },
         {
           status: 500,
           headers: { "Content-Type": "application/json" },

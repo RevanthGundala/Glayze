@@ -10,7 +10,7 @@ async function main(inputArray: TransactionInput[]) {
     const hash = await walletClient.writeContract({
       address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
       abi,
-      functionName: "buyShares",
+      functionName: "sellShares",
       args: [postId, shares, 0],
     });
     const txReceipt = await publicClient.getTransactionReceipt({ hash });

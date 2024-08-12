@@ -1,11 +1,12 @@
 import { walletClient, publicClient } from "./config";
-import abi from "../abi.json";
 import { Address } from "viem";
-import { data, Input } from "./config";
+import { CreatePostInput } from "./config";
 import { supabase } from "@/utils/supabase";
 import { ABI } from "@/utils/constants";
 
-const main = async (inputArray: Input[]) => {
+export const data: CreatePostInput[] = [{}, {}, {}];
+
+const main = async (inputArray: CreatePostInput[]) => {
   for (const input of inputArray) {
     const { postId, name, symbol, url, image } = input;
     const response = await fetch(
