@@ -12,3 +12,13 @@ export const walletClient = createWalletClient({
   transport: http(),
   account: privateKeyToAccount(process.env.PRIVATE_KEY! as Address),
 });
+
+export type Input = {
+  postId: string;
+  name: string;
+  symbol: string;
+  url: string;
+  image: string;
+};
+
+export const data: Input[] = [{}, {}, {}];
