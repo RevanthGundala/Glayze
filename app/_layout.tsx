@@ -11,46 +11,40 @@ import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { View, Text } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Image } from "expo-image";
-import appleIcon from "../assets/images/socials/apple.png";
+import appleIcon from "@/assets/images/socials/apple.png";
+import icon from "@/assets/images/icon.png";
+import { NativeWindStyleSheet } from "nativewind";
+
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
 
 export default function RootLayout() {
   const router = useRouter();
+  // if (Platform.OS === "web") {
+  //   console.log("Showing web layout");
+  //   return (
+  //     <View className="flex-1 bg-white">
+  //       <View className="mt-40">
+  //         <Image source={icon} className="w-1/2 h-1/2" />
+  //       </View>
+  //       <View className="flex items-center justify-center mt-20">
+  //         <Button
+  //           buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"
+  //           onPress={() => router.push("/")}
+  //         >
+  //           <Image source={appleIcon} className="w-4 h-4 mr-3" />
+  //           <Text className="text-center text-black">
+  //             Download Glayze on the App store
+  //           </Text>
+  //         </Button>
+  //       </View>
+  //     </View>
+  //   );
+  // }
 
   const { auth } = useReactiveClient(client);
   const url = useBetterURL();
-  console.log("Here");
-  if (Platform.OS === "web") {
-    console.log("Showing web layout");
-    return (
-      <View className="flex-1 bg-white">
-        <View className="mt-40">
-          <Text className="text-black font-semibold text-center text-4xl">
-            Glayze
-          </Text>
-        </View>
-        <View className="flex items-center justify-center mt-20">
-          <Button
-            buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"
-            onPress={() => router.push("/")}
-          >
-            <Image
-              source={require("@/assets/images/light/back.png")}
-              style={{ width: 100, height: 100 }}
-              contentFit="contain"
-              onLoadStart={() => console.log("Loading")}
-              onLoadEnd={() => console.log("Loaded")}
-              onError={(e) => {
-                console.log(e);
-              }}
-            />
-            <Text className="text-center text-black">
-              Download Glayze on the App store
-            </Text>
-          </Button>
-        </View>
-      </View>
-    );
-  }
 
   useEffect(() => {
     if (auth.token && !auth.authenticatedUser?.newUser) {

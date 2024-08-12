@@ -13,10 +13,13 @@ export async function POST(request: Request) {
     const imageIpfsHash = await uploadImageToPinata(requestData);
 
     if (!imageIpfsHash)
-      return new Response(JSON.stringify({ error: "Failed to upload image" }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
+      return Response.json(
+        { error: "Failed to upload image" },
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
     const metadataIpfsHash = await uploadMetadataToPinata(
       requestData,
@@ -32,16 +35,22 @@ export async function POST(request: Request) {
         }
       );
 
-    return new Response(JSON.stringify({ metadataIpfsHash, imageIpfsHash }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return Response.json(
+      { metadataIpfsHash, imageIpfsHash },
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ error: "An error occurred" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return Response.json(
+      { error: "An error occurred" },
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 }
 
@@ -101,7 +110,7 @@ async function uploadMetadataToPinata(
     const blob = new Blob([JSON.stringify(metadata)], {
       type: "application/json",
     });
-    const file = new File([blob], `Metadata for ${symbol}`);
+    const file = new File([blob], `Metadata for ${postId}`);
     formData.append("file", file);
 
     const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {

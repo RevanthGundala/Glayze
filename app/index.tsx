@@ -5,44 +5,9 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { lightTheme as theme } from "@/utils/theme";
-import { Platform } from "react-native";
 
 export default function Index() {
   const router = useRouter();
-
-  if (Platform.OS === "web") {
-    console.log("Showing web layout");
-    return (
-      <View className="flex-1 bg-white">
-        <View className="mt-40">
-          <Text className="text-black font-semibold text-center text-4xl">
-            Glayze
-          </Text>
-        </View>
-        <View className="flex items-center justify-center mt-20">
-          <Button
-            buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"
-            onPress={() => router.push("/")}
-          >
-            <Image
-              source={require("@/assets/images/icon.png")}
-              style={{ width: 10, height: 10 }}
-              contentFit="contain"
-              onLoadStart={() => console.log("Loading")}
-              onLoadEnd={() => console.log("Loaded")}
-              onError={(e) => {
-                console.log(e);
-              }}
-            />
-            <Text className="text-center text-black">
-              Download Glayze on the App store
-            </Text>
-          </Button>
-        </View>
-      </View>
-    );
-  }
-
   return (
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex flex-row justify-center items-center pt-2">

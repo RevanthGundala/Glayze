@@ -22,15 +22,16 @@ import { client } from "@/utils/dynamic-client.native";
 import { BaseWallet } from "@/components/base-wallet";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { Loading } from "@/components/loading";
+import { colors } from "@/utils/theme";
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const { auth, sdk } = useReactiveClient(client);
 
-  if (!sdk.loaded) {
-    return <Text>Loading...</Text>;
-  }
+  if (!sdk.loaded) return <Loading />;
+
   const handleEmailLogin = async () => {
     try {
       console.log("Logging in with email");
@@ -47,10 +48,7 @@ export default function Login() {
     }
   };
   return (
-    <SafeAreaView
-      className="flex-1"
-      style={{ backgroundColor: theme.backgroundColor }}
-    >
+    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.white }}>
       <View className="flex flex-row">
         <Header backArrow />
       </View>
@@ -76,8 +74,7 @@ export default function Login() {
                   value={email}
                   onChangeText={setEmail}
                   style={{
-                    color: theme.textColor,
-                    backgroundColor: theme.backgroundColor,
+                    color: colors.white,
                   }}
                 />
               </View>

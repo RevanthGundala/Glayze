@@ -341,12 +341,17 @@ export default function Glayze() {
                   }}
                   render={({ field: { onChange, value } }) => (
                     <>
-                      <Text
-                        className="text-lg"
-                        style={{ color: theme.textColor }}
-                      >
-                        URL
-                      </Text>
+                      <View className="flex-row justify-between items-center">
+                        <Text
+                          className="text-lg"
+                          style={{ color: theme.textColor }}
+                        >
+                          URL
+                        </Text>
+                        <TouchableOpacity onPress={() => onChange("")}>
+                          <Text style={{ color: theme.tintColor }}>Clear</Text>
+                        </TouchableOpacity>
+                      </View>
                       <Input
                         placeholder="https://x.com/username/status/123213"
                         value={value}
@@ -451,10 +456,14 @@ export default function Glayze() {
               onPress={handleSubmit(handlePurchase)}
             >
               <Text
-                className="text-center font-semibold py-4"
+                className="text-center font-semibold py-4 flex items-center justify-center"
                 style={{ color: colors.white }}
               >
-                {isLoading ? <ActivityIndicator size="large" /> : "Pay $1.09"}
+                {isLoading ? (
+                  <ActivityIndicator size="small" color={colors.white} />
+                ) : (
+                  "Pay $1.09"
+                )}
               </Text>
             </Button>
           </ScrollView>
