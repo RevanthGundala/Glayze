@@ -24,11 +24,12 @@ import { useShareInfo, useShares } from "@/hooks";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { client } from "@/utils/dynamic-client.native";
 import { Loading } from "@/components/loading";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
-  const { wallets } = useReactiveClient(client);
-  const address = wallets.primary?.address;
+  const { smartAccountClient } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
   const { data: post, isLoading, isError, refetch } = usePost(id);
   const [selectedTime, setSelectedTime] = useState<Time>("1H");
   const { data: postPrices } = usePostPrices(id as string, selectedTime);

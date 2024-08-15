@@ -10,11 +10,14 @@ import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { Loading } from "@/components/loading";
 import { upsertUser } from "@/utils/helpers";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 export default function ConnectToTwitter() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { sdk, auth, wallets } = useReactiveClient(client);
+  const { smartAccountClient } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
+  const { sdk, auth } = useReactiveClient(client);
   const pathname = usePathname();
 
   if (!sdk.loaded) return <Loading />;
@@ -26,7 +29,7 @@ export default function ConnectToTwitter() {
         : null;
       await upsertUser(auth.authenticatedUser?.userId, {
         xUserId,
-        address: wallets.userWallets[0]?.address,
+        address,
         referralCode: "test",
       });
       router.push("/end");

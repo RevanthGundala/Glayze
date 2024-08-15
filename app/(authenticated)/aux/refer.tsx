@@ -11,10 +11,11 @@ import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import Toast from "react-native-toast-message";
 import * as Clipboard from "expo-clipboard";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 export default function Refer() {
-  const { wallets } = useReactiveClient(client);
-  const address = wallets.primary?.address;
+  const { smartAccountClient } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
   const { data: aura } = useAura(address);
   const { theme } = useTheme();
 

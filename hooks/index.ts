@@ -7,7 +7,6 @@ export { usePostPrices } from "./use-post-prices";
 export { useSearch } from "./use-search";
 export { useReferral } from "./use-referral";
 export { useEmbeddedTweet } from "./use-embedded-tweet";
-export { useSmartAccountClient } from "./use-smart-account-client";
 export { useWallet } from "./use-wallet";
 export { useBalance } from "./use-balance";
 export { useShareInfo } from "./use-share-info";

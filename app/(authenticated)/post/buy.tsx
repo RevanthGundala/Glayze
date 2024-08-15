@@ -28,13 +28,13 @@ import {
   useBalance,
   useBuyPrice,
   useAura,
-  useSmartAccountClient,
   usePublicClient,
 } from "@/hooks";
 import { Loading } from "@/components/loading";
 import { ABI, ERC20_ABI } from "@/utils/constants";
 import { Address, encodeFunctionData } from "viem";
 import { formatUSDC } from "@/utils/helpers";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 export default function Buy() {
   const maxFontSize = 48;
@@ -43,8 +43,8 @@ export default function Buy() {
   const [auraAmount, setAuraAmount] = useState("0");
   const [isLoading, setIsLoading] = useState(false);
   const { id, name, symbol, image } = useLocalSearchParams();
-  const { wallets } = useReactiveClient(client);
-  const address = wallets.primary?.address;
+  const { smartAccountClient } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
   const {
     data: balance,
     isLoading: balanceLoading,
@@ -70,7 +70,6 @@ export default function Buy() {
     isLoading: auraLoading,
     isError: auraError,
   } = useAura(address);
-  const { data: smartAccountClient, isError } = useSmartAccountClient();
   const { data: publicClient } = usePublicClient();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(true);

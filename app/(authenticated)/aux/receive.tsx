@@ -9,10 +9,11 @@ import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
 import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 export default function Receive() {
-  const { wallets } = useReactiveClient(client);
-  const address = wallets.userWallets[0]?.address;
+  const { smartAccountClient } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
   const { theme } = useTheme();
 
   const copyToClipboard = async () => {

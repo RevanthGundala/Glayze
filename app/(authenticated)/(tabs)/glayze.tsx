@@ -38,6 +38,7 @@ import { baseSepolia, base } from "viem/chains";
 import { usePublicClient } from "@/hooks/use-public-client";
 import { useConstants } from "@/hooks/use-constants";
 import { formatUSDC } from "@/utils/helpers";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 interface FormInput {
   name: string;
@@ -48,11 +49,10 @@ interface FormInput {
 export default function Glayze() {
   const { theme, themeName } = useTheme();
   const router = useRouter();
-  const { data: smartAccountClient, isError } = useSmartAccountClient();
   const [isLoading, setIsLoading] = useState(false);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(true);
-  const { wallets } = useReactiveClient(client);
-  const address = wallets.primary?.address;
+  const { smartAccountClient } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
   const { data: balance, isLoading: balanceLoading } = useBalance(address);
   const { data: constants, isLoading: constantsLoading } = useConstants();
   const [xUserId, setXUserId] = useState<string | null>(null);

@@ -20,14 +20,15 @@ import { client } from "@/utils/dynamic-client.native";
 import { useBalance } from "@/hooks";
 import { formatUSDC } from "@/utils/helpers";
 import { Loading } from "@/components/loading";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 export default function Wallet() {
   const { theme, themeName } = useTheme();
   const ref = useRef(null);
   useScrollToTop(ref);
   const router = useRouter();
-  const { wallets } = useReactiveClient(client);
-  const address = wallets.userWallets[0]?.address;
+  const { smartAccountClient } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
   const {
     data: balance,
     isLoading: isBalanceLoading,

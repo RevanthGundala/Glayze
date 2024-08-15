@@ -17,9 +17,8 @@ import { supabase } from "@/utils/supabase";
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
-  const { wallets, ui, sdk } = useReactiveClient(client);
+  const { ui, sdk } = useReactiveClient(client);
   const [isLoading, setIsLoading] = useState(false);
-  const address = wallets.userWallets[0]?.address;
 
   if (!sdk.loaded) return <Loading />;
 
