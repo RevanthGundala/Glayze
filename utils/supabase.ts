@@ -6,7 +6,7 @@ import { Database } from "../database.types";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-class SupabaseStorage {
+export class SupabaseStorage {
   async getItem(key: string) {
     if (Platform.OS === "web") {
       if (typeof localStorage === "undefined") {

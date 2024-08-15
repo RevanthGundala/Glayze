@@ -10,7 +10,7 @@ import { colors } from "@/utils/theme";
 import { useTheme } from "../contexts/theme-context";
 
 type GraphProps = {
-  price: number;
+  price: string;
   change: number;
   selectedTime: Time;
   setSelectedTime: React.Dispatch<React.SetStateAction<Time>>;

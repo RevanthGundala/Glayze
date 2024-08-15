@@ -12,6 +12,58 @@ export const share = async (url: string | undefined | null): Promise<void> => {
   }
 };
 
+export const formatUSDC = (priceString: string | undefined | null): string => {
+  if (!priceString) return "0.00";
+
+  const num = BigInt(priceString);
+  const wholePart = num / BigInt(10 ** 6);
+  const fractionalPart = num % BigInt(10 ** 6);
+
+  let result = wholePart.toString();
+  let fraction = fractionalPart.toString().padStart(6, "0");
+
+  if (wholePart === BigInt(0)) {
+    // Value is less than 1, show more decimals
+    // Remove trailing zeros
+    fraction = fraction.replace(/0+$/, "");
+    if (fraction.length > 0) {
+      result = "0." + fraction;
+    } else {
+      result = "0";
+    }
+    // Ensure at least two decimal places
+    if (result.split(".")[1]?.length === 1) {
+      result += "0";
+    }
+  } else {
+    // Value is 1 or greater, show exactly 2 decimals
+    result += "." + fraction.slice(0, 2);
+  }
+
+  return result;
+};
+
+export const parseUSDC = (formattedUSDC: string | null | undefined): string => {
+  if (!formattedUSDC || formattedUSDC === "0") return "0";
+
+  // Remove any commas that might be present in the formatted string
+  formattedUSDC = formattedUSDC.replace(/,/g, "");
+
+  const [wholePart, fractionalPart = ""] = formattedUSDC.split(".");
+
+  // Pad or truncate fractional part to 6 digits
+  const paddedFractionalPart = fractionalPart.padEnd(6, "0").slice(0, 6);
+
+  // Combine whole and fractional parts
+  const combined = wholePart + paddedFractionalPart;
+
+  // Remove leading zeros
+  const trimmed = combined.replace(/^0+/, "");
+
+  // If the result is empty (all zeros), return "0"
+  return trimmed || "0";
+};
+
 type CreateUserOptions = {
   xUserId: number | undefined | null;
   address: string | undefined | null;

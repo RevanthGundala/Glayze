@@ -38,10 +38,6 @@ export default function Receive() {
     }
   };
 
-  const handlePress = () => {
-    // TODO: Implement referral functionality
-  };
-
   return (
     <SafeAreaView
       className="flex-1"

@@ -1,30 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
 import { createPublicClient, http, Address } from "viem";
-import { baseSepolia, base } from "viem/chains";
-import { USDC_ABI } from "../utils/constants";
+import { ERC20_ABI } from "../utils/constants";
+import { fetchPublicClient } from "./use-public-client";
 
-const fetchBalance = async (address: string | null): Promise<string | null> => {
+const fetchBalance = async (
+  address: string | undefined
+): Promise<string | null> => {
   if (!address) return null;
   try {
-    const chain = process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
-    const client = createPublicClient({
-      chain,
-      transport: http(),
-    });
-    const balance = (await client.readContract({
-      address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS as Address,
-      abi: USDC_ABI,
+    const client = fetchPublicClient();
+    if (!client) return null;
+
+    const usdcBalance = await client.readContract({
+      address: process.env.EXPO_PUBLIC_USDC_ADDRESS as Address,
+      abi: ERC20_ABI,
       functionName: "balanceOf",
-      args: [address],
-    })) as unknown as bigint;
-    return balance.toString();
+      args: [address as Address],
+    });
+    return usdcBalance.toString();
   } catch (error) {
     console.log(error);
     return null;
   }
 };
 
-export function useBalance(address: string | null) {
+export function useBalance(address: string | undefined) {
   return useQuery<string | null, Error>({
     queryKey: ["user", address],
     queryFn: () => fetchBalance(address),

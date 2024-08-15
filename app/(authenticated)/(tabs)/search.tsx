@@ -31,7 +31,6 @@ const SearchScreen = () => {
   const { data, isLoading, isError } = useSearch(dynamicId);
   const searchBarRef = useRef(null);
   const { theme } = useTheme();
-
   const handleSearch = async () => {
     await addToSearchHistory(dynamicId, searchText);
   };
@@ -51,7 +50,7 @@ const SearchScreen = () => {
     if (!isLoading && data) {
       const newRoutes = data.map((searchItem) => ({
         name: searchItem,
-        href: `post/${searchItem.split("/").pop()}` as Href,
+        href: `post/${searchItem.split("/").pop()}` as Href<string>,
       }));
       console.log(newRoutes);
       setRoutes(newRoutes);

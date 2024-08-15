@@ -25,35 +25,7 @@ export const ABI = [
   },
   {
     type: "function",
-    name: "AURA_REFERRAL_AMOUNT",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "GLAYZE_CREATOR_FEE",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
     name: "MAX_SUPPLY",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "PROTOCOL_FEE",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "REAL_CREATOR_FEE",
     inputs: [],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
@@ -70,13 +42,6 @@ export const ABI = [
     name: "USDC",
     inputs: [],
     outputs: [{ name: "", type: "address", internalType: "contract IERC20" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "USDC_CREATION_PAYMENT",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
   },
   {
@@ -100,6 +65,13 @@ export const ABI = [
     ],
     outputs: [{ name: "", type: "bool", internalType: "bool" }],
     stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "auraReferralAmount",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
   },
   {
     type: "function",
@@ -150,6 +122,7 @@ export const ABI = [
     inputs: [
       { name: "postId", type: "uint256", internalType: "uint256" },
       { name: "shares", type: "uint256", internalType: "uint256" },
+      { name: "aura", type: "uint256", internalType: "uint256" },
     ],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
@@ -194,6 +167,7 @@ export const ABI = [
     inputs: [
       { name: "postId", type: "uint256", internalType: "uint256" },
       { name: "shares", type: "uint256", internalType: "uint256" },
+      { name: "aura", type: "uint256", internalType: "uint256" },
     ],
     outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
@@ -210,14 +184,17 @@ export const ABI = [
   },
   {
     type: "function",
+    name: "glayzeCreatorFee",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "glayzeCreatorRemainingEarnings",
     inputs: [{ name: "id", type: "uint256", internalType: "uint256" }],
     outputs: [
-      {
-        name: "remainingEarnings",
-        type: "uint256",
-        internalType: "uint256",
-      },
+      { name: "remainingEarnings", type: "uint256", internalType: "uint256" },
     ],
     stateMutability: "view",
   },
@@ -246,13 +223,16 @@ export const ABI = [
       { name: "name", type: "string", internalType: "string" },
       { name: "symbol", type: "string", internalType: "string" },
       { name: "postURI", type: "string", internalType: "string" },
-      {
-        name: "glayzeCreator",
-        type: "address",
-        internalType: "address",
-      },
+      { name: "glayzeCreator", type: "address", internalType: "address" },
       { name: "realCreator", type: "address", internalType: "address" },
     ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "protocolFee",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
   },
   {
@@ -260,6 +240,13 @@ export const ABI = [
     name: "protocolFeeDestination",
     inputs: [],
     outputs: [{ name: "", type: "address", internalType: "address" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "realCreatorFee",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
   },
   {
@@ -285,6 +272,24 @@ export const ABI = [
   },
   {
     type: "function",
+    name: "setAuraReferralAmount",
+    inputs: [
+      { name: "_auraReferralAmount", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setGlazyCreatorFee",
+    inputs: [
+      { name: "_glazyCreatorFee", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "setOperator",
     inputs: [
       { name: "operator", type: "address", internalType: "address" },
@@ -295,10 +300,41 @@ export const ABI = [
   },
   {
     type: "function",
+    name: "setPrtocolFee",
+    inputs: [
+      { name: "_protocolFee", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "setRealCreator",
     inputs: [
       { name: "postId", type: "uint256", internalType: "uint256" },
       { name: "realCreator", type: "address", internalType: "address" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setRealCreatorFee",
+    inputs: [
+      { name: "_realCreatorFee", type: "uint256", internalType: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "setUsdcCreationPayment",
+    inputs: [
+      {
+        name: "_usdcCreationPayment",
+        type: "uint256",
+        internalType: "uint256",
+      },
     ],
     outputs: [],
     stateMutability: "nonpayable",
@@ -359,6 +395,13 @@ export const ABI = [
   },
   {
     type: "function",
+    name: "usdcCreationPayment",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
     name: "usersReferred",
     inputs: [{ name: "user", type: "address", internalType: "address" }],
     outputs: [{ name: "isReferred", type: "bool", internalType: "bool" }],
@@ -380,12 +423,7 @@ export const ABI = [
         indexed: true,
         internalType: "address",
       },
-      {
-        name: "id",
-        type: "uint256",
-        indexed: true,
-        internalType: "uint256",
-      },
+      { name: "id", type: "uint256", indexed: true, internalType: "uint256" },
       {
         name: "amount",
         type: "uint256",
@@ -411,12 +449,7 @@ export const ABI = [
         indexed: true,
         internalType: "address",
       },
-      {
-        name: "approved",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
+      { name: "approved", type: "bool", indexed: false, internalType: "bool" },
     ],
     anonymous: false,
   },
@@ -424,12 +457,7 @@ export const ABI = [
     type: "event",
     name: "OwnershipTransferred",
     inputs: [
-      {
-        name: "user",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
+      { name: "user", type: "address", indexed: true, internalType: "address" },
       {
         name: "newOwner",
         type: "address",
@@ -455,12 +483,7 @@ export const ABI = [
         indexed: false,
         internalType: "address",
       },
-      {
-        name: "name",
-        type: "string",
-        indexed: false,
-        internalType: "string",
-      },
+      { name: "name", type: "string", indexed: false, internalType: "string" },
       {
         name: "symbol",
         type: "string",
@@ -548,12 +571,7 @@ export const ABI = [
         indexed: false,
         internalType: "address",
       },
-      {
-        name: "isBuy",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
+      { name: "isBuy", type: "bool", indexed: false, internalType: "bool" },
       {
         name: "aura",
         type: "uint256",
@@ -609,12 +627,7 @@ export const ABI = [
         indexed: false,
         internalType: "address",
       },
-      {
-        name: "isBuy",
-        type: "bool",
-        indexed: false,
-        internalType: "bool",
-      },
+      { name: "isBuy", type: "bool", indexed: false, internalType: "bool" },
       {
         name: "aura",
         type: "uint256",
@@ -646,24 +659,9 @@ export const ABI = [
         indexed: false,
         internalType: "address",
       },
-      {
-        name: "from",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "to",
-        type: "address",
-        indexed: true,
-        internalType: "address",
-      },
-      {
-        name: "id",
-        type: "uint256",
-        indexed: true,
-        internalType: "uint256",
-      },
+      { name: "from", type: "address", indexed: true, internalType: "address" },
+      { name: "to", type: "address", indexed: true, internalType: "address" },
+      { name: "id", type: "uint256", indexed: true, internalType: "uint256" },
       {
         name: "amount",
         type: "uint256",
@@ -720,12 +718,17 @@ export const ABI = [
   },
 ] as const;
 
-export const USDC_ABI = [
+export const ERC20_ABI = [
   {
     constant: true,
     inputs: [],
     name: "name",
-    outputs: [{ name: "", type: "string" }],
+    outputs: [
+      {
+        name: "",
+        type: "string",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -733,11 +736,22 @@ export const USDC_ABI = [
   {
     constant: false,
     inputs: [
-      { name: "_spender", type: "address" },
-      { name: "_value", type: "uint256" },
+      {
+        name: "_spender",
+        type: "address",
+      },
+      {
+        name: "_value",
+        type: "uint256",
+      },
     ],
     name: "approve",
-    outputs: [{ name: "", type: "bool" }],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+      },
+    ],
     payable: false,
     stateMutability: "nonpayable",
     type: "function",
@@ -746,38 +760,39 @@ export const USDC_ABI = [
     constant: true,
     inputs: [],
     name: "totalSupply",
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
     constant: false,
-    inputs: [{ name: "_account", type: "address" }],
-    name: "unBlacklist",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
     inputs: [
-      { name: "_from", type: "address" },
-      { name: "_to", type: "address" },
-      { name: "_value", type: "uint256" },
+      {
+        name: "_from",
+        type: "address",
+      },
+      {
+        name: "_to",
+        type: "address",
+      },
+      {
+        name: "_value",
+        type: "uint256",
+      },
     ],
     name: "transferFrom",
-    outputs: [{ name: "", type: "bool" }],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [{ name: "minter", type: "address" }],
-    name: "removeMinter",
-    outputs: [{ name: "", type: "bool" }],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+      },
+    ],
     payable: false,
     stateMutability: "nonpayable",
     type: "function",
@@ -786,130 +801,31 @@ export const USDC_ABI = [
     constant: true,
     inputs: [],
     name: "decimals",
-    outputs: [{ name: "", type: "uint8" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      { name: "_name", type: "string" },
-      { name: "_symbol", type: "string" },
-      { name: "_currency", type: "string" },
-      { name: "_decimals", type: "uint8" },
-      { name: "_masterMinter", type: "address" },
-      { name: "_pauser", type: "address" },
-      { name: "_blacklister", type: "address" },
-      { name: "_owner", type: "address" },
+    outputs: [
+      {
+        name: "",
+        type: "uint8",
+      },
     ],
-    name: "initialize",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "masterMinter",
-    outputs: [{ name: "", type: "address" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [],
-    name: "unpause",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      { name: "_to", type: "address" },
-      { name: "_amount", type: "uint256" },
-    ],
-    name: "mint",
-    outputs: [{ name: "", type: "bool" }],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [{ name: "_amount", type: "uint256" }],
-    name: "burn",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [
-      { name: "minter", type: "address" },
-      { name: "minterAllowedAmount", type: "uint256" },
-    ],
-    name: "configureMinter",
-    outputs: [{ name: "", type: "bool" }],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [{ name: "_newPauser", type: "address" }],
-    name: "updatePauser",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "paused",
-    outputs: [{ name: "", type: "bool" }],
     payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
     constant: true,
-    inputs: [{ name: "account", type: "address" }],
+    inputs: [
+      {
+        name: "_owner",
+        type: "address",
+      },
+    ],
     name: "balanceOf",
-    outputs: [{ name: "", type: "uint256" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [],
-    name: "pause",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [{ name: "minter", type: "address" }],
-    name: "minterAllowance",
-    outputs: [{ name: "", type: "uint256" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "owner",
-    outputs: [{ name: "", type: "address" }],
+    outputs: [
+      {
+        name: "balance",
+        type: "uint256",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -918,16 +834,12 @@ export const USDC_ABI = [
     constant: true,
     inputs: [],
     name: "symbol",
-    outputs: [{ name: "", type: "string" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "pauser",
-    outputs: [{ name: "", type: "address" }],
+    outputs: [
+      {
+        name: "",
+        type: "string",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
@@ -935,171 +847,72 @@ export const USDC_ABI = [
   {
     constant: false,
     inputs: [
-      { name: "_to", type: "address" },
-      { name: "_value", type: "uint256" },
+      {
+        name: "_to",
+        type: "address",
+      },
+      {
+        name: "_value",
+        type: "uint256",
+      },
     ],
     name: "transfer",
-    outputs: [{ name: "", type: "bool" }],
+    outputs: [
+      {
+        name: "",
+        type: "bool",
+      },
+    ],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [{ name: "_newMasterMinter", type: "address" }],
-    name: "updateMasterMinter",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [{ name: "account", type: "address" }],
-    name: "isMinter",
-    outputs: [{ name: "", type: "bool" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [{ name: "_newBlacklister", type: "address" }],
-    name: "updateBlacklister",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: "blacklister",
-    outputs: [{ name: "", type: "address" }],
-    payable: false,
-    stateMutability: "view",
     type: "function",
   },
   {
     constant: true,
     inputs: [
-      { name: "owner", type: "address" },
-      { name: "spender", type: "address" },
+      {
+        name: "_owner",
+        type: "address",
+      },
+      {
+        name: "_spender",
+        type: "address",
+      },
     ],
     name: "allowance",
-    outputs: [{ name: "", type: "uint256" }],
+    outputs: [
+      {
+        name: "",
+        type: "uint256",
+      },
+    ],
     payable: false,
     stateMutability: "view",
     type: "function",
   },
   {
-    constant: true,
-    inputs: [],
-    name: "currency",
-    outputs: [{ name: "", type: "string" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [{ name: "newOwner", type: "address" }],
-    name: "transferOwnership",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: false,
-    inputs: [{ name: "_account", type: "address" }],
-    name: "blacklist",
-    outputs: [],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    constant: true,
-    inputs: [{ name: "_account", type: "address" }],
-    name: "isBlacklisted",
-    outputs: [{ name: "", type: "bool" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
+    payable: true,
+    stateMutability: "payable",
+    type: "fallback",
   },
   {
     anonymous: false,
     inputs: [
-      { indexed: true, name: "minter", type: "address" },
-      { indexed: true, name: "to", type: "address" },
-      { indexed: false, name: "amount", type: "uint256" },
-    ],
-    name: "Mint",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: "burner", type: "address" },
-      { indexed: false, name: "amount", type: "uint256" },
-    ],
-    name: "Burn",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: "minter", type: "address" },
-      { indexed: false, name: "minterAllowedAmount", type: "uint256" },
-    ],
-    name: "MinterConfigured",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [{ indexed: true, name: "oldMinter", type: "address" }],
-    name: "MinterRemoved",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [{ indexed: true, name: "newMasterMinter", type: "address" }],
-    name: "MasterMinterChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [{ indexed: true, name: "_account", type: "address" }],
-    name: "Blacklisted",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [{ indexed: true, name: "_account", type: "address" }],
-    name: "UnBlacklisted",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [{ indexed: true, name: "newBlacklister", type: "address" }],
-    name: "BlacklisterChanged",
-    type: "event",
-  },
-  { anonymous: false, inputs: [], name: "Pause", type: "event" },
-  { anonymous: false, inputs: [], name: "Unpause", type: "event" },
-  {
-    anonymous: false,
-    inputs: [{ indexed: true, name: "newAddress", type: "address" }],
-    name: "PauserChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: "owner", type: "address" },
-      { indexed: true, name: "spender", type: "address" },
-      { indexed: false, name: "value", type: "uint256" },
+      {
+        indexed: true,
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        name: "spender",
+        type: "address",
+      },
+      {
+        indexed: false,
+        name: "value",
+        type: "uint256",
+      },
     ],
     name: "Approval",
     type: "event",
@@ -1107,22 +920,23 @@ export const USDC_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: false, name: "previousOwner", type: "address" },
-      { indexed: false, name: "newOwner", type: "address" },
-    ],
-    name: "OwnershipTransferred",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: "from", type: "address" },
-      { indexed: true, name: "to", type: "address" },
-      { indexed: false, name: "value", type: "uint256" },
+      {
+        indexed: true,
+        name: "from",
+        type: "address",
+      },
+      {
+        indexed: true,
+        name: "to",
+        type: "address",
+      },
+      {
+        indexed: false,
+        name: "value",
+        type: "uint256",
+      },
     ],
     name: "Transfer",
     type: "event",
   },
-];
-
-export const AURA_ABI = [];
+] as const;

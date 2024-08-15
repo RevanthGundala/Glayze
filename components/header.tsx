@@ -6,9 +6,10 @@ import { BackArrow } from "./ui/back-arrow";
 type HeaderProps = {
   title?: string;
   backArrow?: true;
+  path?: string;
 };
 
-export const Header = ({ title, backArrow }: HeaderProps) => {
+export const Header = ({ title, backArrow, path }: HeaderProps) => {
   const { theme } = useTheme();
 
   return (

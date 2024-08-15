@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { lightTheme as theme } from "@/utils/theme";
+import { colors, lightTheme as theme } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { useState } from "react";
 import { useLocalSearchParams } from "expo-router";
@@ -21,12 +21,13 @@ import { client } from "@/utils/dynamic-client.native";
 import Toast from "react-native-toast-message";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { Loading } from "@/components/loading";
-import { upsertUser } from "@/utils/helpers";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function ConfirmEmail() {
   const router = useRouter();
   const { email } = useLocalSearchParams();
   const [code, setCode] = useState("");
+  const { theme } = useTheme();
   const { sdk, auth } = useReactiveClient(client);
 
   if (!sdk.loaded) return <Loading />;
@@ -47,7 +48,10 @@ export default function ConfirmEmail() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: theme.backgroundColor }}
+    >
       <Toast />
       <View className="flex flex-row">
         <Header backArrow />
@@ -99,7 +103,7 @@ export default function ConfirmEmail() {
                 <Text
                   className="text-center font-semibold"
                   style={{
-                    color: theme.secondaryTextColor,
+                    color: colors.white,
                   }}
                 >
                   Confirm

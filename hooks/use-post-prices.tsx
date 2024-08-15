@@ -12,7 +12,15 @@ const calculatePercentChange = (
   return ((newValue - originalValue) / originalValue) * 100;
 };
 
-const fetchPostPrices = async (id: number | null | undefined, time: Time) => {
+interface Trade {
+  price: number | null;
+  created_at: string;
+}
+
+const fetchPostPrices = async (
+  id: string | null | undefined,
+  time: Time
+): Promise<PostPrices | null> => {
   if (!id) return null;
   let prices: number[] = [];
   let price_change: number = 0;
@@ -24,26 +32,29 @@ const fetchPostPrices = async (id: number | null | undefined, time: Time) => {
     throw error;
   }
   const now = new Date();
+  const filterAndMapTrades = (startDate: Date): number[] => {
+    return trades
+      .filter((trade: Trade) => new Date(trade.created_at) >= startDate)
+      .map((trade: Trade) => trade.price)
+      .filter((price): price is number => price !== null);
+  };
+
   if (time === "1D") {
     const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    prices = trades
-      .filter((trade) => new Date(trade.created_at) >= oneDayAgo)
-      .map((trade) => trade.price);
+    prices = filterAndMapTrades(oneDayAgo);
     price_change = calculatePercentChange(prices[0], prices[2]);
   } else if (time === "1W") {
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    prices = trades
-      .filter((trade) => new Date(trade.created_at) >= oneWeekAgo)
-      .map((trade) => trade.price);
+    prices = filterAndMapTrades(oneWeekAgo);
     price_change = calculatePercentChange(prices[0], prices[3]);
   } else if (time === "1M") {
     const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    prices = trades
-      .filter((trade) => new Date(trade.created_at) >= oneMonthAgo)
-      .map((trade) => trade.price);
+    prices = filterAndMapTrades(oneMonthAgo);
     price_change = calculatePercentChange(prices[0], prices[4]);
   } else if (time === "ALL") {
-    prices = trades.map((trade) => trade.price);
+    prices = trades
+      .map((trade: Trade) => trade.price)
+      .filter((price): price is number => price !== null);
     price_change = calculatePercentChange(prices[0], prices[prices.length - 1]);
   } else {
     prices = [];
@@ -57,9 +68,9 @@ interface PostPrices {
   price_change: number;
 }
 
-export const usePostPrices = (id: number | null | undefined, time: Time) => {
+export const usePostPrices = (id: string | null | undefined, time: Time) => {
   return useQuery<PostPrices | null, Error>({
-    queryKey: ["time", time],
+    queryKey: ["time", id, time],
     queryFn: () => fetchPostPrices(id, time),
   });
 };

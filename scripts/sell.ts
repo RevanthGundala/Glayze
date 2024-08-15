@@ -2,8 +2,6 @@ import { walletClient, publicClient, TransactionInput } from "./config";
 import abi from "../abi.json";
 import { Address } from "viem";
 
-const data: TransactionInput[] = [{}, {}];
-
 async function main(inputArray: TransactionInput[]) {
   for (const input of inputArray) {
     const { postId, shares } = input;

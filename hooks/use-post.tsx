@@ -9,7 +9,6 @@ const fetchPost = async (id: string | string[] | null | undefined) => {
     .select("*")
     .eq("post_id", id)
     .single();
-
   if (error) {
     console.log(error);
     throw new Error(`Error fetching posts: ${error.message}`);

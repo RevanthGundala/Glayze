@@ -3,7 +3,7 @@ import { supabase } from "@/utils/supabase";
 import { Address } from "viem";
 
 const fetchRealCreator = async (
-  xUserId: number | null
+  xUserId: string | null | undefined
 ): Promise<Address | null> => {
   try {
     if (!xUserId) return null;
@@ -22,7 +22,7 @@ const fetchRealCreator = async (
   }
 };
 
-export function useRealCreator(xUserId: number | null) {
+export function useRealCreator(xUserId: string | null | undefined) {
   return useQuery<Address | null, Error>({
     queryKey: ["user", xUserId],
     queryFn: () => fetchRealCreator(xUserId),

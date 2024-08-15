@@ -4,12 +4,17 @@ import { Image } from "expo-image";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
-import { lightTheme as theme } from "@/utils/theme";
+import { useTheme } from "@/contexts/theme-context";
+import { colors } from "@/utils/theme";
 
 export default function Index() {
   const router = useRouter();
+  const { theme } = useTheme();
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: theme.backgroundColor }}
+    >
       <View className="flex flex-row justify-center items-center pt-2">
         <Image
           source={require("@/assets/images/icon.png")}
@@ -51,7 +56,7 @@ export default function Index() {
           <View className="px-6 py-4 flex flex-row items-center justify-center space-x-2">
             <Text
               className="text-center font-bold"
-              style={{ color: theme.secondaryTextColor }}
+              style={{ color: colors.white }}
             >
               Get Started
             </Text>

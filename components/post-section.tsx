@@ -9,6 +9,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { usePosts } from "@/hooks/use-posts";
 import { Instagram } from "react-content-loader/native";
+import { formatUSDC } from "@/utils/helpers";
 
 type PostSectionProps = {
   selectedTab: string;
@@ -81,7 +82,6 @@ export const PostComponent = ({
                 >
                   <Image
                     source={{ uri: `${post.image_uri}` || "" }}
-                    // source={require("@/assets/images/icon.png")}
                     className="w-10 h-10"
                   />
                 </View>
@@ -91,14 +91,14 @@ export const PostComponent = ({
                       className="text-lg"
                       style={{ color: theme.textColor }}
                     >
-                      ${post.symbol || "N/A"}
+                      {post.symbol || "N/A"}
                     </Text>
                     <Text
                       className="text-xl font-semibold"
                       style={{ color: theme.textColor }}
                     >
-                      {shareInfo != null
-                        ? `$${shareInfo.price.toFixed(3)}`
+                      {shareInfo
+                        ? `$${formatUSDC(shareInfo?.price || "0")}`
                         : "N/A"}
                     </Text>
                   </View>

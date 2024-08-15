@@ -29,11 +29,9 @@ const fetchSmartAccountClient =
       if (!wallet) return null;
       const chain =
         process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
-      console.log("🔍 Wallet created!");
-
       const publicClient = createPublicClient({
         chain,
-        transport: http(),
+        transport: http(process.env.EXPO_PUBLIC_RPC_URL as string),
       });
       const walletViemClient = client.viem.createWalletClient({
         wallet,
@@ -47,7 +45,6 @@ const fetchSmartAccountClient =
         entryPoint: process.env
           .EXPO_PUBLIC_BASE_ENTRYPOINT_ADDRESS as EntryPoint,
       });
-      console.log("🔍 Simple account created!");
 
       const cloudPaymaster = createPimlicoPaymasterClient({
         chain,

@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
 
-const completeReferral = async (address: string, to?: string) => {
+const completeReferral = async (address: string | undefined, to?: string) => {
   if (!address) return null;
   const { data, error } = await supabase
     .from("Users")
@@ -48,9 +48,9 @@ interface Referral {
   refer: () => void;
 }
 
-export const useReferral = (address: string, to?: string) => {
+export const useReferral = (address: string | undefined, to?: string) => {
   return useQuery<Referral | null, Error>({
-    queryKey: ["referal_link", address],
+    queryKey: ["referal_link", address, to],
     queryFn: () => completeReferral(address, to),
   });
 };

@@ -13,4 +13,8 @@ export { useBalance } from "./use-balance";
 export { useShareInfo } from "./use-share-info";
 export { useAura } from "./use-aura";
 export { useRealCreator } from "./use-real-creator";
+export { useShares } from "./use-shares";
+export { useBuyPrice } from "./use-buy-price";
+export { useSellPrice } from "./use-sell-price";
+export { usePublicClient } from "./use-public-client";
 // export { useProduct } from "./use-product";

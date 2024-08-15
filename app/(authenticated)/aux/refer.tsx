@@ -9,16 +9,37 @@ import { colors } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import Toast from "react-native-toast-message";
+import * as Clipboard from "expo-clipboard";
 
 export default function Refer() {
   const { wallets } = useReactiveClient(client);
   const address = wallets.primary?.address;
   const { data: aura } = useAura(address);
-  const { data } = useReferral(address);
   const { theme } = useTheme();
 
-  const handlePress = async () => {
-    await share(data?.referralLink || null);
+  const copyToClipboard = async () => {
+    console.log("Copying to clipboard");
+    try {
+      if (!address) return;
+      await Clipboard.setStringAsync(address);
+      Toast.show({
+        text1: "Copied to clipboard",
+        text2: "Address copied to clipboard",
+        type: "success",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        text1: "Error copying to clipboard",
+        text2: "Please try again",
+        type: "error",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
+    }
   };
 
   return (
@@ -48,37 +69,36 @@ export default function Refer() {
           className="leading-6"
           style={{ color: theme.mutedForegroundColor }}
         >
-          You and your friend both earn 5 $AURA when they make a transaction
-          within 14 days of the invite. Use $AURA to pay for transaction fees.
+          You and your friend both earn 1 $AURA when they make a transaction
+          within 14 days of using your code. Use $AURA to pay for transaction
+          fees.
         </Text>
         <ReferralCard amount={aura || "0"} />
         <Text
           className="font-medium text-lg pb-2"
           style={{ color: theme.textColor }}
         >
-          Share your link
+          Share your code
         </Text>
         <Input
-          placeholder={data?.referralLink || ""}
+          placeholder={address || ""}
           readOnly
           style={{ backgroundColor: theme.textColor }}
         />
         <Button
           buttonStyle="w-full rounded-lg my-4"
           style={{
-            backgroundColor: data?.referralLink
+            backgroundColor: address
               ? theme.tabBarActiveTintColor
               : theme.tabBarInactiveTintColor,
           }}
-          onPress={handlePress}
+          onPress={copyToClipboard}
         >
           <Text
             className="text-center font-semibold py-4"
             style={{ color: colors.white }}
           >
-            {data?.referralLink
-              ? "Share"
-              : "There was a problem finding your referral link"}
+            {address ? "Copy" : "There was a problem finding your address"}
           </Text>
         </Button>
       </View>

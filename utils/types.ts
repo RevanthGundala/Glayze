@@ -8,7 +8,6 @@ export type Referral = Tables["Referrals"]["Row"];
 export type Search = Tables["Search"]["Row"];
 
 export type Position = {
-  shares: number;
   totalValueInvested: number;
   marketValue: number;
   averageCost: number;

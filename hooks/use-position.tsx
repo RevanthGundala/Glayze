@@ -4,11 +4,12 @@ import { supabase } from "@/utils/supabase";
 import { createPublicClient, http, Address } from "viem";
 import { baseSepolia, base } from "viem/chains";
 import { ABI } from "@/utils/constants";
+import { fetchPublicClient } from "./use-public-client";
 
 const calculatePosition = async (
   post: Post | null | undefined,
   address: string | undefined,
-  price: number | undefined
+  price: string | undefined
 ): Promise<Position | null> => {
   if (!post || !address) return null;
   const { data: trades, error } = await supabase
@@ -22,22 +23,18 @@ const calculatePosition = async (
     throw error;
   }
 
-  const chain = process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
-  const client = createPublicClient({
-    chain,
-    transport: http(),
-  });
+  const client = fetchPublicClient();
+  if (!client) return null;
 
-  const shares = parseFloat(
-    await client
-      .readContract({
-        address: process.env.CONTRACT_ADDRESS as Address,
-        abi: ABI,
-        functionName: "balanceOf",
-        args: [address as Address, BigInt(post.post_id)],
-      })
-      .toString()
-  );
+  const shares = await client
+    .readContract({
+      address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS as Address,
+      abi: ABI,
+      functionName: "balanceOf",
+      args: [address as Address, BigInt(post.post_id)],
+    })
+    .toString();
+
   let totalValueInvested = 0;
   let firstBought = new Date();
 
@@ -60,7 +57,6 @@ const calculatePosition = async (
     totalValueInvested > 0 ? (totalReturn / totalValueInvested) * 100 : 0;
 
   return {
-    shares,
     totalValueInvested,
     marketValue,
     averageCost,
@@ -75,10 +71,10 @@ const calculatePosition = async (
 export const usePosition = (
   post: Post | null | undefined,
   address: string | undefined,
-  price: number | undefined
+  price: string | undefined
 ) => {
   return useQuery<Position | null, Error>({
-    queryKey: ["position", post?.post_id, address],
+    queryKey: ["position", post?.post_id, address, price],
     queryFn: () => calculatePosition(post, address, price),
   });
 };

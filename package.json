@@ -11,8 +11,8 @@
     "test": "jest --watchAll",
     "lint": "expo lint",
     "create-post": "npx tsx --env-file=.env.development scripts/create-post.ts",
-    "buy": "npx tsx --env-file=.env.development scripts/buy.ts",
-    "sell": "npx tsx --env-file=.env.development scripts/sell.ts",
+    "buy-shares": "npx tsx --env-file=.env.development scripts/buy-shares.ts",
+    "sell-shares": "npx tsx --env-file=.env.development scripts/sell-shares.ts",
     "gen-types": "npx supabase gen types --lang=typescript --project-id cniogwryfwtupzifkrow --schema public > database.types.ts"
   },
   "jest": {

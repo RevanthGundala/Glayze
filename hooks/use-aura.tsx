@@ -1,24 +1,23 @@
 import { useQuery } from "@tanstack/react-query";
-import { createPublicClient, http, Address } from "viem";
-import { baseSepolia, base } from "viem/chains";
-import { AURA_ABI } from "../utils/constants";
+import { Address } from "viem";
+import { ERC20_ABI } from "../utils/constants";
+import { fetchPublicClient } from "./use-public-client";
 
 const fetchAura = async (
   address: string | undefined
 ): Promise<string | null> => {
+  console.log("fetching aura");
   if (!address) return null;
   try {
-    const chain = process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
-    const client = createPublicClient({
-      chain,
-      transport: http(),
-    });
-    const balance = (await client.readContract({
-      address: process.env.EXPO_PUBLIC_AURA_CONTRACT_ADDRESS as Address,
-      abi: AURA_ABI,
+    const client = fetchPublicClient();
+    if (!client) return null;
+    const balance = await client.readContract({
+      address: process.env.EXPO_PUBLIC_AURA_ADDRESS as Address,
+      abi: ERC20_ABI,
       functionName: "balanceOf",
-      args: [address],
-    })) as unknown as bigint;
+      args: [address as Address],
+    });
+    console.log("aura balance:", balance.toString());
     return balance.toString();
   } catch (error) {
     console.log(error);

@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   SafeAreaView,
   View,
   ImageSourcePropType,
   ScrollView,
-  ActivityIndicator,
 } from "react-native";
-import { useLocalSearchParams, useRouter, Href } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { Graph } from "@/components/graph";
 import { Button } from "@/components/ui/button";
@@ -21,27 +20,41 @@ import { lightTheme, colors } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { ShareHeader } from "@/components/share-header";
 import { type Post } from "@/utils/types";
-import { useShareInfo } from "@/hooks";
+import { useShareInfo, useShares } from "@/hooks";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { client } from "@/utils/dynamic-client.native";
 import { Loading } from "@/components/loading";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
-  console.log("id", id);
   const { wallets } = useReactiveClient(client);
   const address = wallets.primary?.address;
-  const { data: post, isLoading, isError } = usePost(id);
+  const { data: post, isLoading, isError, refetch } = usePost(id);
   const [selectedTime, setSelectedTime] = useState<Time>("1H");
-  const { data: postPrices } = usePostPrices(
-    parseInt(id as string),
-    selectedTime
-  );
+  const { data: postPrices } = usePostPrices(id as string, selectedTime);
   const { theme } = useTheme();
-  const { data: shareInfo } = useShareInfo(parseFloat(id.toString()));
+  const {
+    data: shareInfo,
+    isLoading: shareInfoLoading,
+    isError: shareInfoError,
+  } = useShareInfo(id as string);
+  const { data: shareValue } = useShares(address, id as string);
   const { data: position } = usePosition(post, address, shareInfo?.price);
 
-  if (isLoading || isError || !post)
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // Refetch data when the screen comes into focus
+      if (typeof id === "string") {
+        refetch();
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation, id]);
+
+  if (isLoading || isError || !post || shareInfoLoading || shareInfoError)
     return <Loading error={isError ? "Error loading post" : null} />;
 
   return (
@@ -68,14 +81,14 @@ export default function Post() {
         contentContainerStyle={{ paddingBottom: 80 }}
       >
         <Graph
-          price={shareInfo?.price ?? 0}
-          change={postPrices?.price_change ?? 0}
+          price={shareInfo?.price ?? "0.000"}
+          change={postPrices?.price_change ?? 0.0}
           selectedTime={selectedTime}
           setSelectedTime={setSelectedTime}
         />
         <Position
-          marketValue={position?.marketValue ?? 0}
-          shares={position?.shares ?? 0}
+          marketValue={shareValue?.value ?? "0"}
+          shares={shareValue?.number ?? "0"}
           averageCost={position?.averageCost ?? 0}
           firstBought={position?.firstBought ?? new Date()}
           todaysReturn={position?.todaysReturn ?? 0}
@@ -83,13 +96,13 @@ export default function Post() {
           todaysReturnPercent={position?.todaysReturnPercent ?? 0}
           totalReturnPercent={position?.totalReturnPercent ?? 0}
         />
-        <Stats
+        {/* <Stats
           marketCap={(shareInfo && shareInfo?.price * shareInfo?.supply) ?? 0}
           volume={post.volume ?? 0}
           allTimeHigh={post.ath ?? 0}
           // allTimeLow={0}
           createdAt={new Date(post.created_at)}
-        />
+        /> */}
       </ScrollView>
       <BuySellButtons theme={theme} post={post} />
     </SafeAreaView>
@@ -97,8 +110,8 @@ export default function Post() {
 }
 
 type PositionProps = {
-  marketValue: number;
-  shares: number;
+  marketValue: string;
+  shares: string;
   averageCost: number;
   firstBought: Date;
   todaysReturn: number;
@@ -147,7 +160,7 @@ const Position = ({
             Shares
           </Text>
           <Text className="text-lg" style={{ color: theme.textColor }}>
-            ${shares}
+            {shares}
           </Text>
         </View>
       </View>
@@ -304,6 +317,7 @@ type BuySellButtonsProps = {
 
 const BuySellButtons = ({ theme, post }: BuySellButtonsProps) => {
   const router = useRouter();
+
   return (
     <BlurView
       intensity={10}
@@ -318,10 +332,10 @@ const BuySellButtons = ({ theme, post }: BuySellButtonsProps) => {
             router.push({
               pathname: "/(authenticated)/post/sell",
               params: {
-                key1: post.post_id,
-                key2: post.name,
-                key3: post.symbol,
-                key4: post.image_uri, // TODO: Add image
+                id: post.post_id as string,
+                name: post.name as string,
+                symbol: post.symbol as string,
+                image: post.image_uri as string,
               },
             });
           }}
@@ -340,10 +354,10 @@ const BuySellButtons = ({ theme, post }: BuySellButtonsProps) => {
             router.push({
               pathname: "/(authenticated)/post/buy",
               params: {
-                key1: post.post_id,
-                key2: post.name,
-                key3: post.symbol,
-                key4: post.image_uri, // TODO: Add image
+                id: post.post_id as string,
+                name: post.name as string,
+                symbol: post.symbol as string,
+                image: post.image_uri as string,
               },
             });
           }}

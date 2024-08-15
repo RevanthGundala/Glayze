@@ -16,7 +16,7 @@ export type Database = {
           created_at: string
           image_uri: string | null
           name: string | null
-          post_id: number
+          post_id: string
           real_creator: string | null
           symbol: string | null
           url: string | null
@@ -28,7 +28,7 @@ export type Database = {
           created_at?: string
           image_uri?: string | null
           name?: string | null
-          post_id: number
+          post_id: string
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
@@ -40,7 +40,7 @@ export type Database = {
           created_at?: string
           image_uri?: string | null
           name?: string | null
-          post_id?: number
+          post_id?: string
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
@@ -132,21 +132,21 @@ export type Database = {
           created_at: string
           dynamic_id: string
           referral_code: string | null
-          x_user_id: number | null
+          x_user_id: string | null
         }
         Insert: {
           address?: string | null
           created_at?: string
           dynamic_id: string
           referral_code?: string | null
-          x_user_id?: number | null
+          x_user_id?: string | null
         }
         Update: {
           address?: string | null
           created_at?: string
           dynamic_id?: string
           referral_code?: string | null
-          x_user_id?: number | null
+          x_user_id?: string | null
         }
         Relationships: []
       }

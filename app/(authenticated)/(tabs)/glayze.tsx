@@ -16,23 +16,28 @@ import { useRouter, Href } from "expo-router";
 import { ScrollView } from "react-native";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/theme-context";
-import { DEPLOYMENT_FEE } from "@/utils/constants";
+import { ABI, DEPLOYMENT_FEE, ERC20_ABI } from "@/utils/constants";
 import { Header } from "@/components/header";
-import { Image } from "expo-image";
 import Toast from "react-native-toast-message";
 import { useForm, Controller } from "react-hook-form";
 import { colors } from "@/utils/theme";
-import { useSmartAccountClient, useRealCreator } from "@/hooks";
+import { useSmartAccountClient, useRealCreator, useBalance } from "@/hooks";
 import { fetchTweet } from "@/hooks/use-embedded-tweet";
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-// import { useProduct } from "@/hooks";
-import Purchases from "react-native-purchases";
-import abi from "@/abi.json";
-import { Address } from "viem";
+import {
+  Address,
+  encodeFunctionData,
+  http,
+  createPublicClient,
+  parseUnits,
+  formatUnits,
+} from "viem";
 import { supabase } from "@/utils/supabase";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { client } from "@/utils/dynamic-client.native";
+import { baseSepolia, base } from "viem/chains";
+import { usePublicClient } from "@/hooks/use-public-client";
+import { useConstants } from "@/hooks/use-constants";
+import { formatUSDC } from "@/utils/helpers";
 
 interface FormInput {
   name: string;
@@ -42,13 +47,17 @@ interface FormInput {
 
 export default function Glayze() {
   const { theme, themeName } = useTheme();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const router = useRouter();
   const { data: smartAccountClient, isError } = useSmartAccountClient();
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSufficientBalance, setHasSufficientBalance] = useState(true);
   const { wallets } = useReactiveClient(client);
-  const [xUserId, setXUserId] = useState<number | null>(null);
+  const address = wallets.primary?.address;
+  const { data: balance, isLoading: balanceLoading } = useBalance(address);
+  const { data: constants, isLoading: constantsLoading } = useConstants();
+  const [xUserId, setXUserId] = useState<string | null>(null);
   const { data: realCreator } = useRealCreator(xUserId);
+  const { data: publicClient } = usePublicClient();
 
   const {
     control,
@@ -62,25 +71,11 @@ export default function Glayze() {
     },
   });
 
-  const selectImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-      if (!result.canceled) {
-        setSelectedImage(result.assets[0].uri);
-      }
-    } catch (e) {
-      Toast.show({
-        text1: "Cancelled",
-        text2: "Did not select image",
-        type: "info",
-      });
-    }
-  };
+  useEffect(() => {
+    setHasSufficientBalance(
+      Number(balance) >= Number(constants?.usdcCreationPayment)
+    );
+  }, [balance, constants, balanceLoading, constantsLoading]);
 
   const uploadToIpfs = async (
     name: string,
@@ -88,34 +83,32 @@ export default function Glayze() {
     postId: string,
     url: string
   ) => {
+    let image: string;
     try {
-      let image: string;
-      if (selectedImage !== null) {
-        const imageFile = await FileSystem.readAsStringAsync(selectedImage, {
-          encoding: FileSystem.EncodingType.Base64,
-        });
-        image = `data:image/jpeg;base64,${imageFile}`;
+      const tweetData = await fetchTweet(url);
+      if (
+        !tweetData ||
+        !tweetData.user ||
+        !tweetData.user.profile_image_url_https
+      ) {
+        throw new Error("Failed to fetch tweet data or profile image.");
+      }
+      if (tweetData.mediaDetails?.length && tweetData.mediaDetails.length > 0) {
+        console.log("Media details found:", tweetData.mediaDetails);
+        image = tweetData.mediaDetails[0].media_url_https;
       } else {
-        try {
-          const tweetData = await fetchTweet(url);
-          if (
-            !tweetData ||
-            !tweetData.user ||
-            !tweetData.user.profile_image_url_https
-          ) {
-            throw new Error("Failed to fetch tweet data or profile image.");
-          }
-          image = tweetData.user.profile_image_url_https;
-          console.log(tweetData.user.id_str);
-          setXUserId(parseInt(tweetData.user.id_str));
-        } catch (fetchError) {
-          console.error("Error fetching tweet:", fetchError);
-          throw new Error(
-            "Failed to fetch tweet data. Please check your network connection and try again."
-          );
-        }
+        image = tweetData.user.profile_image_url_https;
       }
 
+      setXUserId(tweetData.user.id_str);
+    } catch (fetchError) {
+      console.error("Error fetching tweet:", fetchError);
+      throw new Error(
+        "Failed to fetch tweet data. Please check your network connection and try again."
+      );
+    }
+
+    try {
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_API_URL}/api/ipfs`,
         {
@@ -169,43 +162,60 @@ export default function Glayze() {
       const response = await uploadToIpfs(name, symbol, postId, url);
       if (!response) throw new Error("Failed to upload to IPFS.");
       const { metadataIpfsHash, imageIpfsHash } = response;
-      // const offerings = await Purchases.getOfferings();
-      // console.log(offerings);
-      // if (
-      //   offerings.current !== null &&
-      //   offerings.current.availablePackages.length !== 0
-      // ) {
-      //   // Display packages for sale
-      // }
-      const txHash = await smartAccountClient.writeContract({
-        address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
-        abi,
-        functionName: "createPost",
-        args: [postId, name, symbol, metadataIpfsHash],
+
+      const transactions = [
+        {
+          to: process.env.EXPO_PUBLIC_USDC_ADDRESS! as Address,
+          data: encodeFunctionData({
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [
+              process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
+              parseUnits("1", 6),
+            ],
+          }),
+          value: 0n,
+        },
+        {
+          to: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
+          data: encodeFunctionData({
+            abi: ABI,
+            functionName: "createPost",
+            args: [BigInt(postId), name, symbol, metadataIpfsHash],
+          }),
+          value: 0n,
+        },
+      ];
+      if (realCreator) {
+        transactions.push({
+          to: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
+          data: encodeFunctionData({
+            abi: ABI,
+            functionName: "setRealCreator",
+            args: [BigInt(postId), realCreator],
+          }),
+          value: 0n,
+        });
+      }
+      const txHash = await smartAccountClient.sendTransactions({
+        transactions,
       });
       console.log("✅ Transaction successfully sponsored!");
       console.log(
         `🔍 View on Etherscan: https://sepolia.basescan.org/tx/${txHash}`
       );
-      if (realCreator) {
-        const txHash = await smartAccountClient.writeContract({
-          address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
-          abi,
-          functionName: "setRealCreator",
-          args: [postId, realCreator],
-        });
-        console.log("✅ Transaction successfully sponsored!");
-        console.log(
-          `🔍 View on Etherscan: https://sepolia.basescan.org/tx/${txHash}`
-        );
-      }
+
+      const txReceipt = await publicClient?.getTransactionReceipt({
+        hash: txHash,
+      });
+      console.log(txReceipt);
       const { error } = await supabase.from("Posts").insert([
         {
-          post_id: parseInt(postId),
+          post_id: postId,
           name,
           symbol,
           url,
-          contract_creator: wallets.primary?.address,
+          contract_creator: address,
           real_creator: realCreator,
           image_uri: imageIpfsHash,
           volume: 0,
@@ -216,13 +226,13 @@ export default function Glayze() {
         throw new Error("Failed to create post in Supabase.");
       }
       setIsLoading(false);
-      // router.replace(
-      //   `/(authenticated)/aux/success?isGlayze=true&id=${data.postId}` as Href
-      // );
+      router.replace(
+        `/(authenticated)/aux/success?isGlayze=true&id=${postId}` as Href<string>
+      );
     } catch (error) {
       setIsLoading(false);
       console.error("Purchase failed:", error);
-      router.replace("/(authenticated)/aux/error" as Href);
+      router.replace("/(authenticated)/aux/error" as Href<string>);
     }
   };
 
@@ -378,93 +388,41 @@ export default function Glayze() {
                   name="url"
                 />
               </View>
-              <View>
-                <Text className="text-lg" style={{ color: theme.textColor }}>
-                  Image
-                </Text>
-                {!selectedImage ? (
-                  <>
-                    <Text
-                      className="text-sm mb-4"
-                      style={{ color: theme.mutedForegroundColor }}
-                    >
-                      The creator's profile picture will be used if no image is
-                      provided
-                    </Text>
-                    <Button
-                      buttonStyle="rounded-lg py-3 border flex-row items-center justify-center w-full"
-                      style={{
-                        backgroundColor: theme.backgroundColor,
-                        borderColor: theme.tabBarActiveTintColor,
-                      }}
-                      onPress={selectImage}
-                    >
-                      <Image
-                        source={
-                          themeName === "dark"
-                            ? require("@/assets/images/dark/upload.png")
-                            : require("@/assets/images/light/upload.png")
-                        }
-                        className="w-6 h-6 mr-2"
-                      />
-                      <Text
-                        className="text-center"
-                        style={{ color: theme.textColor }}
-                      >
-                        Choose Image
-                      </Text>
-                    </Button>
-                  </>
+            </View>
+            {/* <PaymentDetails /> */}
+            <Button
+              buttonStyle="w-full rounded-full mt-12"
+              onPress={handleSubmit(handlePurchase)}
+              disabled={!hasSufficientBalance}
+              style={{
+                backgroundColor: !hasSufficientBalance
+                  ? theme.mutedForegroundColor
+                  : theme.tabBarActiveTintColor,
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {!isLoading ? (
+                  <Text
+                    className="text-center py-4 font-semibold text-lg"
+                    style={{ color: colors.white }}
+                  >
+                    {!hasSufficientBalance && "Insufficient Balance: "}
+                    Pay ${formatUSDC(constants?.usdcCreationPayment)}
+                  </Text>
                 ) : (
-                  <View className="flex items-center p-3">
-                    <View
-                      className="border-2 rounded-full overflow-hidden mt-2"
-                      style={{
-                        borderColor: theme.textColor,
-                        width: 100, // Adjust this value as needed
-                        height: 100, // Adjust this value as needed
-                      }}
-                    >
-                      <Image
-                        source={{ uri: selectedImage }}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                        }}
-                        contentFit="cover"
-                        onError={(e) => console.log(e)}
-                      />
-                    </View>
-                    <TouchableOpacity onPress={() => setSelectedImage(null)}>
-                      <Text
-                        style={{ color: theme.tabBarActiveTintColor }}
-                        className="text-lg pt-1"
-                      >
-                        Remove Image
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
+                  <ActivityIndicator
+                    size="large"
+                    color={colors.white}
+                    style={{ marginLeft: 10, paddingTop: 8 }}
+                  />
                 )}
               </View>
-            </View>
-            <PaymentDetails />
-            <Button
-              buttonStyle="w-full rounded-lg my-4"
-              style={{
-                backgroundColor: theme.tabBarActiveTintColor,
-              }}
-              onPress={handleSubmit(handlePurchase)}
-            >
-              <Text
-                className="text-center font-semibold py-4 flex items-center justify-center"
-                style={{ color: colors.white }}
-              >
-                {isLoading ? (
-                  <ActivityIndicator size="small" color={colors.white} />
-                ) : (
-                  "Pay $1.09"
-                )}
-              </Text>
             </Button>
           </ScrollView>
         </TouchableWithoutFeedback>

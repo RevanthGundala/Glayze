@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
 import { createPublicClient, http, Address } from "viem";
-import { baseSepolia, base } from "viem/chains";
 import { ABI } from "@/utils/constants";
 import { Post } from "@/utils/types";
+import { fetchPublicClient } from "./use-public-client";
 
 type Wallet = {
   holdings: Post[];
@@ -11,7 +11,9 @@ type Wallet = {
   creations: Post[];
 };
 
-const fetchWallet = async (address: string | null): Promise<Wallet | null> => {
+const fetchWallet = async (
+  address: string | undefined
+): Promise<Wallet | null> => {
   if (!address) return null;
   const { data, error } = await supabase.from("Posts").select("*");
 
@@ -22,22 +24,18 @@ const fetchWallet = async (address: string | null): Promise<Wallet | null> => {
     const xPosts = data.filter((post) => post.real_creator === address);
     const creations = data.filter((post) => post.contract_creator === address);
 
-    const chain = process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
-    const client = createPublicClient({
-      chain,
-      transport: http(),
-    });
+    const client = fetchPublicClient();
+    if (!client) return null;
 
     let holdings: Post[] = [];
     for (const post of data) {
       const postId = post.post_id;
       const shares = await client.readContract({
-        address: process.env.CONTRACT_ADDRESS as Address,
+        address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS as Address,
         abi: ABI,
         functionName: "balanceOf",
-        args: [address as Address, postId],
+        args: [address as Address, BigInt(postId)],
       });
-      console.log(shares);
       if (shares > 0) holdings.push(post);
     }
 
@@ -52,7 +50,7 @@ const fetchWallet = async (address: string | null): Promise<Wallet | null> => {
   }
 };
 
-export function useWallet(address: string | null) {
+export function useWallet(address: string | undefined) {
   return useQuery<Wallet | null, Error>({
     queryKey: ["user", address],
     queryFn: () => fetchWallet(address),

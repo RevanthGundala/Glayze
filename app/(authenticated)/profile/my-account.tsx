@@ -13,6 +13,7 @@ import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { ActivityIndicator } from "react-native";
 import { Loading } from "@/components/loading";
+import { supabase } from "@/utils/supabase";
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
@@ -189,10 +190,22 @@ const DeleteAccount = () => {
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
+  const { auth } = useReactiveClient(client);
+  const dynamicId = auth.authenticatedUser?.userId;
 
-  const handleDelete = () => {
-    setModalVisible(false);
-    router.push("/");
+  const handleDelete = async () => {
+    try {
+      if (!dynamicId) throw new Error("No address found");
+      setModalVisible(false);
+      const { error } = await supabase
+        .from("Users")
+        .delete()
+        .eq("dynamic_id", dynamicId);
+      if (error) console.log(error);
+      router.push("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <View className="w-full pt-4">

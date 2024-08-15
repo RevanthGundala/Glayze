@@ -10,7 +10,6 @@ import {
   Keyboard,
 } from "react-native";
 import { Header } from "@/components/header";
-import { lightTheme as theme } from "@/utils/theme";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -24,11 +23,13 @@ import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Loading } from "@/components/loading";
 import { colors } from "@/utils/theme";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const { auth, sdk } = useReactiveClient(client);
+  const { theme } = useTheme();
 
   if (!sdk.loaded) return <Loading />;
 
@@ -37,7 +38,7 @@ export default function Login() {
       console.log("Logging in with email");
       await auth.email.sendOTP(email);
       console.log("Email sent");
-      router.push(("/confirm-email?email=" + email) as Href);
+      router.push(("/confirm-email?email=" + email) as Href<string>);
     } catch (error) {
       Toast.show({
         text1: "Error sending email",
@@ -48,7 +49,10 @@ export default function Login() {
     }
   };
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: colors.white }}>
+    <SafeAreaView
+      className="flex-1"
+      style={{ backgroundColor: theme.backgroundColor }}
+    >
       <View className="flex flex-row">
         <Header backArrow />
       </View>
@@ -73,9 +77,7 @@ export default function Login() {
                   placeholder="Your Email"
                   value={email}
                   onChangeText={setEmail}
-                  style={{
-                    color: colors.white,
-                  }}
+                  style={{}}
                 />
               </View>
               <View>
@@ -92,7 +94,7 @@ export default function Login() {
                   <Text
                     className="text-center font-semibold"
                     style={{
-                      color: theme.secondaryTextColor,
+                      color: colors.white,
                     }}
                   >
                     Continue
