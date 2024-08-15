@@ -15,7 +15,7 @@ export default function Layout() {
   useEffect(() => {
     if (!auth.token) {
       console.log("No token");
-      router.replace("/" as Href);
+      router.replace("/" as Href<string>);
     }
   }, [auth]);
   return (
@@ -25,10 +25,7 @@ export default function Layout() {
       <Stack.Screen name="aux/error" options={{ headerShown: false }} />
       <Stack.Screen name="aux/refer" options={{ headerShown: false }} />
       <Stack.Screen name="aux/profile" options={{ headerShown: false }} />
-      {/* <Stack.Screen
-        name="aux/send"
-        options={{ headerShown: false }}
-      /> */}
+      <Stack.Screen name="aux/send" options={{ headerShown: false }} />
       <Stack.Screen name="aux/receive" options={{ headerShown: false }} />
       <Stack.Screen name="post/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="post/sell" options={{ headerShown: false }} />

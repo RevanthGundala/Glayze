@@ -90,23 +90,7 @@ export default function Wallet() {
                 ${formatUSDC(balance ?? "0")}
               </Text>
             </View>
-            <View className="flex flex-row justify-center">
-              <TouchableOpacity onPress={() => router.push("/aux/receive")}>
-                <View className="flex flex-col items-center space-y-2">
-                  <Image
-                    source={
-                      themeName === "dark"
-                        ? require("@/assets/images/dark/receive.png")
-                        : require("@/assets/images/light/receive.png")
-                    }
-                    className="w-8 h-8"
-                  />
-                  <Text className="text-lg" style={{ color: theme.textColor }}>
-                    Receive
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+            <SendReceiveButtons />
           </View>
         </View>
       ),
@@ -176,5 +160,49 @@ export default function Wallet() {
         keyExtractor={(item, index) => index.toString()}
       />
     </SafeAreaView>
+  );
+}
+
+function SendReceiveButtons() {
+  const router = useRouter();
+  const { theme, themeName } = useTheme();
+
+  return (
+    <View className="flex flex-row justify-center items-end space-x-12 mt-4">
+      <TouchableOpacity onPress={() => router.push("/aux/send")}>
+        <View className="flex flex-col items-center">
+          <View className="h-8 flex items-end justify-end">
+            <Image
+              source={
+                themeName === "dark"
+                  ? require("@/assets/images/dark/send.png")
+                  : require("@/assets/images/light/send.png")
+              }
+              className="w-7 h-7"
+            />
+          </View>
+          <Text className="text-lg mt-2" style={{ color: theme.textColor }}>
+            Send
+          </Text>
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push("/aux/receive")}>
+        <View className="flex flex-col items-center">
+          <View className="h-8 flex items-end justify-end">
+            <Image
+              source={
+                themeName === "dark"
+                  ? require("@/assets/images/dark/receive.png")
+                  : require("@/assets/images/light/receive.png")
+              }
+              className="w-8 h-8"
+            />
+          </View>
+          <Text className="text-lg mt-2" style={{ color: theme.textColor }}>
+            Receive
+          </Text>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 }
