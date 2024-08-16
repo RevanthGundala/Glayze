@@ -34,7 +34,7 @@ export const fetchShareInfo = async (
 
 export function useShareInfo(post_id: string | null) {
   return useQuery<ShareInfo | null, Error>({
-    queryKey: ["post", post_id],
+    queryKey: ["shareInfo", post_id],
     queryFn: () => fetchShareInfo(post_id),
   });
 }

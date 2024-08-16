@@ -17,7 +17,7 @@ import { supabase } from "@/utils/supabase";
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
-  const { ui, sdk } = useReactiveClient(client);
+  const { auth, ui, sdk } = useReactiveClient(client);
   const [isLoading, setIsLoading] = useState(false);
 
   if (!sdk.loaded) return <Loading />;

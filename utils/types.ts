@@ -7,16 +7,14 @@ export type Trade = Tables["Trades"]["Row"];
 export type Referral = Tables["Referrals"]["Row"];
 export type Search = Tables["Search"]["Row"];
 
-export type Position = {
-  totalValueInvested: number;
-  marketValue: number;
-  averageCost: number;
-  todaysReturn: number;
-  todaysReturnPercent: number;
-  totalReturn: number;
-  totalReturnPercent: number;
+export interface Position {
+  averageCost: string;
+  todaysReturn: string;
+  todaysReturnPercent: bigint;
+  totalReturn: string;
+  totalReturnPercent: bigint;
   firstBought: Date;
-};
+}
 
 export type Route = {
   name: string;

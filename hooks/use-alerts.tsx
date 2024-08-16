@@ -2,7 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
 import { Referral } from "@/utils/types";
 
-const fetchReferrals = async (address: string) => {
+const fetchReferrals = async (address: string | undefined) => {
+  if (!address) {
+    return [];
+  }
   const { data, error } = await supabase
     .from("Referrals")
     .select("*")
@@ -16,10 +19,7 @@ const fetchReferrals = async (address: string) => {
   return data;
 };
 
-export const useAlerts = () => {
-  // TODO: get user address from wallet
-  const address = "0x1234567890abcdef1234567890abcdef12345678";
-
+export const useAlerts = (address: string | undefined) => {
   return useQuery<Referral[], Error>({
     queryKey: ["referral", address],
     queryFn: () => fetchReferrals(address),

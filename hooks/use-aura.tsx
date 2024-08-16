@@ -27,7 +27,7 @@ const fetchAura = async (
 
 export function useAura(address: string | undefined) {
   return useQuery<string | null, Error>({
-    queryKey: ["user", address],
+    queryKey: ["aura", address],
     queryFn: () => fetchAura(address),
   });
 }

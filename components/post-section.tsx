@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { TouchableWithoutFeedback, View, Image, Text } from "react-native";
 import { Link } from "expo-router";
-import { usePostPrices } from "@/hooks";
 import { EmbeddedTweet } from "./twitter-theme/embedded-tweet";
-import { useEmbeddedTweet, useShareInfo } from "@/hooks";
+import { useEmbeddedTweet, useShareInfo, usePriceHistory } from "@/hooks";
 import { Post } from "@/utils/types";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
@@ -58,7 +57,7 @@ export const PostComponent = ({
   viewTweets,
   border,
 }: PostComponentProps) => {
-  const { data: oneHour } = usePostPrices(post.post_id, "1H");
+  const { data: priceHistory } = usePriceHistory(post.post_id);
   const { data: tweet, isLoading, isError } = useEmbeddedTweet(post.url);
   const { data: shareInfo } = useShareInfo(post.post_id);
   const { theme } = useTheme();
@@ -107,7 +106,7 @@ export const PostComponent = ({
                     <Text style={{ color: theme.mutedForegroundColor }}>
                       {post.name || "N/A"}
                     </Text>
-                    {oneHour && oneHour.price_change >= 0 ? (
+                    {priceHistory && priceHistory.oneDay.change >= 0 ? (
                       <View className="flex flex-row items-center space-x-1">
                         <Image
                           source={require("@/assets/images/aux/up-arrow.png")}
@@ -117,7 +116,7 @@ export const PostComponent = ({
                           className="text-lg"
                           style={{ color: colors.greenTintColor }}
                         >
-                          {oneHour?.price_change.toFixed(2)}%
+                          {priceHistory.oneDay.change.toFixed(2)}%
                         </Text>
                       </View>
                     ) : (
@@ -130,7 +129,7 @@ export const PostComponent = ({
                           className="text-lg"
                           style={{ color: colors.redTintColor }}
                         >
-                          {oneHour?.price_change.toFixed(2)}%
+                          {"N/A"}
                         </Text>
                       </View>
                     )}

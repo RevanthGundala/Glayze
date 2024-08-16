@@ -95,34 +95,34 @@ export type Database = {
       }
       Trades: {
         Row: {
-          aura: number | null
+          aura: string | null
           created_at: string
           is_buy: boolean | null
-          post_id: number
-          price: number | null
-          shares: number | null
+          post_id: string
+          price: string | null
+          shares: string | null
           trader: string | null
-          usdc: number | null
+          usdc: string | null
         }
         Insert: {
-          aura?: number | null
+          aura?: string | null
           created_at?: string
           is_buy?: boolean | null
-          post_id: number
-          price?: number | null
-          shares?: number | null
+          post_id: string
+          price?: string | null
+          shares?: string | null
           trader?: string | null
-          usdc?: number | null
+          usdc?: string | null
         }
         Update: {
-          aura?: number | null
+          aura?: string | null
           created_at?: string
           is_buy?: boolean | null
-          post_id?: number
-          price?: number | null
-          shares?: number | null
+          post_id?: string
+          price?: string | null
+          shares?: string | null
           trader?: string | null
-          usdc?: number | null
+          usdc?: string | null
         }
         Relationships: []
       }

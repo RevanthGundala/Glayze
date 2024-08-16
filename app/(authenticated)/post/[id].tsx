@@ -12,8 +12,6 @@ import { Graph } from "@/components/graph";
 import { Button } from "@/components/ui/button";
 import { BlurView } from "expo-blur";
 import { usePost } from "@/hooks/use-post";
-import { usePostPrices } from "@/hooks/use-post-prices";
-import { Time } from "@/utils/types";
 import { usePosition } from "@/hooks/use-position";
 import { useTheme } from "@/contexts/theme-context";
 import { lightTheme, colors } from "@/utils/theme";
@@ -21,27 +19,32 @@ import { Header } from "@/components/header";
 import { ShareHeader } from "@/components/share-header";
 import { type Post } from "@/utils/types";
 import { useShareInfo, useShares } from "@/hooks";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client.native";
 import { Loading } from "@/components/loading";
 import { useSmartAccount } from "@/contexts/smart-account-context";
+import { formatUSDC } from "@/utils/helpers";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
   const { smartAccountClient } = useSmartAccount();
   const address = smartAccountClient?.account.address;
   const { data: post, isLoading, isError, refetch } = usePost(id);
-  const [selectedTime, setSelectedTime] = useState<Time>("1H");
-  const { data: postPrices } = usePostPrices(id as string, selectedTime);
   const { theme } = useTheme();
   const {
     data: shareInfo,
     isLoading: shareInfoLoading,
     isError: shareInfoError,
   } = useShareInfo(id as string);
-  const { data: shareValue } = useShares(address, id as string);
-  const { data: position } = usePosition(post, address, shareInfo?.price);
 
+  const { data: shares } = useShares(address, id as string);
+  const { data: position } = usePosition(
+    post,
+    address,
+    shareInfo?.price,
+    shares?.number,
+    shares?.value
+  );
+
+  console.log("position: ", position);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -81,21 +84,16 @@ export default function Post() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 80 }}
       >
-        <Graph
-          price={shareInfo?.price ?? "0.000"}
-          change={postPrices?.price_change ?? 0.0}
-          selectedTime={selectedTime}
-          setSelectedTime={setSelectedTime}
-        />
+        <Graph price={shareInfo?.price} />
         <Position
-          marketValue={shareValue?.value ?? "0"}
-          shares={shareValue?.number ?? "0"}
-          averageCost={position?.averageCost ?? 0}
+          marketValue={formatUSDC(shares?.value ?? "0")}
+          shares={shares?.number ?? "0"}
+          averageCost={formatUSDC(position?.averageCost ?? "0")}
           firstBought={position?.firstBought ?? new Date()}
-          todaysReturn={position?.todaysReturn ?? 0}
-          totalReturn={position?.totalReturn ?? 0}
-          todaysReturnPercent={position?.todaysReturnPercent ?? 0}
-          totalReturnPercent={position?.totalReturnPercent ?? 0}
+          todaysReturn={formatUSDC(position?.todaysReturn ?? "0")}
+          totalReturn={formatUSDC(position?.totalReturn ?? "0")}
+          todaysReturnPercent={position?.todaysReturnPercent ?? 0n}
+          totalReturnPercent={position?.totalReturnPercent ?? 0n}
         />
         {/* <Stats
           marketCap={(shareInfo && shareInfo?.price * shareInfo?.supply) ?? 0}
@@ -113,12 +111,12 @@ export default function Post() {
 type PositionProps = {
   marketValue: string;
   shares: string;
-  averageCost: number;
+  averageCost: string;
   firstBought: Date;
-  todaysReturn: number;
-  totalReturn: number;
-  todaysReturnPercent: number;
-  totalReturnPercent: number;
+  todaysReturn: string;
+  totalReturn: string;
+  todaysReturnPercent: bigint;
+  totalReturnPercent: bigint;
 };
 
 const Position = ({
@@ -175,7 +173,7 @@ const Position = ({
             Average Cost
           </Text>
           <Text className="text-lg" style={{ color: theme.textColor }}>
-            ${averageCost}
+            ${formatUSDC(averageCost)}
           </Text>
         </View>
         <View className="flex-1 items-end">
@@ -199,10 +197,16 @@ const Position = ({
           className="text-lg"
           style={{
             color:
-              todaysReturn >= 0 ? colors.greenTintColor : colors.redTintColor,
+              todaysReturnPercent >= 0
+                ? colors.greenTintColor
+                : colors.redTintColor,
           }}
         >
-          +${todaysReturn}(+{todaysReturnPercent}%)
+          +${todaysReturn}(
+          {todaysReturnPercent >= 0
+            ? `+${formatUSDC(todaysReturnPercent.toString())}%`
+            : `-${formatUSDC(todaysReturnPercent.toString())}%`}
+          )
         </Text>
       </View>
 
@@ -214,10 +218,16 @@ const Position = ({
           className="text-lg"
           style={{
             color:
-              totalReturn >= 0 ? colors.greenTintColor : colors.redTintColor,
+              totalReturnPercent >= 0
+                ? colors.greenTintColor
+                : colors.redTintColor,
           }}
         >
-          +${totalReturn}({totalReturnPercent}%)
+          +${totalReturn}(
+          {totalReturnPercent >= 0
+            ? `+${formatUSDC(totalReturnPercent.toString())}%`
+            : `-${formatUSDC(totalReturnPercent.toString())}%`}
+          )
         </Text>
       </View>
     </View>

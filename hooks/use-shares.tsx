@@ -4,7 +4,7 @@ import { ABI } from "@/utils/constants";
 import { fetchPublicClient } from "./use-public-client";
 import { fetchShareInfo } from "./use-share-info";
 
-type ShareValue = {
+type Share = {
   number: string;
   value: string;
 };
@@ -12,7 +12,7 @@ type ShareValue = {
 const fetchShares = async (
   address: string | undefined,
   postId: string | null
-): Promise<ShareValue | null> => {
+): Promise<Share | null> => {
   if (!address || !postId) return null;
   try {
     const client = fetchPublicClient();
@@ -25,6 +25,7 @@ const fetchShares = async (
       args: [address as Address, BigInt(postId)],
     });
     const shareInfo = await fetchShareInfo(postId);
+    console.log("shareInfo", shareInfo);
     if (!shareInfo) return null;
     return {
       number: shares.toString(),
@@ -37,8 +38,8 @@ const fetchShares = async (
 };
 
 export function useShares(address: string | undefined, postId: string | null) {
-  return useQuery<ShareValue | null, Error>({
-    queryKey: ["user", address, postId],
+  return useQuery<Share | null, Error>({
+    queryKey: ["shares", address, postId],
     queryFn: () => fetchShares(address, postId),
   });
 }

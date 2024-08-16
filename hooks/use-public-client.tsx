@@ -18,7 +18,7 @@ export const fetchPublicClient = (): PublicClient<any> | null => {
 
 export function usePublicClient() {
   return useQuery<PublicClient<any> | null, Error>({
-    queryKey: [],
+    queryKey: ["public-client"],
     queryFn: () => fetchPublicClient(),
   });
 }

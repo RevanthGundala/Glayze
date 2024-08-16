@@ -4,10 +4,12 @@ import {
   http,
   encodeFunctionData,
   createWalletClient,
+  parseEventLogs,
 } from "viem";
 import { baseSepolia } from "viem/chains";
 import { ERC20_ABI, ABI } from "../utils/constants";
 import { privateKeyToAccount } from "viem/accounts";
+import { decodeEventLog } from "viem/utils";
 import dotenv from "dotenv";
 import path from "path";
 import {
@@ -21,6 +23,7 @@ import {
 import { ENTRYPOINT_ADDRESS_V06 } from "permissionless";
 import { createPimlicoPaymasterClient } from "permissionless/clients/pimlico";
 import { SmartAccountClient } from "permissionless";
+import { createClient } from "@supabase/supabase-js";
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, "../.env.development") });
@@ -33,9 +36,14 @@ type TransactionInput = {
 const data: TransactionInput[] = [
   {
     postId: "1811899344876110166",
-    shares: "2",
+    shares: "1",
   },
 ];
+
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
 
 const chain = baseSepolia;
 const paymaster = process.env.EXPO_PUBLIC_PAYMASTER_KEY as string;
@@ -108,7 +116,26 @@ async function main(inputArray: TransactionInput[]) {
     const txReceipt = await publicClient?.waitForTransactionReceipt({
       hash: txHash as Address,
     });
-    console.log(txReceipt);
+    const logs = parseEventLogs({
+      abi: ABI,
+      logs: txReceipt.logs,
+    });
+    const tradeEvent = logs.find((log) => log.eventName === "Trade");
+    if (!tradeEvent) return;
+    const { trader, isBuy, aura, usdc, newPrice, timestamp } = tradeEvent.args;
+    console.log("✅ Trade event successfully parsed!");
+    const { error } = await supabase.from("Trades").insert({
+      post_id: postId.toString(),
+      trader,
+      is_buy: isBuy,
+      shares: shares.toString(),
+      price: newPrice.toString(),
+      aura: aura.toString(),
+      usdc: usdc.toString(),
+      created_at: new Date().toISOString(),
+    });
+
+    if (error) throw error;
   }
 }
 

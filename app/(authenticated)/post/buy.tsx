@@ -20,8 +20,8 @@ import { Header } from "@/components/header";
 import { Input } from "@/components/ui/input";
 import { ShareHeader } from "@/components/share-header";
 import { useLocalSearchParams } from "expo-router";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client.native";
+import { createPublicClient, http } from "viem";
+import { baseSepolia, base } from "viem/chains";
 import {
   useShares,
   useShareInfo,
@@ -33,8 +33,9 @@ import {
 import { Loading } from "@/components/loading";
 import { ABI, ERC20_ABI } from "@/utils/constants";
 import { Address, encodeFunctionData } from "viem";
-import { formatUSDC } from "@/utils/helpers";
+import { formatUSDC, insertTrade } from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
+import { fetchPublicClient } from "@/hooks/use-public-client";
 
 export default function Buy() {
   const maxFontSize = 48;
@@ -51,7 +52,7 @@ export default function Buy() {
     isError: balanceError,
   } = useBalance(address);
   const {
-    data: shareValue,
+    data: shares,
     isLoading: sharesLoading,
     isError: sharesError,
   } = useShares(address, id as string);
@@ -70,7 +71,11 @@ export default function Buy() {
     isLoading: auraLoading,
     isError: auraError,
   } = useAura(address);
-  const { data: publicClient } = usePublicClient();
+  const publicClient = createPublicClient({
+    chain: process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia,
+    transport: http(process.env.EXPO_PUBLIC_RPC_URL),
+  });
+
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(true);
   const router = useRouter();
@@ -140,9 +145,9 @@ export default function Buy() {
 
   const handleBuy = async () => {
     try {
+      if (!publicClient) throw new Error("No public client found.");
       if (!buyPriceData) throw new Error("Buy price data not available");
-
-      // Disable the button or set some loading state here
+      setModalVisible(false);
       setIsLoading(true);
       const transactions = [
         {
@@ -174,20 +179,17 @@ export default function Buy() {
 
       console.log("✅ Transaction successfully sponsored!");
       console.log(
-        `🔍 View on Etherscan: https://sepolia.basescan.org/tx/${txHash}`
+        `🔍 View on Blockscout: https://base-sepolia.blockscout.com/tx/${txHash}`
       );
 
-      const txReceipt = await publicClient?.getTransactionReceipt({
+      const txReceipt = await publicClient?.waitForTransactionReceipt({
         hash: txHash as Address,
       });
-      console.log(txReceipt);
 
-      // Close the modal and wait for it to finish
-      await new Promise<void>((resolve) => {
-        setModalVisible(false);
-        // Wait for the modal close animation to finish
-        setTimeout(resolve, 500);
-      });
+      if (!txReceipt) throw new Error("Transaction receipt is undefined");
+
+      const error = await insertTrade(txReceipt);
+      if (error) throw error;
 
       // Now navigate to the success screen
       router.replace(
@@ -260,8 +262,8 @@ export default function Buy() {
           className="text-center text-sm pt-2"
           style={{ color: theme.mutedForegroundColor }}
         >
-          {formatUSDC(shareValue?.number ?? "0")} Shares (~$
-          {formatUSDC(shareValue?.value ?? "0")})
+          {shares?.number ?? "0"} Shares (~$
+          {formatUSDC(shares?.value ?? "0")})
         </Text>
         <View className="mt-2 rounded-xl p-4">
           <Text

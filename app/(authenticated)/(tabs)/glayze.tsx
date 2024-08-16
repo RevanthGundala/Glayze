@@ -21,7 +21,7 @@ import { Header } from "@/components/header";
 import Toast from "react-native-toast-message";
 import { useForm, Controller } from "react-hook-form";
 import { colors } from "@/utils/theme";
-import { useSmartAccountClient, useRealCreator, useBalance } from "@/hooks";
+import { useRealCreator, useBalance } from "@/hooks";
 import { fetchTweet } from "@/hooks/use-embedded-tweet";
 import {
   Address,
@@ -35,10 +35,11 @@ import { supabase } from "@/utils/supabase";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { client } from "@/utils/dynamic-client.native";
 import { baseSepolia, base } from "viem/chains";
-import { usePublicClient } from "@/hooks/use-public-client";
+import { fetchPublicClient, usePublicClient } from "@/hooks/use-public-client";
 import { useConstants } from "@/hooks/use-constants";
 import { formatUSDC } from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
+import { Loading } from "@/components/loading";
 
 interface FormInput {
   name: string;
@@ -51,13 +52,17 @@ export default function Glayze() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(true);
-  const { smartAccountClient } = useSmartAccount();
+  const {
+    smartAccountClient,
+    isLoading: smartAccountLoading,
+    error: smartAccountError,
+  } = useSmartAccount();
   const address = smartAccountClient?.account.address;
   const { data: balance, isLoading: balanceLoading } = useBalance(address);
   const { data: constants, isLoading: constantsLoading } = useConstants();
   const [xUserId, setXUserId] = useState<string | null>(null);
   const { data: realCreator } = useRealCreator(xUserId);
-  const { data: publicClient } = usePublicClient();
+  const publicClient = fetchPublicClient();
 
   const {
     control,
@@ -147,7 +152,8 @@ export default function Glayze() {
   const handlePurchase = async (input: FormInput) => {
     try {
       setIsLoading(true);
-      if (!smartAccountClient || isError)
+      if (!publicClient) throw new Error("No public client found.");
+      if (!smartAccountClient || smartAccountError)
         throw new Error("No smart account found.");
 
       const { name, symbol, url } = input;
@@ -202,13 +208,13 @@ export default function Glayze() {
       });
       console.log("✅ Transaction successfully sponsored!");
       console.log(
-        `🔍 View on Etherscan: https://sepolia.basescan.org/tx/${txHash}`
+        `🔍 View on Blockscout: https://base-sepolia.blockscout.com/tx/${txHash}`
       );
 
-      const txReceipt = await publicClient?.getTransactionReceipt({
-        hash: txHash,
-      });
-      console.log(txReceipt);
+      // const txReceipt = await publicClient.waitForTransactionReceipt({
+      //   hash: txHash as Address,
+      // });
+      // console.log(txReceipt);
       const { error } = await supabase.from("Posts").insert([
         {
           post_id: postId,
@@ -227,7 +233,7 @@ export default function Glayze() {
       }
       setIsLoading(false);
       router.replace(
-        `/(authenticated)/aux/success?isGlayze=true&id=${postId}` as Href<string>
+        `/(authenticated)/aux/success?isGlayze=true&id=${postId}&symbol=${symbol}` as Href<string>
       );
     } catch (error) {
       setIsLoading(false);
@@ -235,6 +241,9 @@ export default function Glayze() {
       router.replace("/(authenticated)/aux/error" as Href<string>);
     }
   };
+
+  if (smartAccountLoading || balanceLoading || constantsLoading)
+    return <Loading />;
 
   return (
     <SafeAreaView
@@ -417,9 +426,9 @@ export default function Glayze() {
                   </Text>
                 ) : (
                   <ActivityIndicator
-                    size="large"
+                    size="small"
                     color={colors.white}
-                    style={{ marginLeft: 10, paddingTop: 8 }}
+                    style={{ marginLeft: 10, paddingVertical: 14 }}
                   />
                 )}
               </View>

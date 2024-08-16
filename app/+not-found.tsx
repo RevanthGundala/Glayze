@@ -20,7 +20,7 @@ export default function NotFoundScreen() {
         </Text>
         <Button
           buttonStyle="rounded-full"
-          onPress={() => router.push("/(authenticated)/home" as Href)}
+          onPress={() => router.push("/(authenticated)/home" as Href<string>)}
           style={{ backgroundColor: theme.tabBarActiveTintColor }}
         >
           <Text

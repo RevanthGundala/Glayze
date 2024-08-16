@@ -27,27 +27,27 @@ export default function Success() {
           style={{ color: theme.textColor }}
         >
           {isGlayze
-            ? `Successfully created $${symbol}`
+            ? `Successfully created ${symbol}`
             : isBuy === "true"
-            ? `Successfully bought ${shares} shares of $${symbol} for $${price}`
-            : `Successfully sold ${shares} shares of $${symbol} for $${price}`}
+            ? `Successfully bought ${shares} ${
+                Number(shares) > 1 ? "shares" : "share"
+              } of ${symbol} for $${price}`
+            : `Successfully sold ${shares} ${
+                Number(shares) > 1 ? "shares" : "share"
+              } of ${symbol} for $${price}`}
         </Text>
       </View>
 
       <Button
         buttonStyle="py-4 px-8 rounded-full"
-        onPress={() => {
-          isGlayze
-            ? router.replace(`/(authenticated)/post/${id}` as Href)
-            : router.replace("/(authenticated)/home" as Href);
-        }}
+        onPress={() => router.replace("/(authenticated)/home" as Href<string>)}
         style={{ backgroundColor: theme.tabBarActiveTintColor }}
       >
         <Text
           className="text-black text-lg font-medium"
           style={{ color: colors.white }}
         >
-          {isGlayze ? `View $${symbol}` : "Back to Home"}
+          Back to Home
         </Text>
       </Button>
     </SafeAreaView>

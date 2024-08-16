@@ -1,5 +1,11 @@
-import React, { createContext, useContext, ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import {
   createSmartAccountClient,
   ENTRYPOINT_ADDRESS_V06,
@@ -25,9 +31,10 @@ type SmartAccountClientType = SmartAccountClient<
 >;
 
 type SmartAccountContextType = {
-  smartAccountClient: SmartAccountClientType | null | undefined;
+  smartAccountClient: SmartAccountClientType | null;
   isLoading: boolean;
   error: Error | null;
+  refetch: () => void;
 };
 
 const SmartAccountContext = createContext<SmartAccountContextType | undefined>(
@@ -38,7 +45,7 @@ const fetchSmartAccountClient =
   async (): Promise<SmartAccountClientType | null> => {
     try {
       const wallet = await client.wallets.embedded.getWallet();
-      if (!wallet) return null;
+      if (!wallet) throw new Error("No wallet found.");
 
       const chain =
         process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
@@ -73,19 +80,38 @@ const fetchSmartAccountClient =
       return smartAccountClient as SmartAccountClientType;
     } catch (error) {
       console.error("Error in fetchSmartAccountClient:", error);
-      return null;
+      throw error;
     }
   };
 
 export function SmartAccountProvider({ children }: { children: ReactNode }) {
-  const {
-    data: smartAccountClient,
-    isLoading,
-    error,
-  } = useQuery<SmartAccountClientType | null, Error>({
-    queryKey: ["smartAccountClient"],
-    queryFn: fetchSmartAccountClient,
-  });
+  const [smartAccountClient, setSmartAccountClient] =
+    useState<SmartAccountClientType | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchClient = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const client = await fetchSmartAccountClient();
+      setSmartAccountClient(client);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err : new Error("An unknown error occurred")
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchClient();
+  }, [fetchClient]);
+
+  const refetch = useCallback(() => {
+    fetchClient();
+  }, [fetchClient]);
 
   console.log("SmartAccountProvider render:", {
     clientExists: !!smartAccountClient,
@@ -95,7 +121,7 @@ export function SmartAccountProvider({ children }: { children: ReactNode }) {
 
   return (
     <SmartAccountContext.Provider
-      value={{ smartAccountClient, isLoading, error }}
+      value={{ smartAccountClient, isLoading, error, refetch }}
     >
       {children}
     </SmartAccountContext.Provider>

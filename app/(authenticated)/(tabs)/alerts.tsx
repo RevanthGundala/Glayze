@@ -5,13 +5,16 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import { useAlerts } from "@/hooks/use-alerts";
 import { supabase } from "@/utils/supabase";
 import { useTheme } from "@/contexts/theme-context";
 import { Loading } from "@/components/loading";
+import { useAlerts } from "@/hooks";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 export default function Alerts() {
-  const { data: alerts, isLoading, isError } = useAlerts();
+  const { smartAccountClient } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
+  const { data: alerts, isLoading, isError } = useAlerts(address);
   const { theme } = useTheme();
 
   if (isLoading || isError) {
@@ -45,7 +48,7 @@ export default function Alerts() {
     >
       <View className="pt-6 px-4 mb-4">
         <View className="flex-row justify-center items-center mb-4">
-          {alerts.length > 0 && (
+          {alerts && alerts.length > 0 && (
             <TouchableOpacity
               onPress={clearAllAlerts}
               className="absolute right-4 top-6"
@@ -56,7 +59,7 @@ export default function Alerts() {
         </View>
       </View>
 
-      {alerts.length > 0 ? (
+      {alerts && alerts.length > 0 ? (
         <ScrollView className="px-4">
           {alerts.map((alert) => (
             <View

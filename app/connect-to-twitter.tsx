@@ -44,7 +44,11 @@ export default function ConnectToTwitter() {
         provider: "twitter",
         redirectPathname: pathname,
       });
-      await completeUserFlow();
+      if (auth.authenticatedUser?.verifiedCredentials) {
+        await completeUserFlow();
+      } else {
+        throw new Error("No verified credentials found.");
+      }
     } catch (error) {
       console.log(error);
     }

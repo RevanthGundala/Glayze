@@ -52,7 +52,7 @@ const fetchWallet = async (
 
 export function useWallet(address: string | undefined) {
   return useQuery<Wallet | null, Error>({
-    queryKey: ["user", address],
+    queryKey: ["wallet", address],
     queryFn: () => fetchWallet(address),
   });
 }
