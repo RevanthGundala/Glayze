@@ -9,9 +9,9 @@ export type Search = Tables["Search"]["Row"];
 
 export interface Position {
   averageCost: string;
-  todaysReturn: string;
+  todaysReturn: bigint;
   todaysReturnPercent: bigint;
-  totalReturn: string;
+  totalReturn: bigint;
   totalReturnPercent: bigint;
   firstBought: Date;
 }

@@ -24,13 +24,12 @@ export default function ConnectToTwitter() {
 
   const completeUserFlow = async () => {
     try {
-      const xUserId = auth.authenticatedUser?.verifiedCredentials?.[2]?.id
-        ? parseInt(auth.authenticatedUser?.verifiedCredentials?.[2]?.id)
-        : null;
+      const xUserId =
+        auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthAccountId?.toString();
       await upsertUser(auth.authenticatedUser?.userId, {
         xUserId,
         address,
-        referralCode: "test",
+        referralCode: address,
       });
       router.push("/end");
     } catch (error) {
@@ -58,9 +57,9 @@ export default function ConnectToTwitter() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <View className="flex flex-row">
+      {/* <View className="flex flex-row">
         <Header backArrow />
-      </View>
+      </View> */}
       <View className="mt-24 space-y-4 items-center">
         <Text
           className="text-3xl font-semibold"

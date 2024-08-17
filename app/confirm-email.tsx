@@ -22,6 +22,7 @@ import Toast from "react-native-toast-message";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { Loading } from "@/components/loading";
 import { useTheme } from "@/contexts/theme-context";
+import { ProgressBar } from "@/components/ui/progress-bar";
 
 export default function ConfirmEmail() {
   const router = useRouter();
@@ -111,6 +112,7 @@ export default function ConfirmEmail() {
               </Button>
             </View>
           </ScrollView>
+          <ProgressBar sections={3} currentSection={1} />
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>

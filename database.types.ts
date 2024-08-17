@@ -99,7 +99,6 @@ export type Database = {
           created_at: string
           is_buy: boolean | null
           post_id: string
-          price: string | null
           shares: string | null
           trader: string | null
           usdc: string | null
@@ -109,7 +108,6 @@ export type Database = {
           created_at?: string
           is_buy?: boolean | null
           post_id: string
-          price?: string | null
           shares?: string | null
           trader?: string | null
           usdc?: string | null
@@ -119,7 +117,6 @@ export type Database = {
           created_at?: string
           is_buy?: boolean | null
           post_id?: string
-          price?: string | null
           shares?: string | null
           trader?: string | null
           usdc?: string | null

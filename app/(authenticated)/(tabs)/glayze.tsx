@@ -37,9 +37,10 @@ import { client } from "@/utils/dynamic-client.native";
 import { baseSepolia, base } from "viem/chains";
 import { fetchPublicClient, usePublicClient } from "@/hooks/use-public-client";
 import { useConstants } from "@/hooks/use-constants";
-import { formatUSDC } from "@/utils/helpers";
+import { formatToMaxLength, formatUSDC } from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { Loading } from "@/components/loading";
+import { fetchRealCreator } from "@/hooks/use-real-creator";
 
 interface FormInput {
   name: string;
@@ -58,10 +59,13 @@ export default function Glayze() {
     error: smartAccountError,
   } = useSmartAccount();
   const address = smartAccountClient?.account.address;
-  const { data: balance, isLoading: balanceLoading } = useBalance(address);
+  const {
+    data: balance,
+    isLoading: balanceLoading,
+    refetch: refetchBalance,
+  } = useBalance(address);
   const { data: constants, isLoading: constantsLoading } = useConstants();
-  const [xUserId, setXUserId] = useState<string | null>(null);
-  const { data: realCreator } = useRealCreator(xUserId);
+  const [realCreator, setRealCreator] = useState<Address | null>(null);
   const publicClient = fetchPublicClient();
 
   const {
@@ -95,17 +99,20 @@ export default function Glayze() {
         !tweetData ||
         !tweetData.user ||
         !tweetData.user.profile_image_url_https
-      ) {
+      )
         throw new Error("Failed to fetch tweet data or profile image.");
-      }
+
       if (tweetData.mediaDetails?.length && tweetData.mediaDetails.length > 0) {
         console.log("Media details found:", tweetData.mediaDetails);
         image = tweetData.mediaDetails[0].media_url_https;
       } else {
+        console.log("No media details found.");
         image = tweetData.user.profile_image_url_https;
       }
-
-      setXUserId(tweetData.user.id_str);
+      console.log("id: ", tweetData.user.id_str);
+      const xCreator = await fetchRealCreator(tweetData.user.id_str);
+      console.log("Real creator:", xCreator);
+      setRealCreator(xCreator);
     } catch (fetchError) {
       console.error("Error fetching tweet:", fetchError);
       throw new Error(
@@ -156,7 +163,8 @@ export default function Glayze() {
       if (!smartAccountClient || smartAccountError)
         throw new Error("No smart account found.");
 
-      const { name, symbol, url } = input;
+      const { name, url } = input;
+      const symbol = input.symbol.split("$").pop(); // Remove the $ prefix
       if (!name || !symbol || !url) {
         throw new Error("Name, symbol, or url is not provided.");
       }
@@ -193,6 +201,7 @@ export default function Glayze() {
         },
       ];
       if (realCreator) {
+        // api endpoint to set real creator
         transactions.push({
           to: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
           data: encodeFunctionData({
@@ -211,10 +220,10 @@ export default function Glayze() {
         `🔍 View on Blockscout: https://base-sepolia.blockscout.com/tx/${txHash}`
       );
 
-      // const txReceipt = await publicClient.waitForTransactionReceipt({
-      //   hash: txHash as Address,
-      // });
-      // console.log(txReceipt);
+      const txReceipt = await publicClient.waitForTransactionReceipt({
+        hash: txHash as Address,
+      });
+      if (!txReceipt) throw new Error("Failed to get transaction receipt.");
       const { error } = await supabase.from("Posts").insert([
         {
           post_id: postId,
@@ -224,6 +233,7 @@ export default function Glayze() {
           contract_creator: address,
           real_creator: realCreator,
           image_uri: imageIpfsHash,
+          post_uri: metadataIpfsHash,
           volume: 0,
           ath: 0,
         },
@@ -231,6 +241,7 @@ export default function Glayze() {
       if (error) {
         throw new Error("Failed to create post in Supabase.");
       }
+      refetchBalance();
       setIsLoading(false);
       router.replace(
         `/(authenticated)/aux/success?isGlayze=true&id=${postId}&symbol=${symbol}` as Href<string>
@@ -267,7 +278,12 @@ export default function Glayze() {
                   <Controller
                     control={control}
                     rules={{
-                      required: true,
+                      required: "Name is required.",
+                      validate: (value) => {
+                        if (value.length > 12)
+                          return "Name must be 12 characters or less.";
+                        return true;
+                      },
                     }}
                     render={({ field: { onChange, value } }) => (
                       <>
@@ -280,7 +296,10 @@ export default function Glayze() {
                         <Input
                           placeholder="Name"
                           value={value}
-                          onChangeText={onChange}
+                          onChangeText={(text) => {
+                            const formattedText = formatToMaxLength(text, 12);
+                            onChange(formattedText);
+                          }}
                           style={{
                             color: theme.textColor,
                             backgroundColor: theme.secondaryBackgroundColor,
@@ -295,7 +314,7 @@ export default function Glayze() {
                               marginLeft: 2,
                             }}
                           >
-                            {errors.name.message || "Name is required."}
+                            {errors.name.message}
                           </Text>
                         )}
                       </>
@@ -307,9 +326,14 @@ export default function Glayze() {
                   <Controller
                     control={control}
                     rules={{
-                      required: true,
-                      validate: (value) =>
-                        value.startsWith("$") || "Symbol must start with $",
+                      required: "Ticker Symbol is required.",
+                      validate: (value) => {
+                        if (!value.startsWith("$"))
+                          return "Symbol must start with $";
+                        if (value.length > 13)
+                          return "Symbol must be 13 characters or less (including $).";
+                        return true;
+                      },
                     }}
                     render={({ field: { onChange, value } }) => (
                       <>
@@ -322,7 +346,10 @@ export default function Glayze() {
                         <Input
                           placeholder="$TICKER"
                           value={value}
-                          onChangeText={onChange}
+                          onChangeText={(text) => {
+                            const formattedText = formatToMaxLength(text, 13);
+                            onChange(formattedText);
+                          }}
                           style={{
                             color: theme.textColor,
                             backgroundColor: theme.secondaryBackgroundColor,
@@ -337,8 +364,7 @@ export default function Glayze() {
                               marginLeft: 2,
                             }}
                           >
-                            {errors.symbol.message ||
-                              "Ticker Symbol is required."}
+                            {errors.symbol.message}
                           </Text>
                         )}
                       </>
@@ -422,7 +448,8 @@ export default function Glayze() {
                     style={{ color: colors.white }}
                   >
                     {!hasSufficientBalance && "Insufficient Balance: "}
-                    Pay ${formatUSDC(constants?.usdcCreationPayment)}
+                    Pay $
+                    {formatUSDC(constants?.usdcCreationPayment).slice(0, 4)}
                   </Text>
                 ) : (
                   <ActivityIndicator

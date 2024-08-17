@@ -17,7 +17,12 @@ import { PostComponent } from "@/components/post-section";
 import { useScrollToTop } from "@react-navigation/native";
 import { useRef } from "react";
 import { useBalance, useWallet } from "@/hooks";
-import { formatUSDC } from "@/utils/helpers";
+import {
+  formatToSixDecimals,
+  formatUSDC,
+  formatUSDCAllDecimals,
+  parseUSDC,
+} from "@/utils/helpers";
 import { Loading } from "@/components/loading";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { Button } from "@/components/ui/button";
@@ -27,6 +32,12 @@ import { colors } from "@/utils/theme";
 import { useForm, Controller, set } from "react-hook-form";
 import Toast from "react-native-toast-message";
 import * as Clipboard from "expo-clipboard";
+import { ERC20_ABI } from "@/utils/constants";
+import { Address, encodeFunctionData, Chain, Transport } from "viem";
+import { SmartAccountClient } from "permissionless";
+import { EntryPoint } from "permissionless/types/entrypoint";
+import { SmartAccount } from "permissionless/accounts";
+import { fetchPublicClient } from "@/hooks/use-public-client";
 
 export default function Wallet() {
   const { theme } = useTheme();
@@ -38,6 +49,7 @@ export default function Wallet() {
     data: balance,
     isLoading: isBalanceLoading,
     isError: isBalanceError,
+    refetch: refetchBalance,
   } = useBalance(address);
   const { data: wallet, isLoading, isError } = useWallet(address);
   const [viewTweets, setViewTweets] = useState({
@@ -96,7 +108,12 @@ export default function Wallet() {
                 ${formatUSDC(balance ?? "0")}
               </Text>
             </View>
-            <SendReceiveButtons balance={balance} address={address} />
+            <SendReceiveButtons
+              balance={balance}
+              address={address}
+              smartAccountClient={smartAccountClient}
+              refetch={refetchBalance}
+            />
           </View>
         </View>
       ),
@@ -172,13 +189,26 @@ export default function Wallet() {
 type SendReceiveButtonsProps = {
   balance: string | undefined | null;
   address: string | undefined | null;
+  smartAccountClient: SmartAccountClient<
+    EntryPoint,
+    Transport,
+    Chain,
+    SmartAccount<EntryPoint, string, Transport, Chain>
+  > | null;
+  refetch: () => void;
 };
 interface FormInput {
   amount: string;
   recipient: string;
 }
 
-function SendReceiveButtons({ balance, address }: SendReceiveButtonsProps) {
+function SendReceiveButtons({
+  balance,
+  address,
+  smartAccountClient,
+  refetch,
+}: SendReceiveButtonsProps) {
+  const publicClient = fetchPublicClient();
   const { theme, themeName } = useTheme();
   const [sendModalVisible, setSendModalVisible] = useState(false);
   const [receiveModalVisible, setReceiveModalVisible] = useState(false);
@@ -198,7 +228,8 @@ function SendReceiveButtons({ balance, address }: SendReceiveButtonsProps) {
   });
 
   const watchAmount = watch("amount");
-  const hasSufficientBalance = Number(watchAmount) <= Number(balance);
+  const hasSufficientBalance =
+    Number(parseUSDC(watchAmount)) <= Number(balance);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -243,11 +274,44 @@ function SendReceiveButtons({ balance, address }: SendReceiveButtonsProps) {
   const handleSend = async (data: FormInput) => {
     setIsLoading(true);
     try {
-      console.log("Sending", data.amount, "to", data.recipient);
-      // Implement your send logic here
+      if (!smartAccountClient) throw new Error("No smart account client found");
+      const { amount, recipient } = data;
+      console.log("Sending", amount, "to", recipient);
       setSendModalVisible(false);
+      const txHash = await smartAccountClient?.sendTransaction({
+        to: process.env.EXPO_PUBLIC_USDC_ADDRESS! as Address,
+        data: encodeFunctionData({
+          abi: ERC20_ABI,
+          functionName: "transfer",
+          args: [recipient as Address, BigInt(parseUSDC(amount))],
+        }),
+        value: 0n,
+      });
+      console.log("✅ Transaction successfully sponsored!");
+      console.log(
+        `🔍 View on Blockscout: https://base-sepolia.blockscout.com/tx/${txHash}`
+      );
+      const txReceipt = await publicClient?.waitForTransactionReceipt({
+        hash: txHash as Address,
+      });
+
+      if (!txReceipt) throw new Error("Transaction receipt is undefined");
+      refetch();
+      Toast.show({
+        text1: "Transaction sent successfully",
+        type: "success",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
     } catch (error) {
       console.error("Error sending:", error);
+      Toast.show({
+        text1: "Error sending transaction",
+        text2: "Please try again",
+        type: "error",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -307,7 +371,7 @@ function SendReceiveButtons({ balance, address }: SendReceiveButtonsProps) {
                   className="pt-1 pb-2"
                   style={{ color: theme.mutedForegroundColor }}
                 >
-                  Balance: ${formatUSDC(balance ?? "0")}
+                  Balance: ${formatUSDCAllDecimals(balance ?? "0")}
                 </Text>
 
                 <View className="flex-row items-center justify-between mb-4">
@@ -316,8 +380,17 @@ function SendReceiveButtons({ balance, address }: SendReceiveButtonsProps) {
                       control={control}
                       rules={{
                         required: "Amount is required",
-                        validate: (value) =>
-                          Number(value) > 0 || "Amount must be greater than 0",
+                        validate: (value) => {
+                          if (Number(value) <= 0)
+                            return "Amount must be greater than 0";
+                          if (
+                            value.includes(".") &&
+                            value.split(".")[1].length > 6
+                          ) {
+                            return "Maximum 6 decimal places allowed";
+                          }
+                          return true;
+                        },
                       }}
                       render={({ field: { onChange, value } }) => (
                         <Input
@@ -325,9 +398,10 @@ function SendReceiveButtons({ balance, address }: SendReceiveButtonsProps) {
                             color: theme.textColor,
                             backgroundColor: theme.secondaryBackgroundColor,
                           }}
-                          placeholder={formatUSDC(balance ?? "0")}
+                          placeholder={formatUSDCAllDecimals(balance ?? "0")}
                           onChangeText={(text) => {
-                            onChange(text);
+                            const formattedText = formatToSixDecimals(text);
+                            onChange(formattedText);
                           }}
                           value={value}
                           keyboardType="numeric"
@@ -342,7 +416,9 @@ function SendReceiveButtons({ balance, address }: SendReceiveButtonsProps) {
                       backgroundColor: theme.backgroundColor,
                       borderColor: theme.mutedForegroundColor,
                     }}
-                    onPress={() => setValue("amount", balance ?? "0")}
+                    onPress={() =>
+                      setValue("amount", formatUSDCAllDecimals(balance ?? "0"))
+                    }
                   >
                     <Text
                       className="text-sm"
@@ -421,21 +497,22 @@ function SendReceiveButtons({ balance, address }: SendReceiveButtonsProps) {
                         justifyContent: "center",
                       }}
                     >
-                      <Text
-                        className="text-center py-3 font-semibold text-lg"
-                        style={{ color: colors.white }}
-                      >
-                        {!hasSufficientBalance
-                          ? "Insufficient Balance"
-                          : watchAmount === ""
-                          ? "Must send more than 0"
-                          : `Send $${formatUSDC(watchAmount)}`}
-                      </Text>
-                      {isLoading && (
+                      {!isLoading ? (
+                        <Text
+                          className="text-center py-3 font-semibold text-lg"
+                          style={{ color: colors.white }}
+                        >
+                          {!hasSufficientBalance
+                            ? "Insufficient Balance"
+                            : watchAmount === ""
+                            ? "Must send more than $0"
+                            : `Send $${watchAmount}`}
+                        </Text>
+                      ) : (
                         <ActivityIndicator
                           size="small"
                           color={colors.white}
-                          style={{ marginLeft: 10 }}
+                          className="py-4"
                         />
                       )}
                     </View>
@@ -495,7 +572,7 @@ function SendReceiveButtons({ balance, address }: SendReceiveButtonsProps) {
                   className="font-medium py-2"
                   style={{ color: theme.textColor }}
                 >
-                  Your EVM Address
+                  Your Address
                 </Text>
                 <Input placeholder={address ?? ""} readOnly />
                 <Text

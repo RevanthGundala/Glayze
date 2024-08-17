@@ -90,8 +90,8 @@ export default function Post() {
           shares={shares?.number ?? "0"}
           averageCost={formatUSDC(position?.averageCost ?? "0")}
           firstBought={position?.firstBought ?? new Date()}
-          todaysReturn={formatUSDC(position?.todaysReturn ?? "0")}
-          totalReturn={formatUSDC(position?.totalReturn ?? "0")}
+          todaysReturn={position?.todaysReturn ?? 0n}
+          totalReturn={position?.totalReturn ?? 0n}
           todaysReturnPercent={position?.todaysReturnPercent ?? 0n}
           totalReturnPercent={position?.totalReturnPercent ?? 0n}
         />
@@ -113,8 +113,8 @@ type PositionProps = {
   shares: string;
   averageCost: string;
   firstBought: Date;
-  todaysReturn: string;
-  totalReturn: string;
+  todaysReturn: bigint;
+  totalReturn: bigint;
   todaysReturnPercent: bigint;
   totalReturnPercent: bigint;
 };
@@ -189,7 +189,7 @@ const Position = ({
         </View>
       </View>
 
-      <View className="flex-row justify-between mt-4">
+      {/* <View className="flex-row justify-between mt-4">
         <Text className="text-sm" style={{ color: theme.mutedForegroundColor }}>
           Today's return
         </Text>
@@ -208,7 +208,7 @@ const Position = ({
             : `-${formatUSDC(todaysReturnPercent.toString())}%`}
           )
         </Text>
-      </View>
+      </View> */}
 
       <View className="flex-row justify-between">
         <Text className="text-sm" style={{ color: theme.mutedForegroundColor }}>
@@ -223,11 +223,13 @@ const Position = ({
                 : colors.redTintColor,
           }}
         >
-          +${totalReturn}(
           {totalReturnPercent >= 0
-            ? `+${formatUSDC(totalReturnPercent.toString())}%`
-            : `-${formatUSDC(totalReturnPercent.toString())}%`}
-          )
+            ? `+$${formatUSDC(totalReturn.toString())}(+${formatUSDC(
+                totalReturnPercent.toString()
+              )}%)`
+            : `-$${formatUSDC(totalReturn.toString())}(-${formatUSDC(
+                totalReturnPercent.toString()
+              )}%)`}
         </Text>
       </View>
     </View>

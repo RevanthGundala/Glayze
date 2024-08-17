@@ -20,32 +20,37 @@ import { Header } from "@/components/header";
 import { Input } from "@/components/ui/input";
 import { ShareHeader } from "@/components/share-header";
 import { useLocalSearchParams } from "expo-router";
-import { createPublicClient, http } from "viem";
-import { baseSepolia, base } from "viem/chains";
-import {
-  useShares,
-  useShareInfo,
-  useBalance,
-  useBuyPrice,
-  useAura,
-  usePublicClient,
-} from "@/hooks";
+import { useShares, useBalance, useBuyPrice, useAura } from "@/hooks";
 import { Loading } from "@/components/loading";
 import { ABI, ERC20_ABI } from "@/utils/constants";
 import { Address, encodeFunctionData } from "viem";
-import { formatUSDC, insertTrade } from "@/utils/helpers";
+import { formatUSDC, insertTrade, parseUSDC } from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { fetchPublicClient } from "@/hooks/use-public-client";
+import { Controller, useForm } from "react-hook-form";
 
 export default function Buy() {
   const maxFontSize = 48;
   const minFontSize = 12;
   const [amount, setAmount] = useState("0");
-  const [auraAmount, setAuraAmount] = useState("0");
   const [isLoading, setIsLoading] = useState(false);
   const { id, name, symbol, image } = useLocalSearchParams();
-  const { smartAccountClient } = useSmartAccount();
+  const { smartAccountClient, error: smartAccountError } = useSmartAccount();
   const address = smartAccountClient?.account.address;
+  type FormData = {
+    auraAmount: string;
+  };
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      auraAmount: "",
+    },
+  });
+  const [localAuraAmount, setLocalAuraAmount] = useState("0");
   const {
     data: balance,
     isLoading: balanceLoading,
@@ -57,27 +62,20 @@ export default function Buy() {
     isError: sharesError,
   } = useShares(address, id as string);
   const {
-    data: shareInfo,
-    isLoading: shareInfoLoading,
-    isError: shareInfoError,
-  } = useShareInfo(id as string);
-  const {
     data: buyPriceData,
     isLoading: buyPriceLoading,
     isError: buyPriceError,
-  } = useBuyPrice(id as string, amount, auraAmount);
+  } = useBuyPrice(id as string, amount, localAuraAmount);
   const {
     data: aura,
     isLoading: auraLoading,
     isError: auraError,
   } = useAura(address);
-  const publicClient = createPublicClient({
-    chain: process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia,
-    transport: http(process.env.EXPO_PUBLIC_RPC_URL),
-  });
+  const publicClient = fetchPublicClient();
 
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(true);
+  const [hasSufficientAura, setHasSufficientAura] = useState(true);
   const router = useRouter();
   const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
@@ -87,7 +85,16 @@ export default function Buy() {
     setHasSufficientBalance(
       Number(balance) >= Number(buyPriceData?.buyPriceAfterFees)
     );
-  }, [balance, buyPriceData, buyPriceLoading, balanceLoading]);
+    setHasSufficientAura(Number(aura) >= Number(localAuraAmount));
+  }, [
+    balance,
+    buyPriceData,
+    buyPriceLoading,
+    balanceLoading,
+    aura,
+    auraLoading,
+    localAuraAmount,
+  ]);
 
   const updateAmount = (value: string) => {
     if (!balance) {
@@ -143,12 +150,15 @@ export default function Buy() {
 
   const clearAmount = () => setAmount("0");
 
-  const handleBuy = async () => {
+  const handleBuy = async (formData: FormData) => {
     try {
       if (!publicClient) throw new Error("No public client found.");
       if (!buyPriceData) throw new Error("Buy price data not available");
+      if (smartAccountError)
+        throw new Error("Error connecting to smart account");
       setModalVisible(false);
       setIsLoading(true);
+
       const transactions = [
         {
           to: process.env.EXPO_PUBLIC_USDC_ADDRESS! as Address,
@@ -167,7 +177,11 @@ export default function Buy() {
           data: encodeFunctionData({
             abi: ABI,
             functionName: "buyShares",
-            args: [BigInt(id as string), BigInt(amount), BigInt(auraAmount)],
+            args: [
+              BigInt(id as string),
+              BigInt(amount),
+              BigInt(parseUSDC(localAuraAmount ?? "0")),
+            ],
           }),
           value: 0n,
         },
@@ -229,11 +243,11 @@ export default function Buy() {
     "X",
   ];
 
-  if (balanceLoading || sharesLoading || shareInfoLoading || auraLoading) {
+  if (balanceLoading || sharesLoading || auraLoading) {
     return <Loading />;
   }
 
-  if (balanceError || sharesError || shareInfoError || auraError) {
+  if (balanceError || sharesError || auraError) {
     return <Loading error={"Could not load, please contact support"} />;
   }
 
@@ -360,34 +374,43 @@ export default function Buy() {
                 justifyContent: "center",
               }}
             >
-              <Text
-                className="text-center py-4 font-semibold text-lg"
-                style={{ color: colors.white }}
-              >
-                {amount === "0"
-                  ? "Place an order"
-                  : !hasSufficientBalance && !buyPriceLoading && buyPriceData
-                  ? "Insufficient Balance: $" +
-                    formatUSDC(buyPriceData?.buyPriceAfterFees)
-                  : `Buy for ${
-                      !buyPriceLoading &&
-                      buyPriceData &&
-                      buyPriceData?.buyPriceAfterFees === "0"
-                        ? "Free"
-                        : `${
-                            !buyPriceLoading && buyPriceData
-                              ? `$${formatUSDC(
-                                  buyPriceData?.buyPriceAfterFees
-                                )}`
-                              : ""
-                          }`
-                    }`}
-              </Text>
-              {buyPriceLoading && (
+              {!isLoading ? (
+                <>
+                  <Text
+                    className="text-center py-4 font-semibold text-lg"
+                    style={{ color: colors.white }}
+                  >
+                    {amount === "0"
+                      ? "Place an order"
+                      : !hasSufficientBalance &&
+                        !buyPriceLoading &&
+                        buyPriceData
+                      ? `Insufficient Balance: $${formatUSDC(
+                          buyPriceData?.buyPriceAfterFees
+                        )}`
+                      : `Buy for ${
+                          !buyPriceLoading &&
+                          buyPriceData &&
+                          buyPriceData?.buyPriceAfterFees === "0"
+                            ? "Free"
+                            : !buyPriceLoading && buyPriceData
+                            ? `$${formatUSDC(buyPriceData?.buyPriceAfterFees)}`
+                            : ""
+                        }`}
+                  </Text>
+                  {buyPriceLoading && (
+                    <ActivityIndicator
+                      size="small"
+                      color={colors.white}
+                      style={{ marginLeft: 10 }}
+                    />
+                  )}
+                </>
+              ) : (
                 <ActivityIndicator
                   size="small"
                   color={colors.white}
-                  style={{ marginLeft: 10 }}
+                  className="py-4"
                 />
               )}
             </View>
@@ -412,7 +435,7 @@ export default function Buy() {
             >
               <View
                 style={{ backgroundColor: theme.backgroundColor }}
-                className="rounded-t-3xl p-6 h-[325px]"
+                className="rounded-t-3xl p-6 h-[300px]"
               >
                 <Text
                   style={{ color: theme.textColor }}
@@ -426,39 +449,64 @@ export default function Buy() {
                 >
                   You are buying {amount ?? "0"} shares of {symbol}
                 </Text>
-                <Text
-                  className="text-sm pt-3"
-                  style={{ color: theme.textColor }}
-                >
-                  Use $AURA to pay for transaction fees
-                </Text>
-                <Text
-                  className="pt-1 pb-2"
-                  style={{ color: theme.mutedForegroundColor }}
-                >
+
+                <Text className="py-2" style={{ color: theme.textColor }}>
                   Balance: {formatUSDC(aura ?? "0")} $AURA
                 </Text>
 
                 <View className="flex-row items-center justify-between mb-4">
                   <View className="w-2/3">
-                    <Input
-                      style={{
-                        color: theme.textColor,
-                        backgroundColor: theme.secondaryBackgroundColor,
+                    <Controller
+                      control={control}
+                      rules={{
+                        validate: (value) => {
+                          if (value === "") return true;
+                          const numValue = Number(value);
+                          if (isNaN(numValue))
+                            return "Please enter a valid number";
+                          if (numValue < 0) return "Amount cannot be negative";
+                          if (aura && numValue > Number(aura))
+                            return "Amount exceeds balance";
+                          return true;
+                        },
                       }}
-                      placeholder={formatUSDC(aura ?? "0")}
-                      value={auraAmount === "0" ? "" : auraAmount.toString()}
-                      onChangeText={(text) => setAuraAmount(text)}
-                      keyboardType="numeric"
+                      render={({ field: { onChange, value } }) => (
+                        <Input
+                          style={{
+                            color: theme.textColor,
+                            backgroundColor: theme.secondaryBackgroundColor,
+                            borderColor: errors.auraAmount
+                              ? "red"
+                              : theme.mutedForegroundColor,
+                          }}
+                          placeholder={formatUSDC(aura ?? "0")}
+                          onChangeText={(text) => {
+                            onChange(text);
+                            setLocalAuraAmount(text === "" ? "0" : text);
+                          }}
+                          value={value}
+                          keyboardType="numeric"
+                        />
+                      )}
+                      name="auraAmount"
                     />
+                    {errors.auraAmount && (
+                      <Text style={{ color: "red", fontSize: 12 }}>
+                        {errors.auraAmount.message}
+                      </Text>
+                    )}
                   </View>
                   <TouchableOpacity
-                    className="aboslute right-32"
+                    className="absolute right-32"
                     style={{
                       backgroundColor: theme.backgroundColor,
                       borderColor: theme.mutedForegroundColor,
                     }}
-                    onPress={() => setAuraAmount(formatUSDC(aura ?? "0"))}
+                    onPress={() => {
+                      const maxAmount = formatUSDC(aura ?? "0");
+                      setValue("auraAmount", maxAmount);
+                      setLocalAuraAmount(maxAmount); // Update local state
+                    }}
                   >
                     <Text
                       className="text-sm"
@@ -471,9 +519,21 @@ export default function Buy() {
                 <View className="mt-auto mb-8">
                   <Button
                     buttonStyle="w-full rounded-full"
-                    onPress={handleBuy}
+                    onPress={handleSubmit(handleBuy)}
+                    disabled={
+                      amount === "0" ||
+                      !hasSufficientBalance ||
+                      !hasSufficientAura ||
+                      !!errors.auraAmount
+                    }
                     style={{
-                      backgroundColor: theme.tabBarActiveTintColor,
+                      backgroundColor:
+                        amount === "0" ||
+                        !hasSufficientBalance ||
+                        !hasSufficientAura ||
+                        errors.auraAmount
+                          ? theme.mutedForegroundColor
+                          : theme.tabBarActiveTintColor,
                     }}
                   >
                     <View
@@ -487,11 +547,8 @@ export default function Buy() {
                         className="text-center py-3 font-semibold text-lg"
                         style={{ color: colors.white }}
                       >
-                        {!hasSufficientBalance &&
-                        !buyPriceLoading &&
-                        buyPriceData
-                          ? "Insufficient Balance: $" +
-                            formatUSDC(buyPriceData?.buyPriceAfterFees)
+                        {!hasSufficientAura && !buyPriceLoading && buyPriceData
+                          ? "Not enough $AURA"
                           : `Buy for ${
                               !buyPriceLoading &&
                               buyPriceData &&

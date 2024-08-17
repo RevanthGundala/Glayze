@@ -14,6 +14,7 @@ import { Image } from "expo-image";
 import appleIcon from "@/assets/images/socials/apple.png";
 import icon from "@/assets/images/icon.png";
 import { NativeWindStyleSheet } from "nativewind";
+import { upsertUser } from "@/utils/helpers";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
@@ -50,6 +51,16 @@ export default function RootLayout() {
       router.replace("/(authenticated)/(tabs)/home" as Href<string>);
     }
   }, [auth.token, router]);
+
+  useEffect(() => {
+    if (auth.authenticatedUser?.verifiedCredentials) {
+      const xUserId =
+        auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthAccountId?.toString();
+      upsertUser(auth.authenticatedUser?.userId, {
+        xUserId,
+      }).catch((error) => console.log(error));
+    }
+  }, [auth.authenticatedUser?.verifiedCredentials]);
 
   return (
     <Providers>

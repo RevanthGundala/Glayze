@@ -8,7 +8,7 @@ const bigIntToFloat = (value: bigint): number => {
 };
 
 type Trade = {
-  price: string | null;
+  usdc: string | null;
   created_at: string;
 };
 
@@ -34,7 +34,7 @@ const calculatePricePeriod = (
   );
   const prices = filteredTrades
     .filter((trade) => trade !== null)
-    .map((trade) => BigInt(trade.price as string));
+    .map((trade) => BigInt(trade.usdc as string));
   const chartPrices = prices.map(bigIntToFloat);
 
   let change = 0;
@@ -58,7 +58,7 @@ const fetchAllPriceHistory = async (
 
   const { data: trades, error } = await supabase
     .from("Trades")
-    .select("price, created_at")
+    .select("usdc, created_at")
     .eq("post_id", id)
     .order("created_at", { ascending: false });
 

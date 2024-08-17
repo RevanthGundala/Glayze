@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { ABI } from "@/utils/constants";
 import { fetchPublicClient } from "./use-public-client";
-9;
+import { parseUSDC } from "@/utils/helpers"; // Make sure to import parseUSDC
 
 type BuyPrice = {
   buyPrice: string;
@@ -21,6 +21,7 @@ const fetchBuyPrice = async (
   try {
     const client = fetchPublicClient();
     if (!client) return null;
+
     const buyPrice = await client.readContract({
       address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS as Address,
       abi: ABI,
@@ -31,7 +32,7 @@ const fetchBuyPrice = async (
       address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS as Address,
       abi: ABI,
       functionName: "getBuyPriceAfterFees",
-      args: [BigInt(postId), BigInt(shares), BigInt(auraAmount)],
+      args: [BigInt(postId), BigInt(shares), BigInt(parseUSDC(auraAmount))],
     });
     console.log("Buy Price After Fees: ", buyPriceAfterFees.toString());
     const totalFees = await client.readContract({
@@ -47,7 +48,7 @@ const fetchBuyPrice = async (
       totalFees: totalFees.toString(),
     };
   } catch (error) {
-    console.log(error);
+    console.error("Error in fetchBuyPrice:", error);
     return null;
   }
 };

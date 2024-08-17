@@ -26,7 +26,7 @@ const fetchBalance = async (
 
 export function useBalance(address: string | undefined) {
   return useQuery<string | null, Error>({
-    queryKey: ["user", address],
+    queryKey: ["balance", address],
     queryFn: () => fetchBalance(address),
   });
 }

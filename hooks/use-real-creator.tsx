@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
 import { Address } from "viem";
 
-const fetchRealCreator = async (
+export const fetchRealCreator = async (
   xUserId: string | null | undefined
 ): Promise<Address | null> => {
   try {
@@ -12,7 +12,7 @@ const fetchRealCreator = async (
       .select("address")
       .eq("x_user_id", xUserId)
       .single();
-    if (error) {
+    if (error || !data) {
       throw new Error(`Error fetching creator: ${error?.message}`);
     }
     return data?.address as Address;

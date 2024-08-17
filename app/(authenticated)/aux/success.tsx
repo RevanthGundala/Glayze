@@ -27,14 +27,14 @@ export default function Success() {
           style={{ color: theme.textColor }}
         >
           {isGlayze
-            ? `Successfully created ${symbol}`
+            ? `Successfully created $${symbol}`
             : isBuy === "true"
             ? `Successfully bought ${shares} ${
                 Number(shares) > 1 ? "shares" : "share"
-              } of ${symbol} for $${price}`
+              } of $${symbol} for $${price}`
             : `Successfully sold ${shares} ${
                 Number(shares) > 1 ? "shares" : "share"
-              } of ${symbol} for $${price}`}
+              } of $${symbol} for $${price}`}
         </Text>
       </View>
 

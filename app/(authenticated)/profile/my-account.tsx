@@ -43,7 +43,7 @@ export default function MyAccount() {
             style={{ color: theme.mutedForegroundColor }}
             className="text-base font-light"
           >
-            Shares are held in a self-custody ETH wallet. You can export your
+            Shares are controlled by a self-custody wallet. You can export your
             keys at any time.
           </Text>
           {/* <View className="space-y-2">

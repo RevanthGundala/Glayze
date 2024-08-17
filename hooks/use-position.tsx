@@ -31,7 +31,6 @@ const calculatePosition = async (
 
   let totalCost = 0n;
   let totalShares = 0n;
-  let buyValue = 0n;
   let firstBought: Date | null = null;
 
   for (const trade of trades) {
@@ -40,44 +39,33 @@ const calculatePosition = async (
     const tradeDate = new Date(trade.created_at);
 
     if (trade.is_buy) {
-      buyValue += tradeUsdc * tradeShares;
       totalCost += tradeUsdc;
       totalShares += tradeShares;
       if (!firstBought || tradeDate < firstBought) {
         firstBought = tradeDate;
       }
     } else {
-      // For sells, reduce shares and cost proportionally
-      const sellRatio = tradeShares / totalShares;
-      totalCost -= totalCost * sellRatio;
+      totalCost -= tradeUsdc;
       totalShares -= tradeShares;
     }
   }
 
-  // Ensure we're only considering currently held shares
-  if (totalShares > currentShares) {
-    const reductionRatio = currentShares / totalShares;
-    totalCost = totalCost * reductionRatio;
-    totalShares = currentShares;
-  }
-
-  const currentValue = (currentMarketValue - buyValue) / buyValue;
-  const averageCost = totalShares > 0n ? totalCost / totalShares : currentPrice;
+  const averageCost = totalShares > 0n ? totalCost / totalShares : 0n;
 
   // Calculate returns
   const totalReturn = currentMarketValue - totalCost;
-  const totalReturnPercent = totalCost > 0n ? totalReturn / totalCost : 0n;
+  console.log("totalcost: ", totalCost);
+  const totalReturnPercent = totalCost !== 0n ? totalReturn / totalCost : 0n;
 
   // Calculate today's return based on the change from average cost
-  const todaysReturn = (currentPrice - averageCost) * currentShares;
-  const todaysReturnPercent =
-    averageCost > 0n ? (currentPrice - averageCost) / averageCost : 0n;
+  const todaysReturn = 0n;
+  const todaysReturnPercent = 0n;
 
   return {
     averageCost: averageCost.toString(),
-    todaysReturn: todaysReturn.toString(),
+    todaysReturn: todaysReturn,
     todaysReturnPercent: todaysReturnPercent,
-    totalReturn: currentValue.toString(),
+    totalReturn: totalReturn,
     totalReturnPercent: totalReturnPercent,
     firstBought: firstBought || new Date(),
   };

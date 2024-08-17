@@ -61,7 +61,7 @@ export const PostComponent = ({
   const { data: tweet, isLoading, isError } = useEmbeddedTweet(post.url);
   const { data: shareInfo } = useShareInfo(post.post_id);
   const { theme } = useTheme();
-
+  const image = `${process.env.EXPO_PUBLIC_IPFS_GATEWAY}/ipfs/${post.image_uri}`;
   return (
     <View
       className={border ? "border-b overflow-hidden" : "overflow-hidden"}
@@ -76,12 +76,13 @@ export const PostComponent = ({
             <View className="flex-row justify-between items-center">
               <View className="flex-row items-center flex-1">
                 <View
-                  className="border rounded-full overflow-hidden p-1"
+                  className="border rounded-full overflow-hidden"
                   style={{ borderColor: theme.mutedForegroundColor }}
                 >
                   <Image
-                    source={{ uri: `${post.image_uri}` || "" }}
-                    className="w-10 h-10"
+                    source={{ uri: image || "" }}
+                    className="w-12 h-12 rounded-full "
+                    resizeMode="cover"
                   />
                 </View>
                 <View className="ml-2 flex-1">
@@ -90,7 +91,7 @@ export const PostComponent = ({
                       className="text-lg"
                       style={{ color: theme.textColor }}
                     >
-                      {post.symbol || "N/A"}
+                      ${post.symbol || "N/A"}
                     </Text>
                     <Text
                       className="text-xl font-semibold"
@@ -106,7 +107,7 @@ export const PostComponent = ({
                     <Text style={{ color: theme.mutedForegroundColor }}>
                       {post.name || "N/A"}
                     </Text>
-                    {priceHistory && priceHistory.oneDay.change >= 0 ? (
+                    {priceHistory && priceHistory.allTime.change >= 0 ? (
                       <View className="flex flex-row items-center space-x-1">
                         <Image
                           source={require("@/assets/images/aux/up-arrow.png")}
@@ -116,7 +117,7 @@ export const PostComponent = ({
                           className="text-lg"
                           style={{ color: colors.greenTintColor }}
                         >
-                          {priceHistory.oneDay.change.toFixed(2)}%
+                          {priceHistory.allTime.change.toFixed(2)}%
                         </Text>
                       </View>
                     ) : (
