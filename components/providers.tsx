@@ -6,20 +6,23 @@ import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import { useTheme } from "@/contexts/theme-context";
 import { client } from "@/utils/dynamic-client.native";
 import { SmartAccountProvider } from "@/contexts/smart-account-context";
+import { PostHogProvider } from "@/components/posthog";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient();
   return (
     <>
       <client.reactNative.WebView />
-      <ThemeProvider>
-        <QueryClientProvider client={queryClient}>
-          <SmartAccountProvider>
-            <StatusBar />
-            {children}
-          </SmartAccountProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
+      <PostHogProvider>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <SmartAccountProvider>
+              <StatusBar />
+              {children}
+            </SmartAccountProvider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </PostHogProvider>
     </>
   );
 };

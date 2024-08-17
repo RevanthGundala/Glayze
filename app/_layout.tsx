@@ -22,27 +22,27 @@ NativeWindStyleSheet.setOutput({
 
 export default function RootLayout() {
   const router = useRouter();
-  // if (Platform.OS === "web") {
-  //   console.log("Showing web layout");
-  //   return (
-  //     <View className="flex-1 bg-white">
-  //       <View className="mt-40">
-  //         <Image source={icon} className="w-1/2 h-1/2" />
-  //       </View>
-  //       <View className="flex items-center justify-center mt-20">
-  //         <Button
-  //           buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"
-  //           onPress={() => router.push("/")}
-  //         >
-  //           <Image source={appleIcon} className="w-4 h-4 mr-3" />
-  //           <Text className="text-center text-black">
-  //             Download Glayze on the App store
-  //           </Text>
-  //         </Button>
-  //       </View>
-  //     </View>
-  //   );
-  // }
+  if (Platform.OS === "web") {
+    console.log("Showing web layout");
+    return (
+      <View className="flex-1 bg-white">
+        <View className="mt-40">
+          <Image source={icon} className="w-1/2 h-1/2" />
+        </View>
+        <View className="flex items-center justify-center mt-20">
+          <Button
+            buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"
+            onPress={() => router.push("/")}
+          >
+            <Image source={appleIcon} className="w-4 h-4 mr-3" />
+            <Text className="text-center text-black">
+              Download Glayze on the App store
+            </Text>
+          </Button>
+        </View>
+      </View>
+    );
+  }
 
   const { auth } = useReactiveClient(client);
 

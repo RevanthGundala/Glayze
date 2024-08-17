@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -11,11 +11,9 @@ import {
 } from "react-native";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { colors, lightTheme as theme } from "@/utils/theme";
+import { colors } from "@/utils/theme";
 import { Header } from "@/components/header";
-import { useState } from "react";
-import { useLocalSearchParams } from "expo-router";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { client } from "@/utils/dynamic-client.native";
 import Toast from "react-native-toast-message";
@@ -36,7 +34,9 @@ export default function ConfirmEmail() {
   const handleConfirmCode = async () => {
     try {
       await auth.email.verifyOTP(code);
-      router.push("/connect-to-twitter");
+      auth.authenticatedUser?.newUser
+        ? router.push("/connect-to-twitter")
+        : router.push("/(authenticated)/(tabs)/home");
     } catch (error) {
       console.log(error);
       Toast.show({
@@ -74,45 +74,47 @@ export default function ConfirmEmail() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-          <ScrollView
-            contentContainerStyle={{ flexGrow: 1 }}
-            className="px-6 py-2"
-          >
-            <View>
-              <Input
-                placeholder="Code"
-                value={code}
-                onChangeText={setCode}
-                style={{
-                  color: theme.textColor,
-                  backgroundColor: theme.mutedForegroundColor,
-                }}
-              />
-            </View>
-            <View className="pt-6">
-              <Button
-                buttonStyle="w-full rounded-full py-3"
-                style={{
-                  backgroundColor:
-                    code !== ""
-                      ? theme.tabBarActiveTintColor
-                      : theme.tabBarInactiveTintColor,
-                }}
-                onPress={handleConfirmCode}
-              >
-                <Text
-                  className="text-center font-semibold"
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={{ flex: 1 }}>
+            <ScrollView
+              contentContainerStyle={{ flexGrow: 1 }}
+              className="px-6 py-2"
+            >
+              <View>
+                <Input
+                  placeholder="Code"
+                  value={code}
+                  onChangeText={setCode}
                   style={{
-                    color: colors.white,
+                    color: theme.textColor,
+                    backgroundColor: theme.mutedForegroundColor,
                   }}
+                />
+              </View>
+              <View className="pt-6">
+                <Button
+                  buttonStyle="w-full rounded-full py-3"
+                  style={{
+                    backgroundColor:
+                      code !== ""
+                        ? theme.tabBarActiveTintColor
+                        : theme.tabBarInactiveTintColor,
+                  }}
+                  onPress={handleConfirmCode}
                 >
-                  Confirm
-                </Text>
-              </Button>
-            </View>
-          </ScrollView>
-          <ProgressBar sections={3} currentSection={1} />
+                  <Text
+                    className="text-center font-semibold"
+                    style={{
+                      color: colors.white,
+                    }}
+                  >
+                    Confirm
+                  </Text>
+                </Button>
+              </View>
+            </ScrollView>
+            <ProgressBar sections={3} currentSection={1} />
+          </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </SafeAreaView>

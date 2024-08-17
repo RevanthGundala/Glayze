@@ -10,11 +10,12 @@ import { useTheme } from "@/contexts/theme-context";
 import { Loading } from "@/components/loading";
 import { useAlerts } from "@/hooks";
 import { useSmartAccount } from "@/contexts/smart-account-context";
+import Toast from "react-native-toast-message";
 
 export default function Alerts() {
   const { smartAccountClient } = useSmartAccount();
   const address = smartAccountClient?.account.address;
-  const { data: alerts, isLoading, isError } = useAlerts(address);
+  const { data: alerts, isLoading, isError, refetch } = useAlerts(address);
   const { theme } = useTheme();
 
   if (isLoading || isError) {
@@ -26,8 +27,16 @@ export default function Alerts() {
       .from("Referrals")
       .update({ show: false })
       .eq("id", id);
+    refetch();
     if (error) {
       console.error("Error clearing alert", error);
+      Toast.show({
+        text1: "Error clearing alert",
+        text2: "Please try again",
+        type: "error",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
     }
   };
 
@@ -36,8 +45,16 @@ export default function Alerts() {
       .from("Referrals")
       .update({ show: false })
       .eq("show", true);
+    refetch();
     if (error) {
       console.error("Error clearing all alerts", error);
+      Toast.show({
+        text1: "Error clearing all alerts",
+        text2: "Please try again",
+        type: "error",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
     }
   };
 
@@ -46,54 +63,63 @@ export default function Alerts() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <View className="pt-6 px-4 mb-4">
-        <View className="flex-row justify-center items-center mb-4">
-          {alerts && alerts.length > 0 && (
-            <TouchableOpacity
-              onPress={clearAllAlerts}
-              className="absolute right-4 top-6"
-            >
-              <Text style={{ color: theme.tintColor }}>Clear All</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-
-      {alerts && alerts.length > 0 ? (
-        <ScrollView className="px-4">
-          {alerts.map((alert) => (
-            <View
-              key={alert.id}
-              className="rounded-lg p-4 mb-4 flex-row justify-between items-center"
-              style={{ backgroundColor: theme.secondaryBackgroundColor }}
-            >
-              <Text className="flex-1 mr-2" style={{ color: theme.textColor }}>
-                {alert.is_accepted
-                  ? `${alert.to} accepted your referral invite`
-                  : `Your referral invite to ${alert.to} is pending`}
-              </Text>
-              <TouchableOpacity onPress={() => clearAlert(alert.id)}>
-                <Text style={{ color: theme.textColor }}>X</Text>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <Toast />
+        <View className="pt-6 px-4 mb-4">
+          <View className="flex-row justify-center items-center mb-4">
+            {alerts && alerts.length > 0 && (
+              <TouchableOpacity
+                onPress={clearAllAlerts}
+                className="absolute right-4 top-6"
+              >
+                <Text style={{ color: theme.tintColor }}>Clear All</Text>
               </TouchableOpacity>
-            </View>
-          ))}
-        </ScrollView>
-      ) : (
-        <View className="flex-1 items-center">
-          <Text
-            className="w-[300px] text-3xl font-semibold text-center mb-4"
-            style={{ color: theme.textColor }}
-          >
-            You have no alerts
-          </Text>
-          <Text
-            className="w-[300px] text-center text-lg"
-            style={{ color: theme.mutedForegroundColor }}
-          >
-            You will be notified when someone accepts your referral invite
-          </Text>
+            )}
+          </View>
         </View>
-      )}
+
+        {alerts && alerts.length > 0 ? (
+          <View className="mt-8 px-4">
+            {alerts.map((alert) => (
+              <View
+                key={alert.id}
+                className="rounded-lg p-4 mb-4 flex-row justify-between items-center border"
+                style={{
+                  backgroundColor: theme.backgroundColor,
+                  borderColor: theme.mutedForegroundColor,
+                }}
+              >
+                <Text
+                  className="flex-1 mr-2"
+                  style={{ color: theme.textColor }}
+                >
+                  {alert.is_accepted
+                    ? `${alert.to} accepted your referral invite`
+                    : `Your referral invite to ${alert.to} is pending`}
+                </Text>
+                <TouchableOpacity onPress={() => clearAlert(alert.id)}>
+                  <Text style={{ color: theme.textColor }}>X</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        ) : (
+          <View className="flex-1 items-center">
+            <Text
+              className="w-[300px] text-3xl font-semibold text-center mb-4"
+              style={{ color: theme.textColor }}
+            >
+              You have no alerts
+            </Text>
+            <Text
+              className="w-[300px] text-center text-lg"
+              style={{ color: theme.mutedForegroundColor }}
+            >
+              You will be notified when someone accepts your referral invite
+            </Text>
+          </View>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }

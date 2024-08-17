@@ -35,7 +35,10 @@ export default function Post() {
     isError: shareInfoError,
   } = useShareInfo(id as string);
 
-  const { data: shares } = useShares(address, id as string);
+  const { data: shares, refetch: refetchShares } = useShares(
+    address,
+    id as string
+  );
   const { data: position } = usePosition(
     post,
     address,
@@ -52,6 +55,7 @@ export default function Post() {
       // Refetch data when the screen comes into focus
       if (typeof id === "string") {
         refetch();
+        refetchShares();
       }
     });
 

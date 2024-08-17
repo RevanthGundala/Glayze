@@ -65,7 +65,6 @@ export default function Glayze() {
     refetch: refetchBalance,
   } = useBalance(address);
   const { data: constants, isLoading: constantsLoading } = useConstants();
-  const [realCreator, setRealCreator] = useState<Address | null>(null);
   const publicClient = fetchPublicClient();
 
   const {
@@ -93,6 +92,7 @@ export default function Glayze() {
     url: string
   ) => {
     let image: string;
+    let realCreator: Address | null = null;
     try {
       const tweetData = await fetchTweet(url);
       if (
@@ -110,9 +110,8 @@ export default function Glayze() {
         image = tweetData.user.profile_image_url_https;
       }
       console.log("id: ", tweetData.user.id_str);
-      const xCreator = await fetchRealCreator(tweetData.user.id_str);
-      console.log("Real creator:", xCreator);
-      setRealCreator(xCreator);
+      realCreator = await fetchRealCreator(tweetData.user.id_str);
+      console.log("Real creator:", realCreator);
     } catch (fetchError) {
       console.error("Error fetching tweet:", fetchError);
       throw new Error(
@@ -149,7 +148,14 @@ export default function Glayze() {
 
       const { metadataIpfsHash, imageIpfsHash } = await response.json();
       console.log("Metadata IPFS Hash:", metadataIpfsHash);
-      return { metadataIpfsHash, postId, name, symbol, imageIpfsHash };
+      return {
+        metadataIpfsHash,
+        postId,
+        name,
+        symbol,
+        imageIpfsHash,
+        realCreator,
+      };
     } catch (error) {
       console.error("Error uploading to IPFS:", error);
       return null;
@@ -175,8 +181,8 @@ export default function Glayze() {
 
       const response = await uploadToIpfs(name, symbol, postId, url);
       if (!response) throw new Error("Failed to upload to IPFS.");
-      const { metadataIpfsHash, imageIpfsHash } = response;
-
+      const { metadataIpfsHash, imageIpfsHash, realCreator } = response;
+      console.log("real creator in post: ", realCreator);
       const transactions = [
         {
           to: process.env.EXPO_PUBLIC_USDC_ADDRESS! as Address,
@@ -200,18 +206,6 @@ export default function Glayze() {
           value: 0n,
         },
       ];
-      if (realCreator) {
-        // api endpoint to set real creator
-        transactions.push({
-          to: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
-          data: encodeFunctionData({
-            abi: ABI,
-            functionName: "setRealCreator",
-            args: [BigInt(postId), realCreator],
-          }),
-          value: 0n,
-        });
-      }
       const txHash = await smartAccountClient.sendTransactions({
         transactions,
       });
@@ -240,6 +234,30 @@ export default function Glayze() {
       ]);
       if (error) {
         throw new Error("Failed to create post in Supabase.");
+      }
+      if (realCreator) {
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/api/set-creator`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              accept: "application/json",
+            },
+            body: JSON.stringify({
+              postId,
+              realCreator,
+            }),
+          }
+        );
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          throw new Error(
+            `Failed to set real creator: ${
+              errorData ? JSON.stringify(errorData) : response.statusText
+            }`
+          );
+        }
       }
       refetchBalance();
       setIsLoading(false);

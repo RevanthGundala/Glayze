@@ -32,6 +32,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="glayze"/>
         <data android:scheme="app.glayze"/>
+        <data android:scheme="exp+glayze-app"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>

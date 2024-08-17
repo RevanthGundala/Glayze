@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   Animated,
+  ActivityIndicator,
 } from "react-native";
 import { Image } from "expo-image";
 import { useRouter, Href } from "expo-router";
@@ -19,21 +20,84 @@ import { Header } from "@/components/header";
 import { Input } from "@/components/ui/input";
 import { ShareHeader } from "@/components/share-header";
 import { useLocalSearchParams } from "expo-router";
+import { useShares, useBalance, useSellPrice, useAura } from "@/hooks";
+import { Loading } from "@/components/loading";
+import { ABI, ERC20_ABI } from "@/utils/constants";
+import { Address, encodeFunctionData } from "viem";
+import { formatUSDC, insertTrade, parseUSDC } from "@/utils/helpers";
+import { useSmartAccount } from "@/contexts/smart-account-context";
+import { fetchPublicClient } from "@/hooks/use-public-client";
+import { Controller, useForm } from "react-hook-form";
 
 export default function Sell() {
   const maxFontSize = 48;
   const minFontSize = 12;
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
-  const { name, symbol, image } = useLocalSearchParams();
   const [amount, setAmount] = useState("0");
+  const [isLoading, setIsLoading] = useState(false);
+  const { id, name, symbol, image } = useLocalSearchParams();
+  const { smartAccountClient, error: smartAccountError } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
+  type FormData = {
+    auraAmount: string;
+  };
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      auraAmount: "",
+    },
+  });
+  const [localAuraAmount, setLocalAuraAmount] = useState("0");
+  const {
+    data: balance,
+    isLoading: balanceLoading,
+    isError: balanceError,
+  } = useBalance(address);
+  const {
+    data: shares,
+    isLoading: sharesLoading,
+    isError: sharesError,
+  } = useShares(address, id as string);
+  const {
+    data: sellPriceData,
+    isLoading: sellPriceLoading,
+    isError: sellPriceError,
+  } = useSellPrice(id as string, amount, localAuraAmount);
+  const {
+    data: aura,
+    isLoading: auraLoading,
+    isError: auraError,
+  } = useAura(address);
+  const publicClient = fetchPublicClient();
+
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [hasSufficientShares, setHasSufficientShares] = useState(true);
+  const [hasSufficientAura, setHasSufficientAura] = useState(true);
   const router = useRouter();
   const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
-  const [auraAmount, setAuraAmount] = useState(0);
   const [fontSize, setFontSize] = useState(maxFontSize);
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    setHasSufficientShares(Number(shares?.number) >= Number(amount));
+    setHasSufficientAura(Number(aura) >= Number(localAuraAmount));
+  }, [
+    balance,
+    sellPriceData,
+    sellPriceLoading,
+    balanceLoading,
+    aura,
+    auraLoading,
+    localAuraAmount,
+  ]);
+
   const updateAmount = (value: string) => {
-    if (amount === "0" && value !== ".") {
+    if (!balance) {
+      return;
+    } else if (amount === "0" && value !== ".") {
       setAmount(value);
     } else {
       setAmount((prev) => prev + value);
@@ -77,30 +141,113 @@ export default function Sell() {
 
   useEffect(() => {
     const length = amount.length;
-    let newSize = maxFontSize - length * 1.5; // Adjust the scaling factor as needed
+    let newSize = maxFontSize - length * 1.5;
     newSize = Math.max(newSize, minFontSize);
     setFontSize(newSize);
   }, [amount, maxFontSize, minFontSize]);
 
   const clearAmount = () => setAmount("0");
 
-  const handleSell = () => {
-    // TODO:
+  const handleSell = async (formData: FormData) => {
     try {
+      if (!publicClient) throw new Error("No public client found.");
+      if (!sellPriceData) throw new Error("Sell price data not available");
+      if (smartAccountError)
+        throw new Error("Error connecting to smart account");
       setModalVisible(false);
-      setTimeout(() => {
-        router.replace(
-          "/(authenticated)/aux/success?isBuy=false&shares=100&price=0.99&symbol=GLAZE" as Href
-        );
-      }, 300); // Add a small delay to ensure the modal is fully dismissed
+      setIsLoading(true);
+
+      const transactions = [
+        {
+          to: process.env.EXPO_PUBLIC_USDC_ADDRESS! as Address,
+          data: encodeFunctionData({
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [
+              process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
+              BigInt(sellPriceData?.sellPriceAfterFees),
+            ],
+          }),
+          value: 0n,
+        },
+        {
+          to: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
+          data: encodeFunctionData({
+            abi: ABI,
+            functionName: "sellShares",
+            args: [
+              BigInt(id as string),
+              BigInt(amount),
+              BigInt(parseUSDC(localAuraAmount ?? "0")),
+            ],
+          }),
+          value: 0n,
+        },
+      ];
+
+      const txHash = await smartAccountClient?.sendTransactions({
+        transactions,
+      });
+
+      console.log("✅ Transaction successfully sponsored!");
+      console.log(
+        `🔍 View on Blockscout: https://base-sepolia.blockscout.com/tx/${txHash}`
+      );
+
+      const txReceipt = await publicClient?.waitForTransactionReceipt({
+        hash: txHash as Address,
+      });
+
+      if (!txReceipt) throw new Error("Transaction receipt is undefined");
+
+      const error = await insertTrade(txReceipt);
+      if (error) throw error;
+
+      // Now navigate to the success screen
+      router.replace(
+        `/(authenticated)/aux/success?isSell=true&shares=${amount}&price=${formatUSDC(
+          sellPriceData?.sellPriceAfterFees
+        )}&symbol=${symbol}` as Href<string>
+      );
     } catch (error) {
-      console.log(error);
-      router.replace("/(authenticated)/aux/error" as Href);
+      console.error("Error in handleSell:", error);
+
+      // Close the modal if it's open
+      setModalVisible(false);
+
+      // Wait a bit before navigating to the error screen
+      setTimeout(() => {
+        router.replace("/(authenticated)/aux/error" as Href<string>);
+      }, 500);
+    } finally {
+      // Reset loading state
+      setIsLoading(false);
     }
   };
 
-  const percentages = ["10%", "25%", "50%", "MAX"];
-  const numpad = ["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0", "X"];
+  const percentages = ["10", "25", "50", "100"];
+  const numpad = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "CLEAR",
+    "0",
+    "X",
+  ];
+
+  if (balanceLoading || sharesLoading || auraLoading) {
+    return <Loading />;
+  }
+
+  if (balanceError || sharesError || auraError) {
+    return <Loading error={"Could not load, please contact support"} />;
+  }
 
   return (
     <SafeAreaView
@@ -127,7 +274,8 @@ export default function Sell() {
           className="text-center text-sm pt-2"
           style={{ color: theme.mutedForegroundColor }}
         >
-          0 Shares (~$0)
+          {shares?.number ?? "0"} Shares (~$
+          {formatUSDC(shares?.value ?? "0")})
         </Text>
         <View className="mt-2 rounded-xl p-4">
           <Text
@@ -144,7 +292,7 @@ export default function Sell() {
               key={i}
               style={{ backgroundColor: theme.tabBarActiveTintColor }}
               buttonStyle="bg-neutral px-5 py-3 rounded-full"
-              onPress={() => updateAmount(percent)}
+              onPress={() => setAmount(percent)}
             >
               <Text className="font-semibold" style={{ color: colors.white }}>
                 {percent}
@@ -155,23 +303,14 @@ export default function Sell() {
 
         <View className="flex-row flex-wrap justify-between mt-6">
           {numpad.map((num, i) =>
-            num !== "X" ? (
+            num === "X" ? (
               <TouchableOpacity
                 key={i}
-                className="w-[30%] aspect-square rounded-full items-center justify-center mb-4"
-                onPress={() => updateAmount(num)}
-              >
-                <Text
-                  className="text-4xl font-semibold"
-                  style={{ color: theme.textColor }}
-                >
-                  {num}
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                key={i}
-                onPress={clearAmount}
+                onPress={() =>
+                  setAmount((prev) =>
+                    prev.slice(0, -1) === "" ? "0" : prev.slice(0, -1)
+                  )
+                }
                 className="w-[30%] aspect-square items-center justify-center mb-4"
               >
                 <Image
@@ -183,6 +322,34 @@ export default function Sell() {
                   className="w-12 h-6"
                 />
               </TouchableOpacity>
+            ) : num === "CLEAR" ? (
+              <TouchableOpacity
+                key={i}
+                onPress={clearAmount}
+                className="w-[30%] aspect-square items-center justify-center mb-4"
+              >
+                <Image
+                  source={
+                    themeName === "dark"
+                      ? require("@/assets/images/dark/clear.png")
+                      : require("@/assets/images/light/clear.png")
+                  }
+                  className="w-9 h-9"
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                key={i}
+                onPress={() => updateAmount(num)}
+                className="w-[30%] aspect-square items-center justify-center mb-4"
+              >
+                <Text
+                  className="text-2xl font-semibold"
+                  style={{ color: theme.textColor }}
+                >
+                  {num}
+                </Text>
+              </TouchableOpacity>
             )
           )}
         </View>
@@ -190,14 +357,61 @@ export default function Sell() {
           <Button
             buttonStyle="w-full rounded-full"
             onPress={openModal}
-            style={{ backgroundColor: theme.tabBarActiveTintColor }}
+            disabled={amount === "0" || !hasSufficientShares}
+            style={{
+              backgroundColor:
+                amount === "0" || !hasSufficientShares
+                  ? theme.mutedForegroundColor
+                  : theme.tabBarActiveTintColor,
+            }}
           >
-            <Text
-              className="text-center py-4 font-semibold text-lg"
-              style={{ color: colors.white }}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              Sell for $0.99
-            </Text>
+              {!isLoading ? (
+                <>
+                  <Text
+                    className="text-center py-4 font-semibold text-lg"
+                    style={{ color: colors.white }}
+                  >
+                    {amount === "0"
+                      ? "Place an order"
+                      : !hasSufficientShares &&
+                        !sellPriceLoading &&
+                        sellPriceData
+                      ? `Not enough shares`
+                      : `Sell for ${
+                          !sellPriceLoading &&
+                          sellPriceData &&
+                          sellPriceData?.sellPriceAfterFees === "0"
+                            ? "Free"
+                            : !sellPriceLoading && sellPriceData
+                            ? `$${formatUSDC(
+                                sellPriceData?.sellPriceAfterFees
+                              )}`
+                            : ""
+                        }`}
+                  </Text>
+                  {sellPriceLoading && (
+                    <ActivityIndicator
+                      size="small"
+                      color={colors.white}
+                      style={{ marginLeft: 10 }}
+                    />
+                  )}
+                </>
+              ) : (
+                <ActivityIndicator
+                  size="small"
+                  color={colors.white}
+                  className="py-4"
+                />
+              )}
+            </View>
           </Button>
         </View>
         <Modal
@@ -219,7 +433,7 @@ export default function Sell() {
             >
               <View
                 style={{ backgroundColor: theme.backgroundColor }}
-                className="rounded-t-3xl p-6 h-[325px]"
+                className="rounded-t-3xl p-6 h-[300px]"
               >
                 <Text
                   style={{ color: theme.textColor }}
@@ -231,31 +445,66 @@ export default function Sell() {
                   style={{ color: theme.mutedForegroundColor }}
                   className="py-2 text-center"
                 >
-                  Use $AURA to pay for transaction fees
+                  You are selling {amount ?? "0"} shares of {symbol}
                 </Text>
-                <Text className="pt-4 pb-1" style={{ color: theme.textColor }}>
-                  Balance: 5 $AURA
+
+                <Text className="py-2" style={{ color: theme.textColor }}>
+                  Balance: {formatUSDC(aura ?? "0")} $AURA
                 </Text>
+
                 <View className="flex-row items-center justify-between mb-4">
                   <View className="w-2/3">
-                    <Input
-                      style={{
-                        color: theme.textColor,
-                        backgroundColor: theme.secondaryBackgroundColor,
+                    <Controller
+                      control={control}
+                      rules={{
+                        validate: (value) => {
+                          if (value === "") return true;
+                          const numValue = Number(value);
+                          if (isNaN(numValue))
+                            return "Please enter a valid number";
+                          if (numValue < 0) return "Amount cannot be negative";
+                          if (aura && numValue > Number(aura))
+                            return "Amount exceeds balance";
+                          return true;
+                        },
                       }}
-                      placeholder={"0"}
-                      value={auraAmount.toString()}
-                      onChangeText={(text) => setAuraAmount(Number(text))}
-                      keyboardType="numeric"
+                      render={({ field: { onChange, value } }) => (
+                        <Input
+                          style={{
+                            color: theme.textColor,
+                            backgroundColor: theme.secondaryBackgroundColor,
+                            borderColor: errors.auraAmount
+                              ? "red"
+                              : theme.mutedForegroundColor,
+                          }}
+                          placeholder={formatUSDC(aura ?? "0")}
+                          onChangeText={(text) => {
+                            onChange(text);
+                            setLocalAuraAmount(text === "" ? "0" : text);
+                          }}
+                          value={value}
+                          keyboardType="numeric"
+                        />
+                      )}
+                      name="auraAmount"
                     />
+                    {errors.auraAmount && (
+                      <Text style={{ color: "red", fontSize: 12 }}>
+                        {errors.auraAmount.message}
+                      </Text>
+                    )}
                   </View>
                   <TouchableOpacity
-                    className="aboslute right-32"
+                    className="absolute right-32"
                     style={{
                       backgroundColor: theme.backgroundColor,
                       borderColor: theme.mutedForegroundColor,
                     }}
-                    onPress={() => setAuraAmount(0)}
+                    onPress={() => {
+                      const maxAmount = formatUSDC(aura ?? "0");
+                      setValue("auraAmount", maxAmount);
+                      setLocalAuraAmount(maxAmount); // Update local state
+                    }}
                   >
                     <Text
                       className="text-sm"
@@ -265,18 +514,63 @@ export default function Sell() {
                     </Text>
                   </TouchableOpacity>
                 </View>
-                <View className="mt-auto mb-10 flex-row justify-between">
+                <View className="mt-auto mb-8">
                   <Button
-                    onPress={handleSell}
-                    buttonStyle="py-3 flex-1 rounded-full"
-                    style={{ backgroundColor: theme.tintColor }}
+                    buttonStyle="w-full rounded-full"
+                    onPress={handleSubmit(handleSell)}
+                    disabled={
+                      amount === "0" ||
+                      !hasSufficientShares ||
+                      !hasSufficientAura ||
+                      !!errors.auraAmount
+                    }
+                    style={{
+                      backgroundColor:
+                        amount === "0" ||
+                        !hasSufficientShares ||
+                        !hasSufficientAura ||
+                        errors.auraAmount
+                          ? theme.mutedForegroundColor
+                          : theme.tabBarActiveTintColor,
+                    }}
                   >
-                    <Text
-                      style={{ color: colors.white }}
-                      className="font-semibold text-center text-lg"
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
                     >
-                      Sell for $0.99
-                    </Text>
+                      <Text
+                        className="text-center py-3 font-semibold text-lg"
+                        style={{ color: colors.white }}
+                      >
+                        {!hasSufficientAura &&
+                        !sellPriceLoading &&
+                        sellPriceData
+                          ? "Not enough $AURA"
+                          : `Sell for ${
+                              !sellPriceLoading &&
+                              sellPriceData &&
+                              sellPriceData?.sellPriceAfterFees === "0"
+                                ? "Free"
+                                : `${
+                                    !sellPriceLoading && sellPriceData
+                                      ? `$${formatUSDC(
+                                          sellPriceData?.sellPriceAfterFees
+                                        )}`
+                                      : ""
+                                  }`
+                            }`}
+                      </Text>
+                      {sellPriceLoading && (
+                        <ActivityIndicator
+                          size="small"
+                          color={colors.white}
+                          style={{ marginLeft: 10 }}
+                        />
+                      )}
+                    </View>
                   </Button>
                 </View>
               </View>
