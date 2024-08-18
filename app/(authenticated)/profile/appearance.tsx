@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Image } from "expo-image";
 import { useTheme } from "../../../contexts/theme-context";
 import { Header } from "@/components/header";
 
@@ -50,7 +49,7 @@ const ThemeOption = ({ name, value, isSelected, onSelect }) => {
   return (
     <Pressable
       onPress={onSelect}
-      className="flex-row justify-between items-center w-full py-4 border-b border-gray-700"
+      className="flex-row justify-between items-center w-full py-4"
     >
       <View className="flex-row items-center space-x-4">
         {/* <Image

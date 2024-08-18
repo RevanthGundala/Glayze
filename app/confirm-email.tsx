@@ -89,6 +89,7 @@ export default function ConfirmEmail() {
                     color: theme.textColor,
                     backgroundColor: theme.mutedForegroundColor,
                   }}
+                  keyboardType="numeric"
                 />
               </View>
               <View className="pt-6">

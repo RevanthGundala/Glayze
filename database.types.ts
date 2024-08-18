@@ -17,6 +17,7 @@ export type Database = {
           image_uri: string | null
           name: string | null
           post_id: string
+          post_uri: string | null
           real_creator: string | null
           symbol: string | null
           url: string | null
@@ -29,6 +30,7 @@ export type Database = {
           image_uri?: string | null
           name?: string | null
           post_id: string
+          post_uri?: string | null
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
@@ -41,6 +43,7 @@ export type Database = {
           image_uri?: string | null
           name?: string | null
           post_id?: string
+          post_uri?: string | null
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
@@ -51,25 +54,22 @@ export type Database = {
       Referrals: {
         Row: {
           created_at: string
-          from: string | null
-          id: number
-          is_accepted: boolean | null
+          dynamic_id: string
+          is_waiting: boolean | null
           show: boolean | null
           to: string | null
         }
         Insert: {
           created_at?: string
-          from?: string | null
-          id?: number
-          is_accepted?: boolean | null
+          dynamic_id: string
+          is_waiting?: boolean | null
           show?: boolean | null
           to?: string | null
         }
         Update: {
           created_at?: string
-          from?: string | null
-          id?: number
-          is_accepted?: boolean | null
+          dynamic_id?: string
+          is_waiting?: boolean | null
           show?: boolean | null
           to?: string | null
         }

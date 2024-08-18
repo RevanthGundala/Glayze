@@ -8,6 +8,7 @@ import {
   Modal,
   Platform,
   Keyboard,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
@@ -44,6 +45,7 @@ export default function Wallet() {
   const ref = useRef(null);
   useScrollToTop(ref);
   const { smartAccountClient } = useSmartAccount();
+  const [refreshing, setRefreshing] = useState(false);
   const address = smartAccountClient?.account.address;
   const {
     data: balance,
@@ -57,6 +59,12 @@ export default function Wallet() {
     "X Creator Rewards": false,
     "Glayze Creator Rewards": false,
   });
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refetchBalance();
+    setRefreshing(false);
+  }, [refetchBalance]);
 
   const toggleViewTweets = useCallback((section) => {
     setViewTweets((prev) => ({
@@ -181,6 +189,13 @@ export default function Wallet() {
           return null;
         }}
         keyExtractor={(item, index) => index.toString()}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.textColor}
+          />
+        }
       />
     </SafeAreaView>
   );

@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
+  RefreshControl,
 } from "react-native";
 import { supabase } from "@/utils/supabase";
 import { useTheme } from "@/contexts/theme-context";
@@ -11,22 +12,30 @@ import { Loading } from "@/components/loading";
 import { useAlerts } from "@/hooks";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import Toast from "react-native-toast-message";
+import { useState } from "react";
 
 export default function Alerts() {
   const { smartAccountClient } = useSmartAccount();
   const address = smartAccountClient?.account.address;
   const { data: alerts, isLoading, isError, refetch } = useAlerts(address);
   const { theme } = useTheme();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   if (isLoading || isError) {
     return <Loading error={isError ? "Error loading profile" : null} />;
   }
 
-  const clearAlert = async (id: number) => {
+  const clearAlert = async (id: string) => {
     const { error } = await supabase
       .from("Referrals")
       .update({ show: false })
-      .eq("id", id);
+      .eq("dynamic_id", id);
     refetch();
     if (error) {
       console.error("Error clearing alert", error);
@@ -63,7 +72,16 @@ export default function Alerts() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.textColor}
+          />
+        }
+      >
         <Toast />
         <View className="pt-6 px-4 mb-4">
           <View className="flex-row justify-center items-center mb-4">
@@ -82,7 +100,7 @@ export default function Alerts() {
           <View className="mt-8 px-4">
             {alerts.map((alert) => (
               <View
-                key={alert.id}
+                key={alert.dynamic_id}
                 className="rounded-lg p-4 mb-4 flex-row justify-between items-center border"
                 style={{
                   backgroundColor: theme.backgroundColor,
@@ -93,11 +111,11 @@ export default function Alerts() {
                   className="flex-1 mr-2"
                   style={{ color: theme.textColor }}
                 >
-                  {alert.is_accepted
-                    ? `${alert.to} accepted your referral invite`
-                    : `Your referral invite to ${alert.to} is pending`}
+                  {alert.is_waiting
+                    ? `${alert.to} made a transaction!`
+                    : `Waiting for ${alert.to} to make a transaction`}
                 </Text>
-                <TouchableOpacity onPress={() => clearAlert(alert.id)}>
+                <TouchableOpacity onPress={() => clearAlert(alert.dynamic_id)}>
                   <Text style={{ color: theme.textColor }}>X</Text>
                 </TouchableOpacity>
               </View>

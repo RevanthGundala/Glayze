@@ -1,8 +1,14 @@
 import React, { useState } from "react";
-import { View, Text, SafeAreaView } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useReferral, useAura } from "@/hooks";
+import { useAura } from "@/hooks";
 import { share } from "@/utils/helpers";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
@@ -16,8 +22,15 @@ import { useSmartAccount } from "@/contexts/smart-account-context";
 export default function Refer() {
   const { smartAccountClient } = useSmartAccount();
   const address = smartAccountClient?.account.address;
-  const { data: aura } = useAura(address);
+  const { data: aura, refetch } = useAura(address);
   const { theme } = useTheme();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   const copyToClipboard = async () => {
     console.log("Copying to clipboard");
@@ -48,61 +61,72 @@ export default function Refer() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <View className="flex flex-row">
-        <Header backArrow />
-      </View>
-      <View className="flex items-center">
-        <Text
-          className="font-semibold text-2xl"
-          style={{ color: theme.textColor }}
-        >
-          Refer your friends.
-        </Text>
-        <Text
-          className="font-semibold text-2xl"
-          style={{ color: theme.textColor }}
-        >
-          Earn $AURA.
-        </Text>
-      </View>
-      <View className="flex-col space-y-4 p-6">
-        <Text
-          className="leading-6"
-          style={{ color: theme.mutedForegroundColor }}
-        >
-          You and your friend both earn 1 $AURA when they make a transaction
-          within 14 days of using your code. Use $AURA to pay for transaction
-          fees.
-        </Text>
-        <ReferralCard amount={aura || "0"} />
-        <Text
-          className="font-medium text-lg pb-2"
-          style={{ color: theme.textColor }}
-        >
-          Share your code
-        </Text>
-        <Input
-          placeholder={address || ""}
-          readOnly
-          style={{ backgroundColor: theme.textColor }}
-        />
-        <Button
-          buttonStyle="w-full rounded-lg my-4"
-          style={{
-            backgroundColor: address
-              ? theme.tabBarActiveTintColor
-              : theme.tabBarInactiveTintColor,
-          }}
-          onPress={copyToClipboard}
-        >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.textColor}
+          />
+        }
+      >
+        <View className="flex flex-row">
+          <Header backArrow />
+        </View>
+        <View className="flex items-center">
           <Text
-            className="text-center font-semibold py-4"
-            style={{ color: colors.white }}
+            className="font-semibold text-2xl"
+            style={{ color: theme.textColor }}
           >
-            {address ? "Copy" : "There was a problem finding your address"}
+            Refer your friends.
           </Text>
-        </Button>
-      </View>
+          <Text
+            className="font-semibold text-2xl"
+            style={{ color: theme.textColor }}
+          >
+            Earn $AURA.
+          </Text>
+        </View>
+        <View className="flex-col space-y-4 p-6">
+          <Text
+            className="leading-6"
+            style={{ color: theme.mutedForegroundColor }}
+          >
+            You and your friend both earn 1 $AURA when they make a transaction
+            within 14 days of using your code. Use $AURA to pay for transaction
+            fees.
+          </Text>
+          <ReferralCard amount={aura || "0"} />
+          <Text
+            className="font-medium text-lg pb-2"
+            style={{ color: theme.textColor }}
+          >
+            Share your address
+          </Text>
+          <Input
+            placeholder={address || ""}
+            readOnly
+            style={{ backgroundColor: theme.textColor }}
+          />
+          <Button
+            buttonStyle="w-full rounded-lg my-4"
+            style={{
+              backgroundColor: address
+                ? theme.tabBarActiveTintColor
+                : theme.tabBarInactiveTintColor,
+            }}
+            onPress={copyToClipboard}
+          >
+            <Text
+              className="text-center font-semibold py-4"
+              style={{ color: colors.white }}
+            >
+              {address ? "Copy" : "There was a problem finding your address"}
+            </Text>
+          </Button>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

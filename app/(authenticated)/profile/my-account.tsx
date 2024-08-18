@@ -11,16 +11,54 @@ import { SubHeader } from "@/components/sub-header";
 import { colors } from "@/utils/theme";
 import { client } from "@/utils/dynamic-client.native";
 import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { ActivityIndicator } from "react-native";
 import { Loading } from "@/components/loading";
 import { supabase } from "@/utils/supabase";
+import Toast from "react-native-toast-message";
+import { Controller, useForm } from "react-hook-form";
+import { useReferral } from "@/hooks";
+
+interface FormData {
+  referralAddress: string;
+}
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
   const { auth, ui, sdk } = useReactiveClient(client);
   const [isLoading, setIsLoading] = useState(false);
-
+  const { data: referral } = useReferral(auth.authenticatedUser?.userId);
   if (!sdk.loaded) return <Loading />;
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      referralAddress: "",
+    },
+  });
+
+  const handleReferral = async (data: FormData) => {
+    const { error } = await supabase.from("Referrals").insert([
+      {
+        dynamic_id: auth.authenticatedUser?.userId ?? "",
+        to: data.referralAddress,
+        show: true,
+        is_waiting: true,
+        created_at: new Date().toISOString(),
+      },
+    ]);
+    if (error) {
+      console.log(error);
+      Toast.show({
+        text1: "Error submitting referral",
+        text2: "Please try again",
+        type: "error",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
+    }
+  };
 
   const exportKeys = () => {
     setIsLoading(true);
@@ -33,6 +71,7 @@ export default function MyAccount() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
+      <Toast />
       <View className="flex flex-row">
         <Header backArrow />
       </View>
@@ -78,6 +117,66 @@ export default function MyAccount() {
             </Button>
           </View> */}
           <Unlink />
+          <View className="py-4">
+            <SubHeader title="Referral" />
+            <Text
+              style={{ color: theme.mutedForegroundColor }}
+              className="font-light pb-2"
+            >
+              Did someone refer you? Enter their address here
+            </Text>
+            <Controller
+              control={control}
+              rules={{
+                pattern: {
+                  value: /^0x[a-fA-F0-9]{40}$/,
+                  message: "Invalid Ethereum address",
+                },
+              }}
+              render={({ field: { onChange, value } }) =>
+                !referral ? (
+                  <Input
+                    placeholder={"0x..."}
+                    style={{ backgroundColor: theme.textColor }}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                ) : (
+                  <Input
+                    placeholder={referral.to ?? ""}
+                    style={{ backgroundColor: theme.textColor }}
+                    readOnly
+                  />
+                )
+              }
+              name="referralAddress"
+            />
+            {errors.referralAddress && (
+              <Text style={{ color: "red" }}>
+                {errors.referralAddress.message}
+              </Text>
+            )}
+            {!referral && (
+              <Button
+                buttonStyle="w-full rounded-lg my-4"
+                style={{
+                  backgroundColor:
+                    !errors.referralAddress &&
+                    control._formValues.referralAddress
+                      ? theme.tabBarActiveTintColor
+                      : theme.tabBarInactiveTintColor,
+                }}
+                onPress={handleSubmit(handleReferral)}
+              >
+                <Text
+                  className="text-center font-semibold py-4"
+                  style={{ color: colors.white }}
+                >
+                  Submit
+                </Text>
+              </Button>
+            )}
+          </View>
         </View>
         <View>
           <SubHeader title="Delete Account" />

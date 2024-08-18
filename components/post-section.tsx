@@ -11,12 +11,17 @@ import { Instagram } from "react-content-loader/native";
 import { formatUSDC } from "@/utils/helpers";
 
 type PostSectionProps = {
-  selectedTab: string;
+  posts: Post[] | undefined;
+  isLoading: boolean;
+  isError: boolean;
 };
 
-export const PostSection = ({ selectedTab }: PostSectionProps) => {
+export const PostSection = ({
+  posts,
+  isLoading,
+  isError,
+}: PostSectionProps) => {
   const { theme } = useTheme();
-  const { data: posts, isLoading, isError } = usePosts(selectedTab);
 
   return (
     <View>
@@ -39,7 +44,10 @@ export const PostSection = ({ selectedTab }: PostSectionProps) => {
           />
         ))
       ) : (
-        <Text style={{ color: theme.textColor }}>
+        <Text
+          style={{ color: theme.textColor }}
+          className="text-center text-2xl pt-4"
+        >
           {isError ? "Error loading posts" : "No posts yet!"}
         </Text>
       )}

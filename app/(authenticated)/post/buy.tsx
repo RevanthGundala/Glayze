@@ -20,7 +20,13 @@ import { Header } from "@/components/header";
 import { Input } from "@/components/ui/input";
 import { ShareHeader } from "@/components/share-header";
 import { useLocalSearchParams } from "expo-router";
-import { useShares, useBalance, useBuyPrice, useAura } from "@/hooks";
+import {
+  useShares,
+  useBalance,
+  useBuyPrice,
+  useAura,
+  useReferral,
+} from "@/hooks";
 import { Loading } from "@/components/loading";
 import { ABI, ERC20_ABI } from "@/utils/constants";
 import { Address, encodeFunctionData } from "viem";
@@ -28,6 +34,8 @@ import { formatUSDC, insertTrade, parseUSDC } from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { fetchPublicClient } from "@/hooks/use-public-client";
 import { Controller, useForm } from "react-hook-form";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { client } from "@/utils/dynamic-client.native";
 
 export default function Buy() {
   const maxFontSize = 48;
@@ -35,6 +43,7 @@ export default function Buy() {
   const [amount, setAmount] = useState("0");
   const [isLoading, setIsLoading] = useState(false);
   const { id, name, symbol, image } = useLocalSearchParams();
+  const { auth } = useReactiveClient(client);
   const { smartAccountClient, error: smartAccountError } = useSmartAccount();
   const address = smartAccountClient?.account.address;
   type FormData = {
@@ -72,7 +81,7 @@ export default function Buy() {
     isError: auraError,
   } = useAura(address);
   const publicClient = fetchPublicClient();
-
+  const { data: referral } = useReferral(auth.authenticatedUser?.userId);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(true);
   const [hasSufficientAura, setHasSufficientAura] = useState(true);
@@ -205,6 +214,21 @@ export default function Buy() {
       const error = await insertTrade(txReceipt);
       if (error) throw error;
 
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/refer`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          dynamicId: auth.authenticatedUser?.userId,
+          from: address,
+          to: referral?.to,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit referral");
+      }
       // Now navigate to the success screen
       router.replace(
         `/(authenticated)/aux/success?isBuy=true&shares=${amount}&price=${formatUSDC(

@@ -1,4 +1,4 @@
-import { Text, View, SafeAreaView } from "react-native";
+import { Text, View, SafeAreaView, RefreshControl } from "react-native";
 import { TopBar } from "@/components/top-bar";
 import { FeedSelector } from "@/components/feed-selector";
 import { Animated } from "react-native";
@@ -8,6 +8,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { PostSection } from "@/components/post-section";
 import { useScrollToTop } from "@react-navigation/native";
 import { useRef, useEffect } from "react";
+import { usePost, usePosts } from "@/hooks";
 
 export default function Home() {
   const [selectedTab, setSelectedTab] = useState("Trending");
@@ -17,6 +18,14 @@ export default function Home() {
   const ref = useRef(null);
   useScrollToTop(ref);
   const { theme } = useTheme();
+  const [refreshing, setRefreshing] = useState(false);
+  const { data: posts, isLoading, isError, refetch } = usePosts(selectedTab);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
@@ -31,6 +40,13 @@ export default function Home() {
           { useNativeDriver: true }
         )}
         scrollEventThrottle={1}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={theme.textColor}
+          />
+        }
       >
         <TopBar />
         <FeedSelector
@@ -38,7 +54,7 @@ export default function Home() {
           selectedTab={selectedTab}
           setSelectedTab={setSelectedTab}
         />
-        <PostSection selectedTab={selectedTab} />
+        <PostSection posts={posts} isLoading={isLoading} isError={isError} />
       </Animated.ScrollView>
     </SafeAreaView>
   );
