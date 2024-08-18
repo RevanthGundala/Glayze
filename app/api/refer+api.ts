@@ -12,15 +12,27 @@ export async function POST(request: Request) {
     const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
     const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
     const chain = process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
+
+    const publicClient = createPublicClient({
+      chain,
+      transport: http(process.env.EXPO_PUBLIC_RPC_URL!),
+    });
+    const address = await publicClient.readContract({
+      address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
+      abi: ABI,
+      functionName: "usersReferred",
+      args: [to as Address],
+    });
+
+    if (address.toString() !== "0x0000000000000000000000000000000000000000") {
+      throw new Error("User already referred!");
+    }
+
     const account = privateKeyToAccount(
       process.env.PRIVATE_KEY as `0x${string}`
     );
     const walletClient = createWalletClient({
       account,
-      chain,
-      transport: http(process.env.EXPO_PUBLIC_RPC_URL!),
-    });
-    const publicClient = createPublicClient({
       chain,
       transport: http(process.env.EXPO_PUBLIC_RPC_URL!),
     });

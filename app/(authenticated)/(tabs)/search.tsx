@@ -72,7 +72,7 @@ const SearchScreen = () => {
       >
         <TouchableWithoutFeedback onPress={handleOutsideClick}>
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View>
+            <View className="mt-8">
               <SearchBar
                 ref={searchBarRef}
                 searchText={searchText}

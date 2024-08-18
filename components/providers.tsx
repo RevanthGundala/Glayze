@@ -7,6 +7,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { client } from "@/utils/dynamic-client.native";
 import { SmartAccountProvider } from "@/contexts/smart-account-context";
 import { PostHogProvider } from "@/components/posthog";
+import { SentryProvider } from "@/components/sentry";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient();
@@ -14,14 +15,16 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
     <>
       <client.reactNative.WebView />
       <PostHogProvider>
-        <ThemeProvider>
-          <QueryClientProvider client={queryClient}>
-            <SmartAccountProvider>
-              <StatusBar />
-              {children}
-            </SmartAccountProvider>
-          </QueryClientProvider>
-        </ThemeProvider>
+        <SentryProvider>
+          <ThemeProvider>
+            <QueryClientProvider client={queryClient}>
+              <SmartAccountProvider>
+                <StatusBar />
+                {children}
+              </SmartAccountProvider>
+            </QueryClientProvider>
+          </ThemeProvider>
+        </SentryProvider>
       </PostHogProvider>
     </>
   );

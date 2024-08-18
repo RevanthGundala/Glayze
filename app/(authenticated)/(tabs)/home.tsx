@@ -9,6 +9,7 @@ import { PostSection } from "@/components/post-section";
 import { useScrollToTop } from "@react-navigation/native";
 import { useRef, useEffect } from "react";
 import { usePost, usePosts } from "@/hooks";
+import { usePostHog } from "posthog-react-native";
 
 export default function Home() {
   const [selectedTab, setSelectedTab] = useState("Trending");
@@ -20,6 +21,11 @@ export default function Home() {
   const { theme } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const { data: posts, isLoading, isError, refetch } = usePosts(selectedTab);
+  const posthog = usePostHog();
+
+  useEffect(() => {
+    posthog.capture("MyComponent loaded", { foo: "bar" });
+  }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
