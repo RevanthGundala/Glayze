@@ -10,9 +10,12 @@ export async function POST(request: Request) {
     const requestData: RequestData = await request.json();
     console.log("Received data:", requestData);
 
+    console.log("Attempting to upload image to Pinata...");
     const imageIpfsHash = await uploadImageToPinata(requestData);
+    console.log("Image upload result:", imageIpfsHash);
 
-    if (!imageIpfsHash)
+    if (!imageIpfsHash) {
+      console.error("Failed to upload image");
       return Response.json(
         { error: "Failed to upload image" },
         {
@@ -20,13 +23,17 @@ export async function POST(request: Request) {
           headers: { "Content-Type": "application/json" },
         }
       );
+    }
 
+    console.log("Attempting to upload metadata to Pinata...");
     const metadataIpfsHash = await uploadMetadataToPinata(
       requestData,
       imageIpfsHash
     );
-    console.log(metadataIpfsHash);
-    if (!metadataIpfsHash)
+    console.log("Metadata upload result:", metadataIpfsHash);
+
+    if (!metadataIpfsHash) {
+      console.error("Failed to upload metadata");
       return Response.json(
         { error: "Failed to upload metadata" },
         {
@@ -34,6 +41,7 @@ export async function POST(request: Request) {
           headers: { "Content-Type": "application/json" },
         }
       );
+    }
 
     return Response.json(
       { metadataIpfsHash, imageIpfsHash },
@@ -59,22 +67,28 @@ async function uploadImageToPinata({
   postId,
 }: RequestData): Promise<string | null> {
   try {
+    console.log("Starting uploadImageToPinata");
     const JWT = process.env.PINATA_JWT!;
+    console.log("JWT available:", !!JWT);
     let buffer;
 
     if (image.startsWith("https://")) {
+      console.log("Fetching image from URL");
       const urlStream = await fetch(image);
       buffer = await urlStream.arrayBuffer();
     } else {
+      console.log("Processing base64 image");
       const base64Data = image.split(",")[1];
       buffer = Buffer.from(base64Data, "base64");
     }
 
+    console.log("Creating Blob and File");
     const blob = new Blob([buffer]);
     const file = new File([blob], "file");
     const formData = new FormData();
     formData.append("file", file, `Image for ${postId}`);
 
+    console.log("Sending request to Pinata");
     const res = await fetch(`https://api.pinata.cloud/pinning/pinFileToIPFS`, {
       method: "POST",
       headers: {
@@ -83,8 +97,11 @@ async function uploadImageToPinata({
       body: formData,
     });
 
-    const { IpfsHash } = await res.json();
-    return IpfsHash;
+    console.log("Pinata response status:", res.status);
+    const data = await res.json();
+    console.log("Pinata response data:", data);
+
+    return data.IpfsHash;
   } catch (e) {
     console.error(e);
     return null;
