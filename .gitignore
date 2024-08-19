@@ -57,3 +57,6 @@ yarn-error.*
 expo-env.d.ts
 # @end expo-cli
 .env.local
+
+/android
+/ios
