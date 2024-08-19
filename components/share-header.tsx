@@ -28,7 +28,7 @@ export const ShareHeader: React.FC<ShareHeaderProps> = ({
       </View>
       <View>
         <Text className="text-sm" style={{ color: theme.textColor }}>
-          {symbol || "$N/A"}
+          ${symbol || "$N/A"}
         </Text>
         <Text style={{ color: theme.mutedForegroundColor }}>
           {name || "N/A"}

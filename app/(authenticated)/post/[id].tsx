@@ -47,8 +47,8 @@ export default function Post() {
     shares?.value
   );
 
-  console.log("position: ", position);
   const navigation = useNavigation();
+  const image = `${process.env.EXPO_PUBLIC_IPFS_GATEWAY}/ipfs/${post?.image_uri}`;
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -72,11 +72,7 @@ export default function Post() {
     >
       <View className="flex flex-row justify-between items-center w-full">
         <Header backArrow />
-        <ShareHeader
-          name={post?.name}
-          symbol={post?.symbol}
-          image={post?.image_uri}
-        />
+        <ShareHeader name={post?.name} symbol={post?.symbol} image={image} />
         <View className="px-6 py-4">
           {/* <Image
             source={require("@/assets/images/share.png")}
