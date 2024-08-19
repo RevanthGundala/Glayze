@@ -1,5 +1,4 @@
 export { usePost } from "./use-post";
-export { useAlerts } from "./use-alerts";
 export { usePosts } from "./use-posts";
 export { useHomeScrollY } from "./use-home-scroll-y";
 export { usePosition } from "./use-position";

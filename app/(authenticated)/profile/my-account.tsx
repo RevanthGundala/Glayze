@@ -16,6 +16,7 @@ import { supabase } from "@/utils/supabase";
 import Toast from "react-native-toast-message";
 import { Controller, useForm } from "react-hook-form";
 import { useReferral } from "@/hooks";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 interface FormData {
   referralAddress: string;
@@ -25,7 +26,9 @@ export default function MyAccount() {
   const { theme, themeName } = useTheme();
   const { auth, ui, sdk } = useReactiveClient(client);
   const [isLoading, setIsLoading] = useState(false);
-  const { data: referral } = useReferral(auth.authenticatedUser?.userId);
+  const { smartAccountClient, error: smartAccountError } = useSmartAccount();
+  const address = smartAccountClient?.account.address;
+  const { data: referrals } = useReferral(address);
   if (!sdk.loaded) return <Loading />;
 
   const {
@@ -41,10 +44,10 @@ export default function MyAccount() {
   const handleReferral = async (data: FormData) => {
     const { error } = await supabase.from("Referrals").insert([
       {
-        dynamic_id: auth.authenticatedUser?.userId ?? "",
-        to: data.referralAddress,
+        referrer: data.referralAddress,
+        referee: address,
         show: true,
-        is_waiting: true,
+        pending: true,
         created_at: new Date().toISOString(),
       },
     ]);
@@ -134,7 +137,7 @@ export default function MyAccount() {
                 },
               }}
               render={({ field: { onChange, value } }) =>
-                !referral ? (
+                !referrals ? (
                   <Input
                     placeholder={"0x..."}
                     style={{ backgroundColor: theme.textColor }}
@@ -142,11 +145,7 @@ export default function MyAccount() {
                     value={value}
                   />
                 ) : (
-                  <Input
-                    placeholder={referral.to ?? ""}
-                    style={{ backgroundColor: theme.textColor }}
-                    readOnly
-                  />
+                  <></> //TODO: get the address that this person was referred by
                 )
               }
               name="referralAddress"
@@ -156,7 +155,7 @@ export default function MyAccount() {
                 {errors.referralAddress.message}
               </Text>
             )}
-            {!referral && (
+            {!referrals && (
               <Button
                 buttonStyle="w-full rounded-lg my-4"
                 style={{

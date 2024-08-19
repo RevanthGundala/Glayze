@@ -9,15 +9,17 @@ import {
 import { supabase } from "@/utils/supabase";
 import { useTheme } from "@/contexts/theme-context";
 import { Loading } from "@/components/loading";
-import { useAlerts } from "@/hooks";
-import { useSmartAccount } from "@/contexts/smart-account-context";
+import { useReferral } from "@/hooks";
 import Toast from "react-native-toast-message";
 import { useState } from "react";
+import { useReactiveClient } from "@dynamic-labs/react-hooks";
+import { client } from "@/utils/dynamic-client.native";
+import { useSmartAccount } from "@/contexts/smart-account-context";
 
 export default function Alerts() {
-  const { smartAccountClient } = useSmartAccount();
+  const { smartAccountClient, error: smartAccountError } = useSmartAccount();
   const address = smartAccountClient?.account.address;
-  const { data: alerts, isLoading, isError, refetch } = useAlerts(address);
+  const { data: alerts, isLoading, isError, refetch } = useReferral(address);
   const { theme } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -31,11 +33,16 @@ export default function Alerts() {
     return <Loading error={isError ? "Error loading profile" : null} />;
   }
 
-  const clearAlert = async (id: string) => {
+  const clearAlert = async (
+    referee: string | null | undefined,
+    referrer: string | null | undefined
+  ) => {
+    if (!referee || !referrer) throw new Error("No referee or referrer found");
     const { error } = await supabase
       .from("Referrals")
       .update({ show: false })
-      .eq("dynamic_id", id);
+      .eq("referee", referee)
+      .eq("referrer", referrer);
     refetch();
     if (error) {
       console.error("Error clearing alert", error);
@@ -98,9 +105,9 @@ export default function Alerts() {
 
         {alerts && alerts.length > 0 ? (
           <View className="mt-8 px-4">
-            {alerts.map((alert) => (
+            {alerts.map((alert, i) => (
               <View
-                key={alert.dynamic_id}
+                key={i}
                 className="rounded-lg p-4 mb-4 flex-row justify-between items-center border"
                 style={{
                   backgroundColor: theme.backgroundColor,
@@ -111,11 +118,13 @@ export default function Alerts() {
                   className="flex-1 mr-2"
                   style={{ color: theme.textColor }}
                 >
-                  {alert.is_waiting
-                    ? `${alert.to} made a transaction!`
-                    : `Waiting for ${alert.to} to make a transaction`}
+                  {alert.pending
+                    ? `${alert.referee} made a transaction!`
+                    : `Waiting for ${alert.referee} to make a transaction`}
                 </Text>
-                <TouchableOpacity onPress={() => clearAlert(alert.dynamic_id)}>
+                <TouchableOpacity
+                  onPress={() => clearAlert(alert.referrer, alert.referee)}
+                >
                   <Text style={{ color: theme.textColor }}>X</Text>
                 </TouchableOpacity>
               </View>

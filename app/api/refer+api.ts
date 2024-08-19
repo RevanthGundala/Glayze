@@ -7,7 +7,7 @@ import { Address } from "viem";
 
 export async function POST(request: Request) {
   try {
-    const { dynamicId, from, to } = await request.json();
+    const { referrer, referee } = await request.json();
     const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
     const supabase = createClient(supabaseUrl!, supabaseAnonKey!);
@@ -21,11 +21,11 @@ export async function POST(request: Request) {
       address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
       abi: ABI,
       functionName: "usersReferred",
-      args: [to as Address],
+      args: [referee as Address],
     });
 
     if (address.toString() !== "0x0000000000000000000000000000000000000000") {
-      throw new Error("User already referred!");
+      return Response.json({ message: "User already referred!" });
     }
 
     const account = privateKeyToAccount(
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
       abi: ABI,
       functionName: "refer",
-      args: [to as Address, from as Address],
+      args: [referee as Address, referrer as Address],
     });
     console.log("✅ Referral Transaction successfully sponsored!");
     console.log(
@@ -54,9 +54,10 @@ export async function POST(request: Request) {
     const { error } = await supabase
       .from("Referrals")
       .update({
-        is_waiting: false,
+        pending: false,
       })
-      .eq("dynamic_id", dynamicId);
+      .eq("referrer", referrer)
+      .eq("referee", referee);
     console.log("✅ Referral updated in Supabase!");
     if (error) {
       throw new Error("Failed to update post in Supabase.");

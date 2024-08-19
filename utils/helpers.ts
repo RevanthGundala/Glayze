@@ -118,6 +118,23 @@ export const formatToMaxLength = (value: string, maxLength: number) => {
   return value.slice(0, maxLength);
 };
 
+export const getUser = async (dynamicId: string | undefined | null) => {
+  try {
+    if (!dynamicId) throw new Error("No dynamic id");
+    const { data, error } = await supabase
+      .from("Users")
+      .select("*")
+      .eq("dynamic_id", dynamicId);
+    if (error || !data) {
+      throw new Error(`Error fetching creator: ${error?.message}`);
+    }
+    return data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 type CreateUserOptions = {
   xUserId?: string | undefined | null;
   address?: string | undefined | null;

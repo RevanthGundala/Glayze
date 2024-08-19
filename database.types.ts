@@ -54,24 +54,24 @@ export type Database = {
       Referrals: {
         Row: {
           created_at: string
-          dynamic_id: string
-          is_waiting: boolean | null
+          pending: boolean | null
+          referee: string | null
+          referrer: string | null
           show: boolean | null
-          to: string | null
         }
         Insert: {
           created_at?: string
-          dynamic_id: string
-          is_waiting?: boolean | null
+          pending?: boolean | null
+          referee?: string | null
+          referrer?: string | null
           show?: boolean | null
-          to?: string | null
         }
         Update: {
           created_at?: string
-          dynamic_id?: string
-          is_waiting?: boolean | null
+          pending?: boolean | null
+          referee?: string | null
+          referrer?: string | null
           show?: boolean | null
-          to?: string | null
         }
         Relationships: []
       }

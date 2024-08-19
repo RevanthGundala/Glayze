@@ -30,7 +30,7 @@ import {
 import { Loading } from "@/components/loading";
 import { ABI, ERC20_ABI } from "@/utils/constants";
 import { Address, encodeFunctionData } from "viem";
-import { formatUSDC, insertTrade, parseUSDC } from "@/utils/helpers";
+import { formatUSDC, getUser, insertTrade, parseUSDC } from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { fetchPublicClient } from "@/hooks/use-public-client";
 import { Controller, useForm } from "react-hook-form";
@@ -46,6 +46,7 @@ export default function Buy() {
   const { auth } = useReactiveClient(client);
   const { smartAccountClient, error: smartAccountError } = useSmartAccount();
   const address = smartAccountClient?.account.address;
+  const { data: referrals } = useReferral(address);
   type FormData = {
     auraAmount: string;
   };
@@ -81,7 +82,6 @@ export default function Buy() {
     isError: auraError,
   } = useAura(address);
   const publicClient = fetchPublicClient();
-  const { data: referral } = useReferral(auth.authenticatedUser?.userId);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [hasSufficientBalance, setHasSufficientBalance] = useState(true);
   const [hasSufficientAura, setHasSufficientAura] = useState(true);
@@ -214,15 +214,19 @@ export default function Buy() {
       const error = await insertTrade(txReceipt);
       if (error) throw error;
 
+      // TODO: switch back to from address and to address
+      // const toId = auth.authenticatedUser?.userId;
+      // const user = await getUser(fromId);
+      // if(!user) throw new Error("User not found");
+
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/refer`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          dynamicId: auth.authenticatedUser?.userId,
-          from: address,
-          to: referral?.to,
+          referrer: referrals?.find((r) => r.referee === address)?.referrer,
+          referee: address,
         }),
       });
 

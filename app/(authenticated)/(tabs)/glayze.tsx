@@ -91,35 +91,36 @@ export default function Glayze() {
     postId: string,
     url: string
   ) => {
-    let image: string;
+    let image: string | null = null;
     let realCreator: Address | null = null;
-    try {
-      const tweetData = await fetchTweet(url);
-      if (
-        !tweetData ||
-        !tweetData.user ||
-        !tweetData.user.profile_image_url_https
-      )
-        throw new Error("Failed to fetch tweet data or profile image.");
+    // try {
+    //   const tweetData = await fetchTweet(url);
+    //   if (
+    //     !tweetData ||
+    //     !tweetData.user ||
+    //     !tweetData.user.profile_image_url_https
+    //   )
+    //     throw new Error("Failed to fetch tweet data or profile image.");
 
-      if (tweetData.mediaDetails?.length && tweetData.mediaDetails.length > 0) {
-        console.log("Media details found:", tweetData.mediaDetails);
-        image = tweetData.mediaDetails[0].media_url_https;
-      } else {
-        console.log("No media details found.");
-        image = tweetData.user.profile_image_url_https;
-      }
-      console.log("id: ", tweetData.user.id_str);
-      realCreator = await fetchRealCreator(tweetData.user.id_str);
-      console.log("Real creator:", realCreator);
-    } catch (fetchError) {
-      console.error("Error fetching tweet:", fetchError);
-      throw new Error(
-        "Failed to fetch tweet data. Please check your network connection and try again."
-      );
-    }
+    //   if (tweetData.mediaDetails?.length && tweetData.mediaDetails.length > 0) {
+    //     console.log("Media details found:", tweetData.mediaDetails);
+    //     image = tweetData.mediaDetails[0].media_url_https;
+    //   } else {
+    //     console.log("No media details found.");
+    //     image = tweetData.user.profile_image_url_https;
+    //   }
+    //   console.log("id: ", tweetData.user.id_str);
+    //   realCreator = await fetchRealCreator(tweetData.user.id_str);
+    //   console.log("Real creator:", realCreator);
+    // } catch (fetchError) {
+    //   console.error("Error fetching tweet:", fetchError);
+    //   throw new Error(
+    //     "Failed to fetch tweet data. Please check your network connection and try again."
+    //   );
+    // }
 
     try {
+      console.log("Starting IPFS upload...");
       const response = await fetch(
         `${process.env.EXPO_PUBLIC_API_URL}/api/ipfs`,
         {
@@ -138,12 +139,7 @@ export default function Glayze() {
       );
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        throw new Error(
-          `Failed to upload metadata to IPFS: ${
-            errorData ? JSON.stringify(errorData) : response.statusText
-          }`
-        );
+        throw new Error("Failed to upload metadata to IPFS.");
       }
 
       const { metadataIpfsHash, imageIpfsHash } = await response.json();
