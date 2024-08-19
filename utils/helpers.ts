@@ -135,6 +135,19 @@ export const getUser = async (dynamicId: string | undefined | null) => {
   }
 };
 
+export const getPostIdFromUrl = (url: string): string | null => {
+  // Regular expression to match the numeric post ID
+  const postIdRegex = /\/status\/(\d+)/;
+  const match = url.match(postIdRegex);
+
+  if (match && match[1]) {
+    return match[1];
+  }
+
+  // If no match found, return null or handle the error as needed
+  return null;
+};
+
 type CreateUserOptions = {
   xUserId?: string | undefined | null;
   address?: string | undefined | null;

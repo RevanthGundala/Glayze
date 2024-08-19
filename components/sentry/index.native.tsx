@@ -9,25 +9,24 @@ export function SentryProvider({ children }: { children: React.ReactNode }) {
   const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
   Sentry.init({
     dsn: "https://af160e085b436e19389700973c316969@o4507799692705792.ingest.us.sentry.io/4507799692902400",
-    //debug: true,
-    // integrations: [
-    //   new Sentry.ReactNativeTracing({
-    //     // Pass instrumentation to be used as `routingInstrumentation`
-    //     routingInstrumentation,
-    //     enableNativeFramesTracking: !isRunningInExpoGo(),
-    //     // ...
-    //   }),
-    // ],
+    integrations: [
+      new Sentry.ReactNativeTracing({
+        // Pass instrumentation to be used as `routingInstrumentation`
+        routingInstrumentation,
+        enableNativeFramesTracking: !isRunningInExpoGo(),
+        // ...
+      }),
+    ],
   });
 
   const posthog = usePostHog();
   const ref = useNavigationContainerRef();
 
-  //   useEffect(() => {
-  //     if (ref) {
-  //       routingInstrumentation.registerNavigationContainer(ref);
-  //     }
-  //   }, [ref]);
+  useEffect(() => {
+    if (ref) {
+      routingInstrumentation.registerNavigationContainer(ref);
+    }
+  }, [ref]);
 
   return (
     <ErrorBoundary

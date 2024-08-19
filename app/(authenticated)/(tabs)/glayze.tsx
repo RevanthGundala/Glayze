@@ -37,10 +37,15 @@ import { client } from "@/utils/dynamic-client.native";
 import { baseSepolia, base } from "viem/chains";
 import { fetchPublicClient, usePublicClient } from "@/hooks/use-public-client";
 import { useConstants } from "@/hooks/use-constants";
-import { formatToMaxLength, formatUSDC } from "@/utils/helpers";
+import {
+  formatToMaxLength,
+  formatUSDC,
+  getPostIdFromUrl,
+} from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { Loading } from "@/components/loading";
 import { fetchRealCreator } from "@/hooks/use-real-creator";
+import { AppState, AppStateStatus } from "react-native";
 
 interface FormInput {
   name: string;
@@ -78,6 +83,31 @@ export default function Glayze() {
       url: "",
     },
   });
+
+  const [isJSReady, setIsJSReady] = useState(false);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+
+    // Set a timeout to ensure JS is ready
+    const timer = setTimeout(() => {
+      setIsJSReady(true);
+    }, 1000); // Adjust this delay if needed
+
+    return () => {
+      subscription.remove();
+      clearTimeout(timer);
+    };
+  }, []);
+
+  const handleAppStateChange = (nextAppState: AppStateStatus) => {
+    if (nextAppState === "active") {
+      setIsJSReady(true);
+    }
+  };
 
   useEffect(() => {
     setHasSufficientBalance(
@@ -171,7 +201,7 @@ export default function Glayze() {
       if (!name || !symbol || !url) {
         throw new Error("Name, symbol, or url is not provided.");
       }
-      const postId = url.split("/").pop();
+      const postId = getPostIdFromUrl(url);
       if (!postId) {
         throw new Error("Token ID not found in the URL.");
       }
@@ -268,7 +298,7 @@ export default function Glayze() {
     }
   };
 
-  if (smartAccountLoading || balanceLoading || constantsLoading)
+  if (smartAccountLoading || balanceLoading || constantsLoading || !isJSReady)
     return <Loading />;
 
   return (

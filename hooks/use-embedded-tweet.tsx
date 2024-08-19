@@ -1,3 +1,4 @@
+import { getPostIdFromUrl } from "@/utils/helpers";
 import { useQuery } from "@tanstack/react-query";
 import type { EnrichedTweet } from "react-tweet";
 
@@ -6,7 +7,7 @@ export const fetchTweet = async (
 ): Promise<EnrichedTweet | null> => {
   try {
     if (!url) return null;
-    const id = url.split("/").pop();
+    const id = getPostIdFromUrl(url);
     if (!id) return null;
     const response = await fetch(
       `${process.env.EXPO_PUBLIC_API_URL}/api/twitter/tweet/${id}`
