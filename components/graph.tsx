@@ -107,10 +107,7 @@ export const Graph = ({ price }: GraphProps) => {
               tickCount: 5,
               labelColor: theme.textColor,
               lineColor: {
-                grid: {
-                  x: 0,
-                  y: theme.mutedForegroundColor,
-                },
+                grid: theme.mutedForegroundColor,
                 frame: theme.secondaryTextColor,
               },
               formatYLabel: (num) => `$${num ? num.toFixed(2) : "..."}`,
