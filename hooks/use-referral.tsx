@@ -10,7 +10,8 @@ export const fetchReferral = async (
     const { data, error } = await supabase
       .from("Referrals")
       .select("*")
-      .eq("referee", referee);
+      .eq("referee", referee)
+      .eq("show", true);
     if (error || !data) {
       throw new Error(`Error fetching creator: ${error?.message}`);
     }

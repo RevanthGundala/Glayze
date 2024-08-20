@@ -34,8 +34,6 @@ import { formatUSDC, getUser, insertTrade, parseUSDC } from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { fetchPublicClient } from "@/hooks/use-public-client";
 import { Controller, useForm } from "react-hook-form";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client.native";
 
 export default function Buy() {
   const maxFontSize = 48;
@@ -43,7 +41,6 @@ export default function Buy() {
   const [amount, setAmount] = useState("0");
   const [isLoading, setIsLoading] = useState(false);
   const { id, name, symbol, image } = useLocalSearchParams();
-  const { auth } = useReactiveClient(client);
   const { smartAccountClient, error: smartAccountError } = useSmartAccount();
   const address = smartAccountClient?.account.address;
   const { data: referrals } = useReferral(address);
@@ -160,6 +157,7 @@ export default function Buy() {
   const clearAmount = () => setAmount("0");
 
   const handleBuy = async (formData: FormData) => {
+    let txSuccess = false;
     try {
       if (!publicClient) throw new Error("No public client found.");
       if (!buyPriceData) throw new Error("Buy price data not available");
@@ -210,28 +208,30 @@ export default function Buy() {
       });
 
       if (!txReceipt) throw new Error("Transaction receipt is undefined");
+      txSuccess = true;
 
       const error = await insertTrade(txReceipt);
       if (error) throw error;
 
-      // TODO: switch back to from address and to address
-      // const toId = auth.authenticatedUser?.userId;
-      // const user = await getUser(fromId);
-      // if(!user) throw new Error("User not found");
+      const referrer = referrals?.find((r) => r.referee === address)?.referrer;
+      if (referrer) {
+        const response = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/refer`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              referrer,
+              referee: address,
+            }),
+          }
+        );
 
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/refer`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          referrer: referrals?.find((r) => r.referee === address)?.referrer,
-          referee: address,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit referral");
+        if (!response.ok) {
+          throw new Error("Failed to submit referral");
+        }
       }
       // Now navigate to the success screen
       router.replace(
@@ -247,7 +247,9 @@ export default function Buy() {
 
       // Wait a bit before navigating to the error screen
       setTimeout(() => {
-        router.replace("/(authenticated)/aux/error" as Href<string>);
+        router.replace(
+          `/(authenticated)/aux/error?success=${txSuccess}` as Href<string>
+        );
       }, 500);
     } finally {
       // Reset loading state

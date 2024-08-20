@@ -149,6 +149,7 @@ export default function Sell() {
   const clearAmount = () => setAmount("0");
 
   const handleSell = async (formData: FormData) => {
+    let txSuccess = false;
     try {
       if (!publicClient) throw new Error("No public client found.");
       if (!sellPriceData) throw new Error("Sell price data not available");
@@ -199,7 +200,7 @@ export default function Sell() {
       });
 
       if (!txReceipt) throw new Error("Transaction receipt is undefined");
-
+      txSuccess = true;
       const error = await insertTrade(txReceipt);
       if (error) throw error;
 
@@ -217,7 +218,9 @@ export default function Sell() {
 
       // Wait a bit before navigating to the error screen
       setTimeout(() => {
-        router.replace("/(authenticated)/aux/error" as Href<string>);
+        router.replace(
+          `/(authenticated)/aux/error?success=${txSuccess}` as Href<string>
+        );
       }, 500);
     } finally {
       // Reset loading state

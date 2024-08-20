@@ -39,6 +39,7 @@ import { SmartAccountClient } from "permissionless";
 import { EntryPoint } from "permissionless/types/entrypoint";
 import { SmartAccount } from "permissionless/accounts";
 import { fetchPublicClient } from "@/hooks/use-public-client";
+import { GlayzeToast } from "@/components/ui/glayze-toast";
 
 export default function Wallet() {
   const { theme } = useTheme();
@@ -159,6 +160,7 @@ export default function Wallet() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
+      <GlayzeToast />
       <SectionList
         className="p-6"
         contentContainerStyle={{
@@ -334,7 +336,6 @@ function SendReceiveButtons({
 
   return (
     <>
-      <Toast />
       <View className="flex flex-row justify-center items-end space-x-12 mt-4">
         <TouchableOpacity onPress={() => setSendModalVisible(true)}>
           <View className="flex flex-col items-center">

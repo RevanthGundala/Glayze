@@ -118,13 +118,13 @@ export const formatToMaxLength = (value: string, maxLength: number) => {
   return value.slice(0, maxLength);
 };
 
-export const getUser = async (dynamicId: string | undefined | null) => {
+export const getUser = async (privyId: string | undefined | null) => {
   try {
-    if (!dynamicId) throw new Error("No dynamic id");
+    if (!privyId) throw new Error("No dynamic id");
     const { data, error } = await supabase
       .from("Users")
       .select("*")
-      .eq("dynamic_id", dynamicId);
+      .eq("privy_id", privyId);
     if (error || !data) {
       throw new Error(`Error fetching creator: ${error?.message}`);
     }
@@ -155,14 +155,14 @@ type CreateUserOptions = {
 };
 
 export const upsertUser = async (
-  dynamicId: string | undefined | null,
+  privyId: string | undefined | null,
   options?: CreateUserOptions
-): Promise<void> => {
+) => {
   try {
-    if (!dynamicId) throw new Error("No dynamic id");
+    if (!privyId) throw new Error("No dynamic id");
 
     const upsertData: any = {
-      dynamic_id: dynamicId,
+      privy_id: privyId,
       created_at: new Date().toISOString(),
     };
 
@@ -179,20 +179,20 @@ export const upsertUser = async (
     }
 
     const { error } = await supabase.from("Users").upsert(upsertData);
-    if (error) throw error;
+    return error ? error : null;
   } catch (error) {
     console.log(error);
     throw error;
   }
 };
 
-export const deleteUser = async (dynamicId: string | undefined | null) => {
+export const deleteUser = async (privyId: string | undefined | null) => {
   try {
-    if (!dynamicId) throw new Error("No dynamic id");
+    if (!privyId) throw new Error("No dynamic id");
     const { error } = await supabase
       .from("Users")
       .delete()
-      .eq("dynamic_id", dynamicId);
+      .eq("privy_id", privyId);
     if (error) throw error;
   } catch (error) {
     console.log(error);
@@ -201,14 +201,14 @@ export const deleteUser = async (dynamicId: string | undefined | null) => {
 };
 
 export const addToSearchHistory = async (
-  dynamicId: string | undefined | null,
+  privyId: string | undefined | null,
   content: string
 ) => {
   try {
-    if (!dynamicId) throw new Error("No dynamic id");
+    if (!privyId) throw new Error("No dynamic id");
     const { error } = await supabase.from("Search").insert([
       {
-        dynamic_id: dynamicId,
+        privy_id: privyId,
         content,
       },
     ]);
@@ -220,14 +220,14 @@ export const addToSearchHistory = async (
 };
 
 export const deleteSearchHistory = async (
-  dynamicId: string | undefined | null
+  privyId: string | undefined | null
 ) => {
   try {
-    if (!dynamicId) throw new Error("No dynamic id");
+    if (!privyId) throw new Error("No dynamic id");
     const { error } = await supabase
       .from("Search")
       .delete()
-      .eq("dynamic_id", dynamicId);
+      .eq("privy_id", privyId);
     if (error) throw new Error("Error clearing all alerts");
   } catch (error) {
     console.log(error);

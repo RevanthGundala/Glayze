@@ -13,11 +13,10 @@ import { share } from "@/utils/helpers";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { Header } from "@/components/header";
-import { client } from "@/utils/dynamic-client.native";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import Toast from "react-native-toast-message";
 import * as Clipboard from "expo-clipboard";
 import { useSmartAccount } from "@/contexts/smart-account-context";
+import { GlayzeToast } from "@/components/ui/glayze-toast";
 
 export default function Refer() {
   const { smartAccountClient } = useSmartAccount();
@@ -71,6 +70,7 @@ export default function Refer() {
           />
         }
       >
+        <GlayzeToast />
         <View className="flex flex-row">
           <Header backArrow />
         </View>

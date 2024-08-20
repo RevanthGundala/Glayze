@@ -6,57 +6,63 @@ import { Link } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
-import { client } from "@/utils/dynamic-client.native";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { Loading } from "@/components/loading";
 import { upsertUser } from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
+import { useLinkWithOAuth, usePrivy } from "@privy-io/expo";
+import Toast from "react-native-toast-message";
+import { GlayzeToast } from "@/components/ui/glayze-toast";
 
 export default function ConnectToTwitter() {
   const router = useRouter();
   const { theme } = useTheme();
   const { smartAccountClient } = useSmartAccount();
   const address = smartAccountClient?.account.address;
-  const { sdk, auth } = useReactiveClient(client);
-  const pathname = usePathname();
+  const { user } = usePrivy();
 
-  if (!sdk.loaded) return <Loading />;
-
-  const completeUserFlow = async () => {
+  const handleUpsert = async (xUserId: string | null) => {
     try {
-      const xUserId =
-        auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthAccountId?.toString();
-      await upsertUser(auth.authenticatedUser?.userId, {
+      const error = await upsertUser(user?.id, {
         xUserId,
         address,
         referralCode: address,
       });
+      console.log(error);
+      if (error) throw error;
       router.push("/end");
     } catch (error) {
       console.log(error);
+      Toast.show({
+        text1: "Error",
+        text2: "Please try again",
+        type: "error",
+      });
     }
   };
 
-  const handleConnect = async () => {
-    try {
-      await auth.social.connect({
-        provider: "twitter",
-        redirectPathname: pathname,
-      });
-      if (auth.authenticatedUser?.verifiedCredentials) {
-        await completeUserFlow();
-      } else {
-        throw new Error("No verified credentials found.");
-      }
-    } catch (error) {
+  const { link } = useLinkWithOAuth({
+    onSuccess(user) {
+      const xAccount = user?.linked_accounts?.find(
+        (acc) => acc.type === "twitter_oauth"
+      );
+      if (!xAccount) throw new Error("No X account found");
+      handleUpsert(xAccount.subject);
+    },
+    onError(error) {
       console.log(error);
-    }
-  };
+      Toast.show({
+        text1: "Error Connecting to X",
+        text2: "Please try again",
+        type: "error",
+      });
+    },
+  });
+
   return (
     <SafeAreaView
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
+      <GlayzeToast />
       {/* <View className="flex flex-row">
         <Header backArrow />
       </View> */}
@@ -71,14 +77,14 @@ export default function ConnectToTwitter() {
           className="w-[300px] text-center text-lg"
           style={{ color: theme.mutedForegroundColor }}
         >
-          When people post your tweets, you are eligible to claim trading fees
+          When people post your X posts, you are eligible to claim trading fees
         </Text>
         <View className="py-8 space-y-4">
           <Button
             buttonStyle={
               "flex flex-row justify-center items-center rounded-full"
             }
-            onPress={handleConnect}
+            onPress={() => link({ provider: "twitter" })}
             style={{
               backgroundColor: theme.tabBarActiveTintColor,
               borderColor: theme.tabBarActiveTintColor,
@@ -91,7 +97,7 @@ export default function ConnectToTwitter() {
               Connect to X
             </Text>
           </Button>
-          <Button onPress={completeUserFlow}>
+          <Button onPress={async () => await handleUpsert(null)}>
             <Text
               className="text-center text-lg pt-4"
               style={{ color: theme.mutedForegroundColor }}

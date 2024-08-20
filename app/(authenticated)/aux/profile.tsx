@@ -10,8 +10,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { GLAYZE_TWITTER, GLAYZE_DISCORD } from "@/utils/constants";
 import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client.native";
+import { usePrivy } from "@privy-io/expo";
 
 const routes: Route[] = [
   {
@@ -30,15 +29,13 @@ const routes: Route[] = [
 
 export default function Profile() {
   const { theme, themeName } = useTheme();
-  const { auth } = useReactiveClient(client);
-  console.log(JSON.stringify(auth.authenticatedUser, null, 2));
-  const name =
-    auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthDisplayName ??
-    "Anon";
-  const handle =
-    auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthUsername ?? "Anon";
-  const image =
-    auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0];
+  const { user } = usePrivy();
+  const xAccount = user?.linked_accounts?.find(
+    (acc) => acc.type === "twitter_oauth"
+  );
+  const name = xAccount?.name ?? "Anon";
+  const handle = xAccount?.username ?? "Anon";
+  const image = xAccount?.profile_picture_url ?? "";
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
@@ -91,11 +88,11 @@ const LogOut = () => {
   const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
-  const { auth } = useReactiveClient(client);
+  const { logout } = usePrivy();
 
   const handleLogOut = async () => {
     setModalVisible(false);
-    await auth.logout();
+    await logout();
     router.replace("/");
   };
 

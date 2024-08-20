@@ -15,29 +15,26 @@ import { colors } from "@/utils/theme";
 import { Header } from "@/components/header";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { client } from "@/utils/dynamic-client.native";
 import Toast from "react-native-toast-message";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { Loading } from "@/components/loading";
 import { useTheme } from "@/contexts/theme-context";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { useLoginWithEmail } from "@privy-io/expo";
+import { GlayzeToast } from "@/components/ui/glayze-toast";
 
 export default function ConfirmEmail() {
   const router = useRouter();
   const { email } = useLocalSearchParams();
   const [code, setCode] = useState("");
   const { theme } = useTheme();
-  const { sdk, auth } = useReactiveClient(client);
-
-  if (!sdk.loaded) return <Loading />;
-
-  const handleConfirmCode = async () => {
-    try {
-      await auth.email.verifyOTP(code);
-      auth.authenticatedUser?.newUser
+  const { loginWithCode } = useLoginWithEmail({
+    onLoginSuccess(user, isNewUser) {
+      console.log(user, isNewUser);
+      isNewUser
         ? router.push("/connect-to-twitter")
         : router.push("/(authenticated)/(tabs)/home");
-    } catch (error) {
+    },
+    onError(error) {
       console.log(error);
       Toast.show({
         text1: "Error verifying code",
@@ -45,15 +42,15 @@ export default function ConfirmEmail() {
         type: "error",
         autoHide: true,
       });
-    }
-  };
+    },
+  });
 
   return (
     <SafeAreaView
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <Toast />
+      <GlayzeToast />
       <View className="flex flex-row">
         <Header backArrow />
       </View>
@@ -101,7 +98,9 @@ export default function ConfirmEmail() {
                         ? theme.tabBarActiveTintColor
                         : theme.tabBarInactiveTintColor,
                   }}
-                  onPress={handleConfirmCode}
+                  onPress={() =>
+                    loginWithCode({ code, email: email as string })
+                  }
                 >
                   <Text
                     className="text-center font-semibold"

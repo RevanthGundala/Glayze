@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "glayze-app",
+    "name": "Glayze",
     "slug": "glayze-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -15,10 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.glayze",
-      "associatedDomains": [
-        "applinks:glayze.app",
-        "webcredentials:glayze.app"
-      ],
+      "associatedDomains": ["applinks:glayze.app", "webcredentials:glayze.app"],
       "infoPlist": {
         "NSFaceIDUsageDescription": "Allow Glayze to use Face ID."
       }

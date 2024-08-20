@@ -18,12 +18,13 @@ export const ShareHeader: React.FC<ShareHeaderProps> = ({
   return (
     <View className="flex-row items-center">
       <View
-        className="border rounded-full overflow-hidden p-1 mr-2"
+        className="border rounded-full overflow-hidden mr-2"
         style={{ borderColor: theme.mutedForegroundColor }}
       >
         <Image
-          source={image ? { uri: image } : require("@/assets/images/icon.png")}
-          style={{ width: 24, height: 24 }}
+          source={{ uri: (image as string) || "" }}
+          className="w-9 h-9 rounded-full "
+          resizeMode="cover"
         />
       </View>
       <View>

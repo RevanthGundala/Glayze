@@ -103,7 +103,7 @@ export default function Post() {
           createdAt={new Date(post.created_at)}
         /> */}
       </ScrollView>
-      <BuySellButtons theme={theme} post={post} />
+      <BuySellButtons theme={theme} post={post} image={image} />
     </SafeAreaView>
   );
 }
@@ -326,9 +326,10 @@ const Stats = ({ marketCap, volume, allTimeHigh, createdAt }: StatsProps) => {
 type BuySellButtonsProps = {
   theme: typeof lightTheme;
   post: Post;
+  image: string;
 };
 
-const BuySellButtons = ({ theme, post }: BuySellButtonsProps) => {
+const BuySellButtons = ({ theme, post, image }: BuySellButtonsProps) => {
   const router = useRouter();
 
   return (
@@ -348,7 +349,7 @@ const BuySellButtons = ({ theme, post }: BuySellButtonsProps) => {
                 id: post.post_id as string,
                 name: post.name as string,
                 symbol: post.symbol as string,
-                image: post.image_uri as string,
+                image,
               },
             });
           }}
@@ -370,7 +371,7 @@ const BuySellButtons = ({ theme, post }: BuySellButtonsProps) => {
                 id: post.post_id as string,
                 name: post.name as string,
                 symbol: post.symbol as string,
-                image: post.image_uri as string,
+                image,
               },
             });
           }}

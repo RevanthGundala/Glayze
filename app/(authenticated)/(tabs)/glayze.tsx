@@ -32,9 +32,6 @@ import {
   formatUnits,
 } from "viem";
 import { supabase } from "@/utils/supabase";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client.native";
-import { baseSepolia, base } from "viem/chains";
 import { fetchPublicClient, usePublicClient } from "@/hooks/use-public-client";
 import { useConstants } from "@/hooks/use-constants";
 import {
@@ -46,6 +43,7 @@ import { useSmartAccount } from "@/contexts/smart-account-context";
 import { Loading } from "@/components/loading";
 import { fetchRealCreator } from "@/hooks/use-real-creator";
 import { AppState, AppStateStatus } from "react-native";
+import { GlayzeToast } from "@/components/ui/glayze-toast";
 
 interface FormInput {
   name: string;
@@ -190,6 +188,7 @@ export default function Glayze() {
   };
 
   const handlePurchase = async (input: FormInput) => {
+    let txSuccess = false;
     try {
       setIsLoading(true);
       if (!publicClient) throw new Error("No public client found.");
@@ -203,7 +202,7 @@ export default function Glayze() {
       }
       const postId = getPostIdFromUrl(url);
       if (!postId) {
-        throw new Error("Token ID not found in the URL.");
+        throw new Error("Post ID not found in the URL.");
       }
 
       const response = await uploadToIpfs(name, symbol, postId, url);
@@ -245,6 +244,7 @@ export default function Glayze() {
         hash: txHash as Address,
       });
       if (!txReceipt) throw new Error("Failed to get transaction receipt.");
+      txSuccess = true;
       const { error } = await supabase.from("Posts").insert([
         {
           post_id: postId,
@@ -294,7 +294,9 @@ export default function Glayze() {
     } catch (error) {
       setIsLoading(false);
       console.error("Purchase failed:", error);
-      router.replace("/(authenticated)/aux/error" as Href<string>);
+      router.replace(
+        `/(authenticated)/aux/error?success=${txSuccess}` as Href<string>
+      );
     }
   };
 
@@ -306,7 +308,7 @@ export default function Glayze() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <Toast />
+      <GlayzeToast />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}

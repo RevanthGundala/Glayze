@@ -9,6 +9,7 @@ import { useTheme } from "@/contexts/theme-context";
 export default function Error() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { success } = useLocalSearchParams();
 
   return (
     <SafeAreaView
@@ -25,8 +26,9 @@ export default function Error() {
           className="text-center mb-8 px-10 leading-5"
           style={{ color: theme.textColor }}
         >
-          Something went wrong. Please try again. {"\n"} If the problem
-          persists, please contact support.
+          {success
+            ? "Your transaction was successful, but we couldn't update our records. Please contact us for support."
+            : "Something went wrong. Please try again.\nIf the problem persists, please contact support."}
         </Text>
       </View>
 

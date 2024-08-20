@@ -1,15 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Text, SafeAreaView, View } from "react-native";
 import { Image } from "expo-image";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "expo-router";
+import { Href, useRouter } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
+import { Loading } from "@/components/loading";
+import { usePrivy } from "@privy-io/expo";
 
 export default function Index() {
   const router = useRouter();
   const { theme } = useTheme();
+  const { user, isReady } = usePrivy();
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    if (isReady) {
+      setIsInitialized(true);
+      if (user) {
+        router.replace("/(authenticated)/(tabs)/home" as Href<string>);
+      }
+    }
+  }, [isReady, user, router]);
+
+  if (!isInitialized) {
+    return <Loading />;
+  }
   return (
     <SafeAreaView
       className="flex-1"
@@ -31,11 +48,23 @@ export default function Index() {
           }}
           contentFit="contain"
         />
+        <Image
+          source={require("@/assets/images/light/home-page.png")}
+          style={{
+            width: 400,
+            height: 380,
+            alignSelf: "center",
+          }}
+          contentFit="contain"
+          className="absolute top-20 rounded-lg"
+        />
       </View>
-      <View className="space-y-2 mt-8">
+      <View className="space-y-2 mt-4 border-t border-gray-200">
         <Text
-          className="text-center text-2xl font-semibold"
-          style={{ color: theme.textColor }}
+          className="text-center text-2xl font-semibold pt-4"
+          style={{
+            color: theme.textColor,
+          }}
         >
           Welcome to Glayze!
         </Text>
@@ -43,7 +72,7 @@ export default function Index() {
           className="text-center text-lg"
           style={{ color: theme.textColor }}
         >
-          The ultimate app for trading tweets.
+          The ultimate app for trading X posts
         </Text>
       </View>
       <ProgressBar sections={3} currentSection={0} />

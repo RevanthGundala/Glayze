@@ -32,21 +32,21 @@ const calculatePricePeriod = (
   const filteredTrades = trades.filter(
     (trade) => new Date(trade.created_at) >= startDate
   );
-  const prices = filteredTrades
-    .filter((trade) => trade !== null)
-    .map((trade) => BigInt(trade.usdc as string));
-  const chartPrices = prices.map(bigIntToFloat);
 
+  const prices = filteredTrades
+    .filter((trade) => trade !== null && trade.usdc !== null)
+    .map((trade) => bigIntToFloat(BigInt(trade.usdc as string)));
+
+  console.log("prices", prices);
   let change = 0;
   if (prices.length >= 2) {
-    const oldestPrice = prices[prices.length - 1];
-    const newestPrice = prices[0];
-    change =
-      ((Number(newestPrice) - Number(oldestPrice)) / Number(oldestPrice)) * 100;
+    const newestPrice = prices[prices.length - 1];
+    const oldestPrice = prices[0];
+    change = ((newestPrice - oldestPrice) / oldestPrice) * 100;
   }
 
   return {
-    chartPrices,
+    chartPrices: prices,
     change,
   };
 };

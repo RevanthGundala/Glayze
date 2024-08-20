@@ -3,21 +3,19 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { useTheme } from "@/contexts/theme-context";
-import { client } from "@/utils/dynamic-client.native";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { Header } from "@/components/header";
+import { usePrivy } from "@privy-io/expo";
 
 export default function End() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { auth } = useReactiveClient(client);
-  const name =
-    auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthDisplayName ??
-    "Anon";
-  const handle =
-    auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthUsername ?? "Anon";
-  const image =
-    auth.authenticatedUser?.verifiedCredentials?.[2]?.oauthAccountPhotos?.[0];
+  const { user } = usePrivy();
+  const xAccount = user?.linked_accounts?.find(
+    (acc) => acc.type === "twitter_oauth"
+  );
+  const name = xAccount?.name ?? "Anon";
+  const handle = xAccount?.username ?? "Anon";
+  const image = xAccount?.profile_picture_url ?? "";
 
   return (
     <SafeAreaView
@@ -27,6 +25,7 @@ export default function End() {
       <View className="flex flex-row">
         <Header backArrow />
       </View>
+
       <View className="space-y-4 items-center">
         <Text className="w-[250px] text-2xl font-semibold text-black text-center">
           You're ready to start trading {name}!

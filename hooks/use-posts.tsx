@@ -1,27 +1,49 @@
 import { useState } from "react";
-import { Feed, Post } from "@/utils/types";
+import { Post } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/utils/supabase";
+import { fetchPublicClient } from "./use-public-client";
+import { ABI } from "@/utils/constants";
+import { Address } from "viem";
 
-const fetchPosts = async (selectedTab: string) => {
-  const { data, error } = await supabase.from("Posts").select("*");
+const fetchPosts = async (selectedTab: string): Promise<Post[]> => {
+  const { data: posts, error } = await supabase.from("Posts").select("*");
 
   if (error) {
-    throw new Error(`Error fetching referrals: ${error.message}`);
+    throw new Error(`Error fetching posts: ${error.message}`);
   }
 
+  const publicClient = fetchPublicClient();
+  if (!publicClient) throw new Error("No public client found.");
+
+  const prices = await Promise.all(
+    posts.map(async (post) => {
+      const shareInfo = await publicClient.readContract({
+        address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS! as Address,
+        abi: ABI,
+        functionName: "shareInfo",
+        args: [BigInt(post.post_id)],
+      });
+      return shareInfo[0] as bigint;
+    })
+  );
+
+  const indexMap = Array.from(Array(posts.length).keys());
+
   if (selectedTab === "Trending") {
-    return data.sort((a, b) => b.price - a.price); // TODO: function to get 1% change
+    // TODO: Implement actual trending logic
+    indexMap.sort((a, b) => Number(prices[b] - prices[a]));
   } else if (selectedTab === "New") {
-    return data.sort(
+    indexMap.sort(
       (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        new Date(posts[b].created_at).getTime() -
+        new Date(posts[a].created_at).getTime()
     );
   } else if (selectedTab === "Top") {
-    return data.sort((a, b) => b.price - a.price);
-  } else {
-    return [];
+    indexMap.sort((a, b) => Number(prices[b] - prices[a]));
   }
+
+  return indexMap.map((index) => posts[index]);
 };
 
 export const usePosts = (selectedTab: string) => {

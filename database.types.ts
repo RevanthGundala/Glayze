@@ -79,17 +79,17 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
-          dynamic_id: string
+          privy_id: string
         }
         Insert: {
           content?: string | null
           created_at?: string
-          dynamic_id: string
+          privy_id: string
         }
         Update: {
           content?: string | null
           created_at?: string
-          dynamic_id?: string
+          privy_id?: string
         }
         Relationships: []
       }
@@ -127,21 +127,21 @@ export type Database = {
         Row: {
           address: string | null
           created_at: string
-          dynamic_id: string
+          privy_id: string
           referral_code: string | null
           x_user_id: string | null
         }
         Insert: {
           address?: string | null
           created_at?: string
-          dynamic_id: string
+          privy_id: string
           referral_code?: string | null
           x_user_id?: string | null
         }
         Update: {
           address?: string | null
           created_at?: string
-          dynamic_id?: string
+          privy_id?: string
           referral_code?: string | null
           x_user_id?: string | null
         }

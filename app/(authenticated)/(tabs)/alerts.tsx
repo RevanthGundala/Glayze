@@ -12,9 +12,8 @@ import { Loading } from "@/components/loading";
 import { useReferral } from "@/hooks";
 import Toast from "react-native-toast-message";
 import { useState } from "react";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client.native";
 import { useSmartAccount } from "@/contexts/smart-account-context";
+import { GlayzeToast } from "@/components/ui/glayze-toast";
 
 export default function Alerts() {
   const { smartAccountClient, error: smartAccountError } = useSmartAccount();
@@ -43,7 +42,7 @@ export default function Alerts() {
       .update({ show: false })
       .eq("referee", referee)
       .eq("referrer", referrer);
-    refetch();
+    await refetch();
     if (error) {
       console.error("Error clearing alert", error);
       Toast.show({
@@ -61,7 +60,7 @@ export default function Alerts() {
       .from("Referrals")
       .update({ show: false })
       .eq("show", true);
-    refetch();
+    await refetch();
     if (error) {
       console.error("Error clearing all alerts", error);
       Toast.show({
@@ -89,7 +88,7 @@ export default function Alerts() {
           />
         }
       >
-        <Toast />
+        <GlayzeToast />
         <View className="pt-6 px-4 mb-4">
           <View className="flex-row justify-center items-center mb-4">
             {alerts && alerts.length > 0 && (

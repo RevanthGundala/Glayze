@@ -8,6 +8,8 @@ import { Address } from "viem";
 export async function POST(request: Request) {
   try {
     const { referrer, referee } = await request.json();
+    if (!referrer || !referee)
+      return Response.json({ error: "No referrer or referee found." });
     const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
     const supabase = createClient(supabaseUrl!, supabaseAnonKey!);

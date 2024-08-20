@@ -53,7 +53,6 @@ export const Graph = ({ price }: GraphProps) => {
       return [];
     }
     return [...selectedPeriodData.chartPrices]
-      .reverse() // Reverse the array here
       .map((price, index) => ({
         timestamp: index,
         price: typeof price === "number" && !isNaN(price) ? price : null,

@@ -17,26 +17,23 @@ import { Input } from "@/components/ui/input";
 import { Menu } from "@/components/menu";
 import { Route } from "@/utils/types";
 import { useTheme } from "@/contexts/theme-context";
-import { client } from "@/utils/dynamic-client.native";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { Loading } from "@/components/loading";
 import { addToSearchHistory, deleteSearchHistory } from "@/utils/helpers";
+import { usePrivy } from "@privy-io/expo";
 
 const SearchScreen = () => {
-  const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const [routes, setRoutes] = useState<Route[]>([]);
-  const { auth, sdk } = useReactiveClient(client);
-  const dynamicId = auth.authenticatedUser?.userId;
-  const { data, isLoading, isError } = useSearch(dynamicId);
+  const { user } = usePrivy();
+  const { data, isLoading, isError } = useSearch(user?.id);
   const searchBarRef = useRef(null);
   const { theme } = useTheme();
   const handleSearch = async () => {
-    await addToSearchHistory(dynamicId, searchText);
+    await addToSearchHistory(user?.id, searchText);
   };
 
   const clearSearchHistory = async () => {
-    await deleteSearchHistory(dynamicId);
+    await deleteSearchHistory(user?.id);
   };
 
   const handleOutsideClick = useCallback(() => {
@@ -57,7 +54,7 @@ const SearchScreen = () => {
     }
   }, [data, isLoading]);
 
-  if (!sdk.loaded || isLoading || isError) {
+  if (isLoading || isError) {
     return <Loading error={isError ? "Error loading profile" : null} />;
   }
 

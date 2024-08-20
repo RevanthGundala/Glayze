@@ -16,43 +16,38 @@ import { useState } from "react";
 import { Image } from "expo-image";
 import { Href, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
-// import { SocialProvider } from "@dynamic-labs/client";
-import { client } from "@/utils/dynamic-client.native";
 import { BaseWallet } from "@/components/base-wallet";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Loading } from "@/components/loading";
 import { colors } from "@/utils/theme";
 import { useTheme } from "@/contexts/theme-context";
+import { useLoginWithEmail } from "@privy-io/expo";
+import { GlayzeToast } from "@/components/ui/glayze-toast";
 
 export default function Login() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const { auth, sdk } = useReactiveClient(client);
   const { theme } = useTheme();
-
-  if (!sdk.loaded) return <Loading />;
-
-  const handleEmailLogin = async () => {
-    try {
-      console.log("Logging in with email");
-      await auth.email.sendOTP(email);
-      console.log("Email sent");
+  const { sendCode } = useLoginWithEmail({
+    onSendCodeSuccess({ email }) {
       router.push(("/confirm-email?email=" + email) as Href<string>);
-    } catch (error) {
+    },
+    onError(error) {
+      console.log(error);
       Toast.show({
         text1: "Error sending email",
         text2: "Please try again",
         type: "error",
       });
-      console.log(error);
-    }
-  };
+    },
+  });
+
   return (
     <SafeAreaView
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
+      <GlayzeToast />
       <View className="flex flex-row">
         <Header backArrow />
       </View>
@@ -89,7 +84,7 @@ export default function Login() {
                         ? theme.tabBarActiveTintColor
                         : theme.tabBarInactiveTintColor,
                   }}
-                  onPress={handleEmailLogin}
+                  onPress={() => sendCode({ email })}
                 >
                   <Text
                     className="text-center font-semibold"

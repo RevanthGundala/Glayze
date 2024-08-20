@@ -1,44 +1,25 @@
 import { Stack } from "expo-router/stack";
 import { NativeWindStyleSheet } from "nativewind";
-import { useEffect, useCallback } from "react";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
-import { client } from "@/utils/dynamic-client.native";
-import { Href, useRouter } from "expo-router";
+import { useEffect } from "react";
 import { useSmartAccount } from "@/contexts/smart-account-context";
+import { Loading } from "@/components/loading";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
 });
 
 export default function Layout() {
-  const { auth } = useReactiveClient(client);
   const { smartAccountClient, isLoading, refetch, error } = useSmartAccount();
-  const router = useRouter();
-
-  const handleRefetch = useCallback(() => {
-    console.log("Refetching smart account client...");
-    refetch();
-  }, [refetch]);
-
-  useEffect(() => {
-    if (!auth.token) {
-      console.log("No token, redirecting to home");
-      router.replace("/" as Href<string>);
-    }
-  }, [auth, router]);
-
-  useEffect(() => {
-    if (!smartAccountClient && !isLoading) {
-      console.log("Smart account client not available, refetching");
-      handleRefetch();
-    }
-  }, [smartAccountClient, isLoading, handleRefetch]);
 
   useEffect(() => {
     if (error) {
       console.error("Error fetching smart account client:", error);
     }
   }, [error]);
+
+  if (!smartAccountClient || isLoading) {
+    return <Loading />;
+  }
 
   return (
     <Stack>

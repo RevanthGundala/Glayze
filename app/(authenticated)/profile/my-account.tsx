@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Pressable, Modal, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Input } from "@/components/ui/input";
@@ -9,14 +9,14 @@ import { useTheme } from "../../../contexts/theme-context";
 import { Header } from "@/components/header";
 import { SubHeader } from "@/components/sub-header";
 import { colors } from "@/utils/theme";
-import { client } from "@/utils/dynamic-client.native";
-import { useReactiveClient } from "@dynamic-labs/react-hooks";
 import { Loading } from "@/components/loading";
 import { supabase } from "@/utils/supabase";
-import Toast from "react-native-toast-message";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { Controller, useForm } from "react-hook-form";
 import { useReferral } from "@/hooks";
 import { useSmartAccount } from "@/contexts/smart-account-context";
+import { useLinkWithOAuth, usePrivy } from "@privy-io/expo";
+import { GlayzeToast } from "@/components/ui/glayze-toast";
 
 interface FormData {
   referralAddress: string;
@@ -24,12 +24,9 @@ interface FormData {
 
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
-  const { auth, ui, sdk } = useReactiveClient(client);
-  const [isLoading, setIsLoading] = useState(false);
   const { smartAccountClient, error: smartAccountError } = useSmartAccount();
   const address = smartAccountClient?.account.address;
   const { data: referrals } = useReferral(address);
-  if (!sdk.loaded) return <Loading />;
 
   const {
     control,
@@ -60,21 +57,20 @@ export default function MyAccount() {
         visibilityTime: 2000,
         onPress: () => Toast.hide(),
       });
+    } else {
+      Toast.show({
+        text1: "Referral submitted",
+        text2: "You will receieve $AURA when your friend makes a trade",
+        type: "success",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
     }
-  };
-
-  const exportKeys = () => {
-    setIsLoading(true);
-    ui.wallets.revealEmbeddedWalletKey({
-      type: "private-key",
-    });
-    console.log("🔍 Exporting keys");
-    setIsLoading(false);
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>
-      <Toast />
+      <GlayzeToast />
       <View className="flex flex-row">
         <Header backArrow />
       </View>
@@ -85,8 +81,8 @@ export default function MyAccount() {
             style={{ color: theme.mutedForegroundColor }}
             className="text-base font-light"
           >
-            Shares are controlled by a self-custody wallet. You can export your
-            keys at any time.
+            Shares are controlled by a self-custody wallet. Export your keys
+            soon!
           </Text>
           {/* <View className="space-y-2">
             <View className="flex flex-row items-center space-x-2 py-2">
@@ -137,7 +133,7 @@ export default function MyAccount() {
                 },
               }}
               render={({ field: { onChange, value } }) =>
-                !referrals ? (
+                referrals?.length === 0 ? (
                   <Input
                     placeholder={"0x..."}
                     style={{ backgroundColor: theme.textColor }}
@@ -155,15 +151,14 @@ export default function MyAccount() {
                 {errors.referralAddress.message}
               </Text>
             )}
-            {!referrals && (
+            {referrals?.length === 0 && (
               <Button
                 buttonStyle="w-full rounded-lg my-4"
+                disabled={errors.referralAddress}
                 style={{
-                  backgroundColor:
-                    !errors.referralAddress &&
-                    control._formValues.referralAddress
-                      ? theme.tabBarActiveTintColor
-                      : theme.tabBarInactiveTintColor,
+                  backgroundColor: !errors.referralAddress
+                    ? theme.tabBarActiveTintColor
+                    : theme.tabBarInactiveTintColor,
                 }}
                 onPress={handleSubmit(handleReferral)}
               >
@@ -189,29 +184,100 @@ export default function MyAccount() {
 const Unlink = () => {
   const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
-  const { auth, ui } = useReactiveClient(client);
+  const { user } = usePrivy();
+  const { link } = useLinkWithOAuth({
+    onSuccess: () => {
+      setModalVisible(false);
+    },
+    onError: (error) => {
+      setModalVisible(false);
+      console.log(error);
+      Toast.show({
+        text1: "Error linking your X account",
+        text2: "Please try again",
+        type: "error",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
+    },
+  });
+  const [isConnectedToX, setIsConnectedToX] = useState(false);
 
-  const handleLogOut = () => {
-    setModalVisible(false);
-  };
+  useEffect(() => {
+    const account = user?.linked_accounts.find(
+      (account) => account.type === "twitter_oauth"
+    );
+    if (account) setIsConnectedToX(true);
+  }, [isConnectedToX, user]);
 
   return (
     <View className="w-full pt-2">
       <View className="flex-row justify-between items-center w-full py-2">
-        <Pressable className="flex-1" onPress={() => ui.userProfile.show()}>
-          <Text style={{ color: theme.textColor }} className="text-lg">
-            Wallet
-          </Text>
-        </Pressable>
-        <Image
-          source={
-            themeName === "dark"
-              ? require("@/assets/images/dark/forward-arrow.png")
-              : require("@/assets/images/light/forward-arrow.png")
-          }
-          className="w-4 h-4"
-        />
+        {isConnectedToX ? null : ( // </Pressable> //   </Text> //     Contact Us To Unlink Your X Account //   <Text style={{ color: theme.textColor }} className="text-lg"> // <Pressable className="flex-1" onPress={() => {}}>
+          <Pressable className="flex-1" onPress={() => setModalVisible(true)}>
+            <Text style={{ color: theme.textColor }} className="text-lg">
+              Link Your X Account
+            </Text>
+          </Pressable>
+        )}
+        {!isConnectedToX && (
+          <Image
+            source={
+              themeName === "dark"
+                ? require("@/assets/images/dark/forward-arrow.png")
+                : require("@/assets/images/light/forward-arrow.png")
+            }
+            className="w-4 h-4"
+          />
+        )}
       </View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setModalVisible(false)}
+          className="flex-1 justify-end bg-black/50"
+        >
+          <View
+            style={{ backgroundColor: theme.backgroundColor }}
+            className="rounded-t-3xl p-6 h-44"
+          >
+            <Text
+              style={{ color: theme.textColor }}
+              className="text-lg font-medium mb-6 text-center"
+            >
+              Link your X Account?
+            </Text>
+            <View className="flex-row justify-between">
+              <Button
+                onPress={() => setModalVisible(false)}
+                buttonStyle="flex-1 py-3 rounded-lg mr-2"
+                style={{ backgroundColor: theme.tabBarInactiveTintColor }}
+              >
+                <Text style={{ color: colors.white }} className="text-center">
+                  No
+                </Text>
+              </Button>
+              <Button
+                onPress={() => link({ provider: "twitter" })}
+                buttonStyle="py-3 flex-1 rounded-lg ml-2"
+                style={{ backgroundColor: theme.tabBarActiveTintColor }}
+              >
+                <Text
+                  style={{ color: theme.tintTextColor }}
+                  className="text-center"
+                >
+                  Link
+                </Text>
+              </Button>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 
@@ -287,17 +353,16 @@ const DeleteAccount = () => {
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
-  const { auth } = useReactiveClient(client);
-  const dynamicId = auth.authenticatedUser?.userId;
+  const { user } = usePrivy();
 
   const handleDelete = async () => {
     try {
-      if (!dynamicId) throw new Error("No address found");
+      if (!user?.id) throw new Error("No address found");
       setModalVisible(false);
       const { error } = await supabase
         .from("Users")
         .delete()
-        .eq("dynamic_id", dynamicId);
+        .eq("privy_id", user?.id);
       if (error) console.log(error);
       router.push("/");
     } catch (error) {
