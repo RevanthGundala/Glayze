@@ -246,7 +246,8 @@ export const insertTrade = async (
       logs: txReceipt.logs,
     });
     const tradeEvent = logs.find((log) => log.eventName === "Trade");
-    if (!tradeEvent) return;
+    const tradeFeesEvent = logs.find((log) => log.eventName === "TradeFees");
+    if (!tradeEvent || !tradeFeesEvent) throw new Error("No trade event");
     const {
       postId,
       trader,
@@ -258,6 +259,7 @@ export const insertTrade = async (
       supply,
       timestamp,
     } = tradeEvent.args;
+    const { usdc: fees } = tradeFeesEvent.args;
     const { error } = await supabase.from("Trades").insert({
       post_id: postId.toString(),
       trader,
@@ -267,6 +269,7 @@ export const insertTrade = async (
       usdc: usdc.toString(),
       price: price.toString(),
       supply: supply.toString(),
+      fees: fees.toString(),
       created_at: new Date().toISOString(),
     });
     console.log("Trade inserted successfully");

@@ -94,6 +94,10 @@ export default function Sell() {
     localAuraAmount,
   ]);
 
+  if (sellPriceError) {
+    console.log("sellPriceError", sellPriceError);
+  }
+
   const updateAmount = (value: string) => {
     if (!balance) {
       return;
@@ -383,9 +387,10 @@ export default function Sell() {
                   >
                     {amount === "0"
                       ? "Place an order"
-                      : !hasSufficientShares &&
-                        !sellPriceLoading &&
-                        sellPriceData
+                      : (!hasSufficientShares &&
+                          !sellPriceLoading &&
+                          sellPriceData) ||
+                        sellPriceError
                       ? `Not enough shares`
                       : `Sell for ${
                           !sellPriceLoading &&

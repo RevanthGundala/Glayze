@@ -67,8 +67,6 @@ const fetchAllPriceHistory = async (
     throw error;
   }
 
-  console.log("trades", trades);
-
   if (!trades || trades.length === 0) {
     const emptyPeriod = { chartPrices: [], change: 0 };
     return {

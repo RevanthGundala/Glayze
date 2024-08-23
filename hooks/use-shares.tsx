@@ -25,11 +25,10 @@ const fetchShares = async (
       args: [address as Address, BigInt(postId)],
     });
     const shareInfo = await fetchShareInfo(postId);
-    console.log("shareInfo", shareInfo);
     if (!shareInfo) return null;
     return {
       number: shares.toString(),
-      value: (Number(shareInfo.price) * Number(shares)).toString(),
+      value: (BigInt(shareInfo.price) * BigInt(shares)).toString(),
     };
   } catch (error) {
     console.log(error);

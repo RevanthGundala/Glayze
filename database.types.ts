@@ -97,6 +97,7 @@ export type Database = {
         Row: {
           aura: string | null
           created_at: string
+          fees: string | null
           is_buy: boolean | null
           post_id: string
           price: string | null
@@ -108,6 +109,7 @@ export type Database = {
         Insert: {
           aura?: string | null
           created_at?: string
+          fees?: string | null
           is_buy?: boolean | null
           post_id: string
           price?: string | null
@@ -119,6 +121,7 @@ export type Database = {
         Update: {
           aura?: string | null
           created_at?: string
+          fees?: string | null
           is_buy?: boolean | null
           post_id?: string
           price?: string | null
