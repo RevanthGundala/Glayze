@@ -300,7 +300,7 @@ export const ABI = [
   },
   {
     type: "function",
-    name: "setPrtocolFee",
+    name: "setProtocolFee",
     inputs: [
       { name: "_protocolFee", type: "uint256", internalType: "uint256" },
     ],
@@ -354,13 +354,6 @@ export const ABI = [
     name: "supportsInterface",
     inputs: [{ name: "interfaceId", type: "bytes4", internalType: "bytes4" }],
     outputs: [{ name: "", type: "bool", internalType: "bool" }],
-    stateMutability: "view",
-  },
-  {
-    type: "function",
-    name: "totalValueDeposited",
-    inputs: [],
-    outputs: [{ name: "", type: "uint256", internalType: "uint256" }],
     stateMutability: "view",
   },
   {
@@ -591,13 +584,13 @@ export const ABI = [
         internalType: "uint256",
       },
       {
-        name: "newSupply",
+        name: "price",
         type: "uint256",
         indexed: false,
         internalType: "uint256",
       },
       {
-        name: "newPrice",
+        name: "supply",
         type: "uint256",
         indexed: false,
         internalType: "uint256",
@@ -710,6 +703,14 @@ export const ABI = [
     type: "error",
     name: "SharesZero",
     inputs: [{ name: "postId", type: "uint256", internalType: "uint256" }],
+  },
+  {
+    type: "error",
+    name: "SupplyExceedsMax",
+    inputs: [
+      { name: "postId", type: "uint256", internalType: "uint256" },
+      { name: "supply", type: "uint256", internalType: "uint256" },
+    ],
   },
   {
     type: "error",

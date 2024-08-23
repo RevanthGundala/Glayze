@@ -24,7 +24,6 @@ export const Graph = ({ price }: GraphProps) => {
   const font = useFont(SpaceMono, 12);
   const { state, isActive } = useChartPressState({ x: 0, y: { price: 0 } });
   const { theme } = useTheme();
-  console.log("Price", price);
   const selectedPeriodData = useMemo(() => {
     if (!priceHistory) return null;
     switch (selectedTime) {
@@ -53,6 +52,7 @@ export const Graph = ({ price }: GraphProps) => {
       return [];
     }
     return [...selectedPeriodData.chartPrices]
+      .reverse()
       .map((price, index) => ({
         timestamp: index,
         price: typeof price === "number" && !isNaN(price) ? price : null,

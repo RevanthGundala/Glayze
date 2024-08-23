@@ -18,8 +18,7 @@ const calculatePosition = async (
     .from("Trades")
     .select("usdc, shares, created_at, is_buy")
     .eq("post_id", post.post_id)
-    .eq("trader", address)
-    .order("created_at", { ascending: true });
+    .eq("trader", address);
 
   if (error) {
     throw error;

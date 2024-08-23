@@ -72,7 +72,6 @@ export default function Login() {
                   placeholder="Your Email"
                   value={email}
                   onChangeText={setEmail}
-                  style={{}}
                 />
               </View>
               <View>

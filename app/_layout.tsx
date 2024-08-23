@@ -21,6 +21,17 @@ const WebLayout = () => {
       <View className="mt-40">
         <Image source={icon} className="w-1/2 h-1/2" />
       </View>
+      <View>
+        <Image
+          source={require("@/assets/images/aux/iphone.png")}
+          style={{
+            width: 450,
+            height: 450,
+            alignSelf: "center",
+          }}
+          contentFit="contain"
+        />
+      </View>
       <View className="flex items-center justify-center mt-20">
         <Button
           buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"

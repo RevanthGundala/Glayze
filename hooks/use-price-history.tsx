@@ -8,7 +8,7 @@ const bigIntToFloat = (value: bigint): number => {
 };
 
 type Trade = {
-  usdc: string | null;
+  price: string | null;
   created_at: string;
 };
 
@@ -34,14 +34,14 @@ const calculatePricePeriod = (
   );
 
   const prices = filteredTrades
-    .filter((trade) => trade !== null && trade.usdc !== null)
-    .map((trade) => bigIntToFloat(BigInt(trade.usdc as string)));
+    .filter((trade) => trade !== null && trade.price !== null)
+    .map((trade) => bigIntToFloat(BigInt(trade.price as string)));
 
   console.log("prices", prices);
   let change = 0;
   if (prices.length >= 2) {
-    const newestPrice = prices[prices.length - 1];
-    const oldestPrice = prices[0];
+    const oldestPrice = prices[prices.length - 1];
+    const newestPrice = prices[0];
     change = ((newestPrice - oldestPrice) / oldestPrice) * 100;
   }
 
@@ -58,7 +58,7 @@ const fetchAllPriceHistory = async (
 
   const { data: trades, error } = await supabase
     .from("Trades")
-    .select("usdc, created_at")
+    .select("price, created_at")
     .eq("post_id", id)
     .order("created_at", { ascending: false });
 
@@ -66,6 +66,8 @@ const fetchAllPriceHistory = async (
     console.error("Error fetching trades:", error);
     throw error;
   }
+
+  console.log("trades", trades);
 
   if (!trades || trades.length === 0) {
     const emptyPeriod = { chartPrices: [], change: 0 };

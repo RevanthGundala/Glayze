@@ -247,8 +247,17 @@ export const insertTrade = async (
     });
     const tradeEvent = logs.find((log) => log.eventName === "Trade");
     if (!tradeEvent) return;
-    const { postId, trader, isBuy, aura, usdc, shares, timestamp } =
-      tradeEvent.args;
+    const {
+      postId,
+      trader,
+      isBuy,
+      aura,
+      usdc,
+      shares,
+      price,
+      supply,
+      timestamp,
+    } = tradeEvent.args;
     const { error } = await supabase.from("Trades").insert({
       post_id: postId.toString(),
       trader,
@@ -256,6 +265,8 @@ export const insertTrade = async (
       shares: shares.toString(),
       aura: aura.toString(),
       usdc: usdc.toString(),
+      price: price.toString(),
+      supply: supply.toString(),
       created_at: new Date().toISOString(),
     });
     console.log("Trade inserted successfully");
