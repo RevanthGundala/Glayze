@@ -33,7 +33,7 @@ async function getUserByPrivyId(privyId: string) {
     .select("*")
     .eq("privy_id", privyId);
 
-  if (error || !data) {
+  if (!data || error) {
     throw new Error(`Error fetching user: ${error?.message}`);
   }
 
@@ -45,13 +45,13 @@ async function getUserAddressByXUserId(xUserId: string) {
     .from("Users")
     .select("address")
     .eq("x_user_id", xUserId)
-    .single();
+    .maybeSingle();
 
-  if (error || !data) {
-    throw new Error(`Error fetching user address: ${error?.message}`);
+  if (error) {
+    throw new Error(`Error fetching X address: ${error?.message}`);
   }
 
-  return Response.json({ data: data.address, status: 200 });
+  return Response.json({ data: data?.address ?? null, status: 200 });
 }
 
 export async function POST(request: Request) {

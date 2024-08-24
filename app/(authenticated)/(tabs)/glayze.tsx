@@ -26,14 +26,13 @@ import { fetchTweet } from "@/hooks/use-embedded-tweet";
 import {
   Address,
   encodeFunctionData,
-  http,
-  createPublicClient,
   parseUnits,
-  formatUnits,
+  decodeFunctionData,
 } from "viem";
 import { fetchPublicClient, usePublicClient } from "@/hooks/use-public-client";
 import { useConstants } from "@/hooks/use-constants";
 import {
+  decodeAndLogFunctionData,
   formatToMaxLength,
   formatUSDC,
   getPostIdFromUrl,
@@ -244,7 +243,7 @@ export default function Glayze() {
         hash: txHash as Address,
       });
       if (!txReceipt) throw new Error("Failed to get transaction receipt.");
-      txSuccess = true;
+
       const error = await insertPost(
         postId,
         name,
@@ -255,6 +254,7 @@ export default function Glayze() {
         imageIpfsHash,
         realCreator
       );
+      txSuccess = true;
       if (error) throw error;
       if (realCreator) {
         const response = await fetch(
@@ -271,7 +271,7 @@ export default function Glayze() {
             }),
           }
         );
-        if (!response.ok) {
+        if (response.status !== 200) {
           const errorData = await response.json().catch(() => null);
           throw new Error(
             `Failed to set real creator: ${
@@ -280,7 +280,6 @@ export default function Glayze() {
           );
         }
       }
-      await refetchBalance();
       setIsLoading(false);
       router.replace(
         `/(authenticated)/aux/success?isGlayze=true&id=${postId}&symbol=${symbol}` as Href<string>
@@ -288,6 +287,7 @@ export default function Glayze() {
     } catch (error) {
       setIsLoading(false);
       console.error("Purchase failed:", error);
+      decodeAndLogFunctionData(error.message as string);
       router.replace(
         `/(authenticated)/aux/error?success=${txSuccess}` as Href<string>
       );
@@ -323,6 +323,8 @@ export default function Glayze() {
                       validate: (value) => {
                         if (value.length > 12)
                           return "Name must be 12 characters or less.";
+                        if (value.startsWith("$"))
+                          return "Name cannot start with '$' symbol.";
                         return true;
                       },
                     }}

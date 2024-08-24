@@ -25,13 +25,23 @@ const WebLayout = () => {
         <Image
           source={require("@/assets/images/aux/iphone.png")}
           style={{
-            width: 450,
-            height: 450,
+            width: 500,
+            height: 500,
             alignSelf: "center",
           }}
           alt="Iphone"
           className="text-black"
           contentFit="contain"
+        />
+        <Image
+          source={require("@/assets/images/dark/home-page.png")}
+          style={{
+            width: 450,
+            height: 450,
+            alignSelf: "center",
+          }}
+          contentFit="contain"
+          className="absolute top-14 rounded-lg"
         />
       </View>
       <View className="flex items-center justify-center mt-20">

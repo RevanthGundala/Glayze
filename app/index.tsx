@@ -11,7 +11,7 @@ import { usePrivy } from "@privy-io/expo";
 
 export default function Index() {
   const router = useRouter();
-  const { theme } = useTheme();
+  const { theme, themeName } = useTheme();
   const { user, isReady } = usePrivy();
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -32,31 +32,35 @@ export default function Index() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <View className="flex flex-row justify-center items-center pt-2">
+      <View className="flex flex-row justify-center items-center">
         <Image
           source={require("@/assets/images/icon.png")}
           style={{ width: 50, height: 50 }}
         />
       </View>
-      <View className="pt-2 px-4">
+      <View className="pb-2 px-4">
         <Image
           source={require("@/assets/images/aux/iphone.png")}
           style={{
-            width: 450,
-            height: 450,
+            width: 475,
+            height: 475,
             alignSelf: "center",
           }}
           contentFit="contain"
         />
         <Image
-          source={require("@/assets/images/light/home-page.png")}
+          source={
+            themeName === "dark"
+              ? require("@/assets/images/dark/home-page.png")
+              : require("@/assets/images/dark/home-page.png") // TODO: Add light version
+          }
           style={{
-            width: 400,
-            height: 380,
+            width: 425,
+            height: 425,
             alignSelf: "center",
           }}
           contentFit="contain"
-          className="absolute top-20 rounded-lg"
+          className="absolute top-14 rounded-lg"
         />
       </View>
       <View className="space-y-2 mt-4 border-t border-gray-200">

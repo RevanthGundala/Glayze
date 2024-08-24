@@ -1,4 +1,6 @@
 import * as Sharing from "expo-sharing";
+import { decodeFunctionData, Address, parseAbi } from "viem";
+import { ABI } from "@/utils/constants";
 
 export const share = async (url: string | undefined | null): Promise<void> => {
   try {
@@ -127,3 +129,22 @@ export const getPostIdFromUrl = (url: string): string | null => {
   // If no match found, return null or handle the error as needed
   return null;
 };
+
+export function decodeAndLogFunctionData(errorMessage: string) {
+  try {
+    const callDataMatch = errorMessage.match(/"callData":"(0x[0-9a-fA-F]+)"/);
+    const callData = callDataMatch ? callDataMatch[1] : null;
+    if (!callData) return;
+    const decodedData = decodeFunctionData({
+      abi: parseAbi([
+        "function multicall(address[] targets, bytes[] datas) returns (bytes[] results)",
+      ]),
+      data: callData as Address,
+    });
+
+    console.log("Decoded function name:", decodedData.functionName);
+    console.log("Decoded arguments:", decodedData.args);
+  } catch (decodeError) {
+    console.error("Failed to decode function data:", decodeError);
+  }
+}

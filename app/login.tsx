@@ -12,22 +12,33 @@ import {
 import { Header } from "@/components/header";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { Image } from "expo-image";
 import { Href, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
-import { BaseWallet } from "@/components/base-wallet";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { Loading } from "@/components/loading";
 import { colors } from "@/utils/theme";
 import { useTheme } from "@/contexts/theme-context";
 import { useLoginWithEmail } from "@privy-io/expo";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
+import { useForm, Controller } from "react-hook-form";
+
+interface FormInput {
+  email: string;
+}
 
 export default function Login() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const { theme } = useTheme();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormInput>({
+    defaultValues: {
+      email: "",
+    },
+  });
+
   const { sendCode } = useLoginWithEmail({
     onSendCodeSuccess({ email }) {
       router.push(("/confirm-email?email=" + email) as Href<string>);
@@ -41,6 +52,10 @@ export default function Login() {
       });
     },
   });
+
+  const onSubmit = (data: FormInput) => {
+    sendCode({ email: data.email });
+  };
 
   return (
     <SafeAreaView
@@ -68,22 +83,35 @@ export default function Login() {
                 <Text className="text-lg" style={{ color: theme.textColor }}>
                   Email
                 </Text>
-                <Input
-                  placeholder="Your Email"
-                  value={email}
-                  onChangeText={setEmail}
+                <Controller
+                  control={control}
+                  rules={{
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  }}
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      placeholder="Your Email"
+                      onChangeText={onChange}
+                      value={value}
+                    />
+                  )}
+                  name="email"
                 />
+                {errors.email && (
+                  <Text style={{ color: "red" }}>{errors.email.message}</Text>
+                )}
               </View>
               <View>
                 <Button
                   buttonStyle="w-full rounded-full py-3"
                   style={{
-                    backgroundColor:
-                      email !== ""
-                        ? theme.tabBarActiveTintColor
-                        : theme.tabBarInactiveTintColor,
+                    backgroundColor: theme.tabBarActiveTintColor,
                   }}
-                  onPress={() => sendCode({ email })}
+                  onPress={handleSubmit(onSubmit)}
                 >
                   <Text
                     className="text-center font-semibold"
@@ -98,19 +126,6 @@ export default function Login() {
               <View className="pt-8">
                 <ProgressBar sections={3} currentSection={1} />
               </View>
-              {/* <View className="items-center">
-                <Text style={{ color: theme.mutedForegroundColor }}>or</Text>
-              </View> */}
-              {/* <View>
-                <SignUpWithOAuth provider="google" />
-                <SignUpWithOAuth provider="apple" />
-              </View>
-              <View className="items-center">
-                <Text style={{ color: theme.mutedForegroundColor }}>or</Text>
-              </View> */}
-              {/* <View>
-                <BaseWallet />
-              </View> */}
             </View>
           </ScrollView>
         </TouchableWithoutFeedback>
@@ -118,47 +133,3 @@ export default function Login() {
     </SafeAreaView>
   );
 }
-
-// const SignUpWithOAuth = ({ provider }: { provider: SocialProvider }) => {
-//   const router = useRouter();
-
-//   const handleLoginWithOauth = async () => {
-//     try {
-//       console.log("Logging in with oauth");
-//       await client.auth.social.connect({
-//         provider,
-//         redirectPathname: "/(authenticated)/home",
-//       });
-//     } catch (error) {
-//       console.log(error);
-//       Toast.show({
-//         text1: "Error Logging in",
-//         text2: "Please try again",
-//         type: "error",
-//       });
-//     }
-//   };
-
-//   return (
-//     <View className="flex items-center justify-center pb-3">
-//       <Button
-//         buttonStyle="w-full rounded-full py-3 border border-gray-200 flex-row items-center justify-center"
-//         style={{
-//           backgroundColor: theme.secondaryTextColor,
-//         }}
-//         onPress={handleLoginWithOauth}
-//       >
-//         <Image source={socialIcons[provider]} className="w-4 h-4 mr-3" />
-//         <Text className="text-center" style={{ color: theme.textColor }}>
-//           Login With {provider.charAt(0).toUpperCase() + provider.slice(1)}
-//         </Text>
-//       </Button>
-//       {/* {state.status === "loading" && <ActivityIndicator />} */}
-//     </View>
-//   );
-// };
-
-// const socialIcons = {
-//   google: require("../assets/images/socials/google.png"),
-//   apple: require("../assets/images/socials/apple.png"),
-// };

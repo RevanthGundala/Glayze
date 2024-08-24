@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   View,
@@ -9,23 +9,34 @@ import {
   ScrollView,
   Text,
 } from "react-native";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { colors } from "@/utils/theme";
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from "react-native-confirmation-code-field";
 import { Header } from "@/components/header";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Image } from "expo-image";
 import Toast from "react-native-toast-message";
 import { useTheme } from "@/contexts/theme-context";
-import { ProgressBar } from "@/components/ui/progress-bar";
 import { useLoginWithEmail } from "@privy-io/expo";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
+
+const CODE_LENGTH = 6;
 
 export default function ConfirmEmail() {
   const router = useRouter();
   const { email } = useLocalSearchParams();
-  const [code, setCode] = useState("");
+  const [value, setValue] = useState("");
   const { theme } = useTheme();
+
+  const ref = useBlurOnFulfill({ value, cellCount: CODE_LENGTH });
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
+  });
+
   const { loginWithCode } = useLoginWithEmail({
     onLoginSuccess(user, isNewUser) {
       console.log(user, isNewUser);
@@ -44,6 +55,15 @@ export default function ConfirmEmail() {
     },
   });
 
+  useEffect(() => {
+    if (value.length === CODE_LENGTH) {
+      loginWithCode({
+        code: value,
+        email: email as string,
+      });
+    }
+  }, [value]);
+
   return (
     <SafeAreaView
       className="flex-1"
@@ -59,60 +79,54 @@ export default function ConfirmEmail() {
           style={{ width: 100, height: 100 }}
         />
       </View>
-      <View className="flex flex-row justify-center items-center pt-12 px-6">
-        <Text style={{ color: theme.textColor }}>
-          An email was sent to{" "}
-          <Text style={{ fontWeight: "bold" }}>{email}</Text>. Please enter the
-          code below to continue.
+      <View className="flex flex-row justify-center items-center pt-12 px-6 pb-6">
+        <Text className="text-center" style={{ color: theme.textColor }}>
+          An email was sent to <Text className="font-bold">{email}</Text>.
+          Please enter the code below to continue.
         </Text>
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+        className="flex-1"
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View style={{ flex: 1 }}>
+          <View className="flex-1">
             <ScrollView
               contentContainerStyle={{ flexGrow: 1 }}
               className="px-6 py-2"
             >
-              <View>
-                <Input
-                  placeholder="Code"
-                  value={code}
-                  onChangeText={setCode}
-                  style={{
-                    color: theme.textColor,
-                    backgroundColor: theme.mutedForegroundColor,
-                  }}
-                  keyboardType="numeric"
-                />
-              </View>
-              <View className="pt-6">
-                <Button
-                  buttonStyle="w-full rounded-full py-3"
-                  style={{
-                    backgroundColor:
-                      code !== ""
-                        ? theme.tabBarActiveTintColor
-                        : theme.tabBarInactiveTintColor,
-                  }}
-                  onPress={() =>
-                    loginWithCode({ code, email: email as string })
-                  }
-                >
-                  <Text
-                    className="text-center font-semibold"
+              <CodeField
+                ref={ref}
+                {...props}
+                value={value}
+                onChangeText={setValue}
+                cellCount={CODE_LENGTH}
+                keyboardType="number-pad"
+                textContentType="oneTimeCode"
+                autoComplete={Platform.select({
+                  android: "sms-otp",
+                  default: "one-time-code",
+                })}
+                renderCell={({ index, symbol, isFocused }) => (
+                  <View
+                    key={index}
+                    onLayout={getCellOnLayoutHandler(index)}
+                    className={`w-12 h-12 justify-center items-center rounded-lg border`}
                     style={{
-                      color: colors.white,
+                      backgroundColor: theme.backgroundColor,
+                      borderColor: theme.mutedForegroundColor,
                     }}
                   >
-                    Confirm
-                  </Text>
-                </Button>
-              </View>
+                    <Text
+                      className="text-2xl text-center"
+                      style={{ color: theme.textColor }}
+                    >
+                      {symbol || (isFocused ? <Cursor /> : null)}
+                    </Text>
+                  </View>
+                )}
+              />
             </ScrollView>
-            <ProgressBar sections={3} currentSection={1} />
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>

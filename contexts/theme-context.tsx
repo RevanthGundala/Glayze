@@ -19,13 +19,13 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType>({
   theme: darkTheme,
   setTheme: () => null,
-  themeName: "light",
+  themeName: "dark",
 });
 
 const THEME_STORAGE_KEY = "@user_theme_preference";
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [themeName, setThemeName] = useState<ThemeName>("light");
+  const [themeName, setThemeName] = useState<ThemeName>("dark");
 
   useEffect(() => {
     // Load the saved theme when the component mounts
@@ -55,9 +55,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       console.warn(
         `Theme "${newThemeName}" not found. Defaulting to light theme.`
       );
-      setThemeName("light");
+      setThemeName("dark");
       try {
-        await AsyncStorage.setItem(THEME_STORAGE_KEY, "light");
+        await AsyncStorage.setItem(THEME_STORAGE_KEY, "dark");
       } catch (e) {
         console.error("Failed to save the theme", e);
       }

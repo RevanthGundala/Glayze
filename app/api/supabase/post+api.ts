@@ -57,8 +57,6 @@ export async function POST(request: Request) {
         real_creator: realCreator,
         image_uri: imageIpfsHash,
         post_uri: metadataIpfsHash,
-        volume: 0,
-        ath: 0,
       },
     ]);
 

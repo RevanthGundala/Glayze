@@ -1,6 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { ABI } from "@/utils/constants";
-import { parseEventLogs } from "viem";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
@@ -74,16 +72,6 @@ async function getTradesPriceHistory(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const { txReceipt } = await request.json();
-    if (!txReceipt) throw new Error("No transaction receipt");
-    console.log("Inserting trade...");
-    const logs = parseEventLogs({
-      abi: ABI,
-      logs: txReceipt.logs,
-    });
-    const tradeEvent = logs.find((log) => log.eventName === "Trade");
-    const tradeFeesEvent = logs.find((log) => log.eventName === "TradeFees");
-    if (!tradeEvent || !tradeFeesEvent) throw new Error("No trade event");
     const {
       postId,
       trader,
@@ -93,20 +81,22 @@ export async function POST(request: Request) {
       shares,
       price,
       supply,
-      timestamp,
-    } = tradeEvent.args;
-    const { usdc: fees } = tradeFeesEvent.args;
+      fees,
+      created_at,
+    } = await request.json();
+    console.log("Inserting trade...");
+
     const { error } = await supabase.from("Trades").insert({
-      post_id: postId.toString(),
+      post_id: postId,
       trader,
       is_buy: isBuy,
-      shares: shares.toString(),
-      aura: aura.toString(),
-      usdc: usdc.toString(),
-      price: price.toString(),
-      supply: supply.toString(),
-      fees: fees.toString(),
-      created_at: new Date().toISOString(),
+      shares,
+      aura,
+      usdc,
+      price,
+      supply,
+      fees,
+      created_at,
     });
     console.log("Trade inserted successfully");
     if (error) throw error;

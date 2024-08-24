@@ -30,7 +30,8 @@ import {
 import { Loading } from "@/components/loading";
 import { ABI, ERC20_ABI } from "@/utils/constants";
 import { Address, encodeFunctionData } from "viem";
-import { formatUSDC, getUser, insertTrade, parseUSDC } from "@/utils/helpers";
+import { formatUSDC, parseUSDC } from "@/utils/helpers";
+import { getUser, insertTrade } from "@/utils/api-calls";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { fetchPublicClient } from "@/hooks/use-public-client";
 import { Controller, useForm } from "react-hook-form";

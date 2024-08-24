@@ -1,4 +1,5 @@
-import { TransactionReceipt } from "viem";
+import { TransactionReceipt, parseEventLogs } from "viem";
+import { ABI } from "./constants";
 
 export const getUser = async (privyId: string | undefined | null) => {
   try {
@@ -51,11 +52,13 @@ export const deleteUser = async (privyId: string | undefined | null) => {
         privyId,
       }),
     });
-    const data = await res.json();
-    return data;
+    if (res.status !== 200) {
+      throw new Error("Failed to create post in Supabase.");
+    }
+    return null;
   } catch (error) {
     console.log(error);
-    return null;
+    return error;
   }
 };
 
@@ -74,11 +77,13 @@ export const addToSearchHistory = async (
         content,
       }),
     });
-    const data = await res.json();
-    return data;
+    if (res.status !== 200) {
+      throw new Error("Failed to create post in Supabase.");
+    }
+    return null;
   } catch (error) {
     console.log(error);
-    return null;
+    return error;
   }
 };
 
@@ -96,10 +101,13 @@ export const deleteSearchHistory = async (
       }),
     });
     const data = await res.json();
-    return data;
+    if (res.status !== 200) {
+      throw new Error("Failed to create post in Supabase.");
+    }
+    return null;
   } catch (error) {
     console.log(error);
-    throw error;
+    return error;
   }
 };
 
@@ -107,20 +115,51 @@ export const insertTrade = async (
   txReceipt: TransactionReceipt | undefined
 ) => {
   try {
+    if (!txReceipt) throw new Error("No transaction receipt provided");
+    const logs = parseEventLogs({
+      abi: ABI,
+      logs: txReceipt.logs,
+    });
+    const tradeEvent = logs.find((log) => log.eventName === "Trade");
+    const tradeFeesEvent = logs.find((log) => log.eventName === "TradeFees");
+    if (!tradeEvent || !tradeFeesEvent) throw new Error("No trade event");
+    const {
+      postId,
+      trader,
+      isBuy,
+      aura,
+      usdc,
+      shares,
+      price,
+      supply,
+      timestamp,
+    } = tradeEvent.args;
+    const { usdc: fees } = tradeFeesEvent.args;
     const res = await fetch(`/api/supabase/trades`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        txReceipt,
+        postId: postId.toString(),
+        trader,
+        isBuy,
+        aura: aura.toString(),
+        usdc: usdc.toString(),
+        shares: shares.toString(),
+        price: price.toString(),
+        supply: supply.toString(),
+        fees: fees.toString(),
+        created_at: new Date().toISOString(),
       }),
     });
-    const data = await res.json();
-    return data;
+    if (res.status !== 200) {
+      throw new Error("Failed to create post in Supabase.");
+    }
+    return null;
   } catch (error) {
     console.log(error);
-    return null;
+    return error;
   }
 };
 
@@ -135,7 +174,7 @@ export const insertPost = async (
   contractCreator: string | undefined | null
 ) => {
   try {
-    const response = await fetch("/api/supabase/posts", {
+    const response = await fetch("/api/supabase/post", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -151,11 +190,13 @@ export const insertPost = async (
         metadataIpfsHash,
       }),
     });
-    const data = await response.json();
-    return data;
+    if (response.status !== 200) {
+      throw new Error("Failed to create post in Supabase.");
+    }
+    return null;
   } catch (error) {
     console.log(error);
-    return null;
+    return error;
   }
 };
 
@@ -174,10 +215,12 @@ export const insertReferral = async (
         referee,
       }),
     });
-    const data = await response.json();
-    return data;
+    if (response.status !== 200) {
+      throw new Error("Failed to create post in Supabase.");
+    }
+    return null;
   } catch (error) {
     console.log(error);
-    return null;
+    return error;
   }
 };

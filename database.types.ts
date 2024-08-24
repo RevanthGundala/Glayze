@@ -11,7 +11,6 @@ export type Database = {
     Tables: {
       Posts: {
         Row: {
-          ath: number | null
           contract_creator: string | null
           created_at: string
           image_uri: string | null
@@ -21,10 +20,8 @@ export type Database = {
           real_creator: string | null
           symbol: string | null
           url: string | null
-          volume: number | null
         }
         Insert: {
-          ath?: number | null
           contract_creator?: string | null
           created_at?: string
           image_uri?: string | null
@@ -34,10 +31,8 @@ export type Database = {
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
-          volume?: number | null
         }
         Update: {
-          ath?: number | null
           contract_creator?: string | null
           created_at?: string
           image_uri?: string | null
@@ -47,7 +42,6 @@ export type Database = {
           real_creator?: string | null
           symbol?: string | null
           url?: string | null
-          volume?: number | null
         }
         Relationships: []
       }
@@ -98,6 +92,7 @@ export type Database = {
           aura: string | null
           created_at: string
           fees: string | null
+          id: number
           is_buy: boolean | null
           post_id: string
           price: string | null
@@ -110,6 +105,7 @@ export type Database = {
           aura?: string | null
           created_at?: string
           fees?: string | null
+          id?: number
           is_buy?: boolean | null
           post_id: string
           price?: string | null
@@ -122,6 +118,7 @@ export type Database = {
           aura?: string | null
           created_at?: string
           fees?: string | null
+          id?: number
           is_buy?: boolean | null
           post_id?: string
           price?: string | null
