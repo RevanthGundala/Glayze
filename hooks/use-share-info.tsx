@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { createPublicClient, http, Address } from "viem";
-import { baseSepolia, base } from "viem/chains";
 import { ABI } from "../utils/constants";
 import { fetchPublicClient } from "./use-public-client";
 

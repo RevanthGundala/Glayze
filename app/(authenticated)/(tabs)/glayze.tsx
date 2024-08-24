@@ -31,7 +31,6 @@ import {
   parseUnits,
   formatUnits,
 } from "viem";
-import { supabase } from "@/utils/supabase";
 import { fetchPublicClient, usePublicClient } from "@/hooks/use-public-client";
 import { useConstants } from "@/hooks/use-constants";
 import {
@@ -44,6 +43,7 @@ import { Loading } from "@/components/loading";
 import { fetchRealCreator } from "@/hooks/use-real-creator";
 import { AppState, AppStateStatus } from "react-native";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
+import { insertPost } from "@/utils/api-calls";
 
 interface FormInput {
   name: string;
@@ -245,23 +245,17 @@ export default function Glayze() {
       });
       if (!txReceipt) throw new Error("Failed to get transaction receipt.");
       txSuccess = true;
-      const { error } = await supabase.from("Posts").insert([
-        {
-          post_id: postId,
-          name,
-          symbol,
-          url,
-          contract_creator: address,
-          real_creator: realCreator,
-          image_uri: imageIpfsHash,
-          post_uri: metadataIpfsHash,
-          volume: 0,
-          ath: 0,
-        },
-      ]);
-      if (error) {
-        throw new Error("Failed to create post in Supabase.");
-      }
+      const error = await insertPost(
+        postId,
+        name,
+        symbol,
+        metadataIpfsHash,
+        url,
+        realCreator,
+        imageIpfsHash,
+        realCreator
+      );
+      if (error) throw error;
       if (realCreator) {
         const response = await fetch(
           `${process.env.EXPO_PUBLIC_API_URL}/api/set-creator`,
@@ -286,7 +280,7 @@ export default function Glayze() {
           );
         }
       }
-      refetchBalance();
+      await refetchBalance();
       setIsLoading(false);
       router.replace(
         `/(authenticated)/aux/success?isGlayze=true&id=${postId}&symbol=${symbol}` as Href<string>

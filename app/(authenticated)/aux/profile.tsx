@@ -169,9 +169,6 @@ const Socials = () => {
 
   return (
     <View className="mt-16">
-      <Text style={{ color: theme.textColor }} className="text-center mb-4">
-        Connect
-      </Text>
       <View className="flex-row justify-center items-center space-x-8">
         <Link href={GLAYZE_TWITTER} className="hover:pointer-cursor">
           <Image

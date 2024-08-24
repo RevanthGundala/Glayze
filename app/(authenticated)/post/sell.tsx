@@ -24,7 +24,8 @@ import { useShares, useBalance, useSellPrice, useAura } from "@/hooks";
 import { Loading } from "@/components/loading";
 import { ABI, ERC20_ABI } from "@/utils/constants";
 import { Address, encodeFunctionData } from "viem";
-import { formatUSDC, insertTrade, parseUSDC } from "@/utils/helpers";
+import { formatUSDC, parseUSDC } from "@/utils/helpers";
+import { insertTrade } from "@/utils/api-calls";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { fetchPublicClient } from "@/hooks/use-public-client";
 import { Controller, useForm } from "react-hook-form";
@@ -65,7 +66,12 @@ export default function Sell() {
     data: sellPriceData,
     isLoading: sellPriceLoading,
     isError: sellPriceError,
-  } = useSellPrice(id as string, amount, localAuraAmount);
+  } = useSellPrice(
+    id as string,
+    amount,
+    localAuraAmount,
+    shares?.number ?? "0"
+  );
   const {
     data: aura,
     isLoading: auraLoading,

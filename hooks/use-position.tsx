@@ -1,6 +1,5 @@
 import { Post } from "@/utils/types";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/utils/supabase";
 import { Position } from "@/utils/types";
 
 const calculatePosition = async (
@@ -13,15 +12,16 @@ const calculatePosition = async (
   if (!post || !address || !price || !sharesHeld || !marketValue) {
     return null;
   }
-
-  const { data: trades, error } = await supabase
-    .from("Trades")
-    .select("usdc, shares, fees, created_at, is_buy")
-    .eq("post_id", post.post_id)
-    .eq("trader", address);
-
-  if (error) {
-    throw error;
+  let trades: any[] = [];
+  try {
+    const response = await fetch(
+      `/api/supabase/trades?action=getTradesByPostAndTrader&postId=${post.post_id}&address=${address}`
+    );
+    const data = await response.json();
+    trades = data.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error(`Error fetching trades`);
   }
 
   const currentShares = BigInt(sharesHeld);
@@ -58,8 +58,9 @@ const calculatePosition = async (
 
   const lastKnownPrice = trades[trades.length - 1]?.usdc;
   const remainingValue = BigInt(totalShares) * BigInt(lastKnownPrice!);
-  totalReturn = totalSold - totalBought + remainingValue;
-  totalReturnPercent = 0n;
+  totalReturn = totalSold - totalBought;
+  totalReturnPercent =
+    totalBought > 0n ? (totalReturn * 10000n) / totalBought : 0n;
 
   const averageCost =
     currentShares > 0n ? (totalBought - totalSold) / currentShares : 0n;

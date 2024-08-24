@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/utils/supabase";
 import { createPublicClient, http, Address } from "viem";
 import { ABI } from "@/utils/constants";
 import { Post } from "@/utils/types";
 import { fetchPublicClient } from "./use-public-client";
+import { fetchPosts } from "./use-posts";
 
 type Wallet = {
   holdings: Post[];
@@ -15,12 +15,10 @@ const fetchWallet = async (
   address: string | undefined
 ): Promise<Wallet | null> => {
   if (!address) return null;
-  const { data, error } = await supabase.from("Posts").select("*");
 
-  if (error) {
-    throw new Error(`Error fetching referrals: ${error?.message}`);
-  }
   try {
+    const data = await fetchPosts();
+    if (!data) throw new Error("No posts found");
     const xPosts = data.filter((post) => post.real_creator === address);
     const creations = data.filter((post) => post.contract_creator === address);
 

@@ -1,7 +1,4 @@
 import * as Sharing from "expo-sharing";
-import { supabase } from "./supabase";
-import { TransactionReceipt, parseEventLogs } from "viem";
-import { ABI } from "./constants";
 
 export const share = async (url: string | undefined | null): Promise<void> => {
   try {
@@ -118,23 +115,6 @@ export const formatToMaxLength = (value: string, maxLength: number) => {
   return value.slice(0, maxLength);
 };
 
-export const getUser = async (privyId: string | undefined | null) => {
-  try {
-    if (!privyId) throw new Error("No dynamic id");
-    const { data, error } = await supabase
-      .from("Users")
-      .select("*")
-      .eq("privy_id", privyId);
-    if (error || !data) {
-      throw new Error(`Error fetching creator: ${error?.message}`);
-    }
-    return data;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-};
-
 export const getPostIdFromUrl = (url: string): string | null => {
   // Regular expression to match the numeric post ID
   const postIdRegex = /\/status\/(\d+)/;
@@ -146,136 +126,4 @@ export const getPostIdFromUrl = (url: string): string | null => {
 
   // If no match found, return null or handle the error as needed
   return null;
-};
-
-type CreateUserOptions = {
-  xUserId?: string | undefined | null;
-  address?: string | undefined | null;
-  referralCode?: string | undefined | null;
-};
-
-export const upsertUser = async (
-  privyId: string | undefined | null,
-  options?: CreateUserOptions
-) => {
-  try {
-    if (!privyId) throw new Error("No dynamic id");
-
-    const upsertData: any = {
-      privy_id: privyId,
-      created_at: new Date().toISOString(),
-    };
-
-    if (options?.xUserId) {
-      upsertData.x_user_id = options.xUserId.toString();
-    }
-
-    if (options?.address) {
-      upsertData.address = options.address.toString();
-    }
-
-    if (options?.referralCode) {
-      upsertData.referral_code = options.referralCode.toString();
-    }
-
-    const { error } = await supabase.from("Users").upsert(upsertData);
-    return error ? error : null;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
-
-export const deleteUser = async (privyId: string | undefined | null) => {
-  try {
-    if (!privyId) throw new Error("No dynamic id");
-    const { error } = await supabase
-      .from("Users")
-      .delete()
-      .eq("privy_id", privyId);
-    if (error) throw error;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
-
-export const addToSearchHistory = async (
-  privyId: string | undefined | null,
-  content: string
-) => {
-  try {
-    if (!privyId) throw new Error("No dynamic id");
-    const { error } = await supabase.from("Search").insert([
-      {
-        privy_id: privyId,
-        content,
-      },
-    ]);
-    if (error) throw error;
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
-
-export const deleteSearchHistory = async (
-  privyId: string | undefined | null
-) => {
-  try {
-    if (!privyId) throw new Error("No dynamic id");
-    const { error } = await supabase
-      .from("Search")
-      .delete()
-      .eq("privy_id", privyId);
-    if (error) throw new Error("Error clearing all alerts");
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-};
-
-export const insertTrade = async (
-  txReceipt: TransactionReceipt | undefined
-) => {
-  try {
-    if (!txReceipt) throw new Error("No transaction receipt");
-    console.log("Inserting trade...");
-    const logs = parseEventLogs({
-      abi: ABI,
-      logs: txReceipt.logs,
-    });
-    const tradeEvent = logs.find((log) => log.eventName === "Trade");
-    const tradeFeesEvent = logs.find((log) => log.eventName === "TradeFees");
-    if (!tradeEvent || !tradeFeesEvent) throw new Error("No trade event");
-    const {
-      postId,
-      trader,
-      isBuy,
-      aura,
-      usdc,
-      shares,
-      price,
-      supply,
-      timestamp,
-    } = tradeEvent.args;
-    const { usdc: fees } = tradeFeesEvent.args;
-    const { error } = await supabase.from("Trades").insert({
-      post_id: postId.toString(),
-      trader,
-      is_buy: isBuy,
-      shares: shares.toString(),
-      aura: aura.toString(),
-      usdc: usdc.toString(),
-      price: price.toString(),
-      supply: supply.toString(),
-      fees: fees.toString(),
-      created_at: new Date().toISOString(),
-    });
-    console.log("Trade inserted successfully");
-    return error ? error : null;
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
 };

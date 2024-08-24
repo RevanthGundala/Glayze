@@ -6,11 +6,11 @@ import { Link } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
-import { upsertUser } from "@/utils/helpers";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { useLinkWithOAuth, usePrivy } from "@privy-io/expo";
 import Toast from "react-native-toast-message";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
+import { upsertUser } from "@/utils/api-calls";
 
 export default function ConnectToTwitter() {
   const router = useRouter();

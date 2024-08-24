@@ -218,12 +218,10 @@ const Position = ({
           className="text-lg"
           style={{
             color:
-              totalReturnPercent >= 0
-                ? colors.greenTintColor
-                : colors.redTintColor,
+              totalReturn >= 0 ? colors.greenTintColor : colors.redTintColor,
           }}
         >
-          {totalReturnPercent >= 0
+          {totalReturn >= 0
             ? `+$${formatUSDC(totalReturn.toString())}(+${formatUSDC(
                 totalReturnPercent.toString()
               )}%)`

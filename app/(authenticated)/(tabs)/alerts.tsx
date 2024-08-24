@@ -6,7 +6,6 @@ import {
   SafeAreaView,
   RefreshControl,
 } from "react-native";
-import { supabase } from "@/utils/supabase";
 import { useTheme } from "@/contexts/theme-context";
 import { Loading } from "@/components/loading";
 import { useReferral } from "@/hooks";
@@ -32,19 +31,23 @@ export default function Alerts() {
     return <Loading error={isError ? "Error loading profile" : null} />;
   }
 
-  const clearAlert = async (
-    referee: string | null | undefined,
-    referrer: string | null | undefined
-  ) => {
-    if (!referee || !referrer) throw new Error("No referee or referrer found");
-    const { error } = await supabase
-      .from("Referrals")
-      .update({ show: false })
-      .eq("referee", referee)
-      .eq("referrer", referrer);
-    await refetch();
-    if (error) {
-      console.error("Error clearing alert", error);
+  const clearAlert = async (referee: string | null | undefined) => {
+    try {
+      const res = await fetch(`/api/supabase/alert`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          referee,
+          referrer: address,
+        }),
+      });
+      if (res.status !== 200) {
+        throw new Error("Error clearing alert");
+      }
+      await refetch();
+    } catch (error) {
       Toast.show({
         text1: "Error clearing alert",
         text2: "Please try again",
@@ -56,13 +59,21 @@ export default function Alerts() {
   };
 
   const clearAllAlerts = async () => {
-    const { error } = await supabase
-      .from("Referrals")
-      .update({ show: false })
-      .eq("show", true);
-    await refetch();
-    if (error) {
-      console.error("Error clearing all alerts", error);
+    try {
+      const res = await fetch(`/api/supabase/alert`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          referrer: address,
+        }),
+      });
+      if (res.status !== 200) {
+        throw new Error("Error clearing all alerts");
+      }
+      await refetch();
+    } catch (error) {
       Toast.show({
         text1: "Error clearing all alerts",
         text2: "Please try again",
@@ -121,9 +132,7 @@ export default function Alerts() {
                     ? `${alert.referee} made a transaction!`
                     : `Waiting for ${alert.referee} to make a transaction`}
                 </Text>
-                <TouchableOpacity
-                  onPress={() => clearAlert(alert.referrer, alert.referee)}
-                >
+                <TouchableOpacity onPress={() => clearAlert(alert.referee)}>
                   <Text style={{ color: theme.textColor }}>X</Text>
                 </TouchableOpacity>
               </View>

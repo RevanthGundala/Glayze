@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Address } from "viem";
 import { ABI } from "@/utils/constants";
 import { fetchPublicClient } from "./use-public-client";
-import { parseUSDC } from "@/utils/helpers"; // Make sure to import parseUSDC
+import { parseUSDC } from "@/utils/helpers";
 
 type SellPrice = {
   sellPrice: string;
@@ -13,15 +13,25 @@ type SellPrice = {
 const fetchSellPrice = async (
   postId: string | null,
   shares: string | null,
-  auraAmount: string | null
-): Promise<SellPrice | null> => {
-  if (!postId || !shares || !auraAmount) return null;
-  if (shares === "0")
-    return { sellPrice: "0", sellPriceAfterFees: "0", totalFees: "0" };
-  try {
-    const client = fetchPublicClient();
-    if (!client) return null;
+  auraAmount: string | null,
+  sharesOwned: string | null
+): Promise<SellPrice> => {
+  if (!postId || !shares || !auraAmount || !sharesOwned) {
+    throw new Error("Missing required parameters");
+  }
+  if (shares === "0") {
+    throw new Error("Shares amount must be greater than 0");
+  }
+  if (Number(sharesOwned) < Number(shares)) {
+    throw new Error("Not enough shares");
+  }
 
+  const client = fetchPublicClient();
+  if (!client) {
+    throw new Error("Failed to fetch public client");
+  }
+
+  try {
     const sellPrice = await client.readContract({
       address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS as Address,
       abi: ABI,
@@ -34,7 +44,6 @@ const fetchSellPrice = async (
       functionName: "getSellPriceAfterFees",
       args: [BigInt(postId), BigInt(shares), BigInt(parseUSDC(auraAmount))],
     });
-    console.log("Sell Price After Fees: ", sellPriceAfterFees.toString());
     const totalFees = await client.readContract({
       address: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS as Address,
       abi: ABI,
@@ -49,17 +58,19 @@ const fetchSellPrice = async (
     };
   } catch (error) {
     console.error("Error in fetchSellPrice:", error);
-    return null;
+    throw error; // Re-throw the error instead of returning null
   }
 };
 
 export function useSellPrice(
   postId: string | null,
   shares: string | null,
-  auraAmount: string | null
+  auraAmount: string | null,
+  sharesOwned: string | null
 ) {
-  return useQuery<SellPrice | null, Error>({
-    queryKey: ["sellPrice", postId, shares, auraAmount],
-    queryFn: () => fetchSellPrice(postId, shares, auraAmount),
+  return useQuery<SellPrice, Error>({
+    queryKey: ["sellPrice", postId, shares, auraAmount, sharesOwned],
+    queryFn: () => fetchSellPrice(postId, shares, auraAmount, sharesOwned),
+    retry: false, // Disable retries for faster error reporting
   });
 }

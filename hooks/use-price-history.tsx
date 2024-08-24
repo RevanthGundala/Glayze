@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/utils/supabase";
 
 const DECIMALS = 6; // Assume 6 decimal places for USDC
 
@@ -42,7 +41,17 @@ const calculatePricePeriod = (
   if (prices.length >= 2) {
     const oldestPrice = prices[prices.length - 1];
     const newestPrice = prices[0];
-    change = ((newestPrice - oldestPrice) / oldestPrice) * 100;
+
+    if (oldestPrice === 0) {
+      // Handle the case where the oldest price is 0
+      if (newestPrice === 0) {
+        change = 0; // Both prices are 0, no change
+      } else {
+        change = ((newestPrice - 0.000001) / 0.000001) * 100; // newestPrice is not 0, change is negative
+      }
+    } else {
+      change = ((newestPrice - oldestPrice) / oldestPrice) * 100;
+    }
   }
 
   return {
@@ -55,16 +64,17 @@ const fetchAllPriceHistory = async (
   id: string | null | undefined
 ): Promise<PriceHistoryData | null> => {
   if (!id) return null;
+  let trades: any[] = [];
 
-  const { data: trades, error } = await supabase
-    .from("Trades")
-    .select("price, created_at")
-    .eq("post_id", id)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    console.error("Error fetching trades:", error);
-    throw error;
+  try {
+    const response = await fetch(
+      `/api/supabase/trades?action=getTradesPriceHistory&id=${id}`
+    );
+    const data = await response.json();
+    trades = data.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error(`Error fetching trades`);
   }
 
   if (!trades || trades.length === 0) {

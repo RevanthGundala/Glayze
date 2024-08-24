@@ -1,20 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/utils/supabase";
 
 const fetchSearchHistory = async (
   privyId: string | undefined
 ): Promise<string[] | null> => {
   if (!privyId) return null;
-  const { data, error } = await supabase
-    .from("Search")
-    .select("content")
-    .eq("privy_id", privyId);
-
-  if (error) {
-    throw new Error(`Error fetching search history: ${error.message}`);
+  let searchHistory: any[] = [];
+  try {
+    const response = await fetch(`/api/supabase/search?privyId=${privyId}`);
+    const data = await response.json();
+    searchHistory = data.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error(`Error fetching search history`);
   }
 
-  return data
+  return searchHistory
     .filter((item): item is { content: string } => item.content !== null)
     .map((item) => item.content);
 };

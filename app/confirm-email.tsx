@@ -16,7 +16,6 @@ import { Header } from "@/components/header";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Image } from "expo-image";
 import Toast from "react-native-toast-message";
-import { Loading } from "@/components/loading";
 import { useTheme } from "@/contexts/theme-context";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { useLoginWithEmail } from "@privy-io/expo";

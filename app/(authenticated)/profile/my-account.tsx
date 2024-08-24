@@ -9,14 +9,13 @@ import { useTheme } from "../../../contexts/theme-context";
 import { Header } from "@/components/header";
 import { SubHeader } from "@/components/sub-header";
 import { colors } from "@/utils/theme";
-import { Loading } from "@/components/loading";
-import { supabase } from "@/utils/supabase";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { Controller, useForm } from "react-hook-form";
 import { useReferral } from "@/hooks";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { useLinkWithOAuth, usePrivy } from "@privy-io/expo";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
+import { insertReferral } from "@/utils/api-calls";
 
 interface FormData {
   referralAddress: string;
@@ -39,15 +38,7 @@ export default function MyAccount() {
   });
 
   const handleReferral = async (data: FormData) => {
-    const { error } = await supabase.from("Referrals").insert([
-      {
-        referrer: data.referralAddress,
-        referee: address,
-        show: true,
-        pending: true,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+    const error = await insertReferral(data.referralAddress, address);
     if (error) {
       console.log(error);
       Toast.show({

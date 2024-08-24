@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/utils/supabase";
 import { Address } from "viem";
 
 export const fetchRealCreator = async (
@@ -7,15 +6,9 @@ export const fetchRealCreator = async (
 ): Promise<Address | null> => {
   try {
     if (!xUserId) return null;
-    const { data, error } = await supabase
-      .from("Users")
-      .select("address")
-      .eq("x_user_id", xUserId)
-      .single();
-    if (error || !data) {
-      throw new Error(`Error fetching creator: ${error?.message}`);
-    }
-    return data?.address as Address;
+    const res = await fetch(`/api/supabase/users?xUserId=${xUserId}`);
+    const data = await res.json();
+    return data?.data.address as Address;
   } catch (error) {
     console.log(error);
     return null;

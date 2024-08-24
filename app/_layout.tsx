@@ -1,4 +1,4 @@
-import { Slot } from "expo-router";
+import { Link, Slot } from "expo-router";
 import { Providers } from "@/components/providers";
 import { useRouter } from "expo-router";
 import { Platform, View, Text } from "react-native";
@@ -8,7 +8,7 @@ import { Image } from "expo-image";
 import appleIcon from "@/assets/images/socials/apple.png";
 import icon from "@/assets/images/icon.png";
 import { NativeWindStyleSheet } from "nativewind";
-import { useEffect } from "react";
+import { GLAYZE_DISCORD, GLAYZE_TWITTER } from "@/utils/constants";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
@@ -17,9 +17,9 @@ NativeWindStyleSheet.setOutput({
 const WebLayout = () => {
   const router = useRouter();
   return (
-    <View className="flex-1 bg-white">
-      <View className="mt-40">
-        <Image source={icon} className="w-1/2 h-1/2" />
+    <View className="flex-1 bg-black">
+      <View className="mt-8 mb-4 items-center">
+        <Image source={icon} className="w-20 h-20" />
       </View>
       <View>
         <Image
@@ -29,12 +29,14 @@ const WebLayout = () => {
             height: 450,
             alignSelf: "center",
           }}
+          alt="Iphone"
+          className="text-black"
           contentFit="contain"
         />
       </View>
       <View className="flex items-center justify-center mt-20">
         <Button
-          buttonStyle="w-1/2 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"
+          buttonStyle="w-1/3 rounded-full py-3 border border-gray-200 flex-row items-center justify-center bg-white"
           onPress={() => router.push("/")}
         >
           <Image source={appleIcon} className="w-4 h-4 mr-3" />
@@ -42,6 +44,22 @@ const WebLayout = () => {
             Download Glayze on the App store
           </Text>
         </Button>
+      </View>
+      <View className="mt-6">
+        <View className="flex-row justify-center items-center space-x-8">
+          <Link href={GLAYZE_TWITTER} className="hover:pointer-cursor">
+            <Image
+              source={require("@/assets/images/dark/twitter.png")}
+              className="w-6 h-6"
+            />
+          </Link>
+          <Link href={GLAYZE_DISCORD} className="hover:pointer-cursor">
+            <Image
+              source={require("@/assets/images/dark/discord.png")}
+              className="w-8 h-8"
+            />
+          </Link>
+        </View>
       </View>
     </View>
   );
