@@ -4,18 +4,21 @@ import { Header } from "@/components/header";
 
 type LoadingProps = {
   error?: string | null;
+  showHeader?: boolean;
 };
 
-export const Loading = ({ error }: LoadingProps) => {
+export const Loading = ({ error, showHeader = true }: LoadingProps) => {
   const { theme } = useTheme();
   return (
     <SafeAreaView
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <View className="flex flex-row">
-        <Header backArrow />
-      </View>
+      {showHeader && (
+        <View className="flex flex-row">
+          <Header backArrow />
+        </View>
+      )}
       <View className="flex-1 justify-center items-center mb-32">
         {error ? (
           <Text style={{ color: theme.textColor }}>{error}</Text>

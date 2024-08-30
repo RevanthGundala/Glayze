@@ -194,6 +194,38 @@ const Unlink = () => {
   });
   const [isConnectedToX, setIsConnectedToX] = useState(false);
 
+  const unlinkX = async () => {
+    if (!isConnectedToX) return;
+    try {
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/api/supabase/users`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
+          body: JSON.stringify({
+            privyId: user?.id,
+          }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to unlink X account");
+      }
+      setIsConnectedToX(false);
+    } catch (error) {
+      console.log(error);
+      Toast.show({
+        text1: "Error unlinking your X account",
+        text2: "Please try again",
+        type: "error",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
+    }
+  };
+
   useEffect(() => {
     const account = user?.linked_accounts.find(
       (account) => account.type === "twitter_oauth"
@@ -203,24 +235,29 @@ const Unlink = () => {
 
   return (
     <View className="w-full pt-2">
+      <GlayzeToast />
       <View className="flex-row justify-between items-center w-full py-2">
-        {isConnectedToX ? null : ( // </Pressable> //   </Text> //     Contact Us To Unlink Your X Account //   <Text style={{ color: theme.textColor }} className="text-lg"> // <Pressable className="flex-1" onPress={() => {}}>
+        {isConnectedToX ? (
+          <Pressable className="flex-1" onPress={unlinkX}>
+            <Text style={{ color: theme.textColor }} className="text-lg">
+              Unlink Your X Account
+            </Text>
+          </Pressable>
+        ) : (
           <Pressable className="flex-1" onPress={() => setModalVisible(true)}>
             <Text style={{ color: theme.textColor }} className="text-lg">
               Link Your X Account
             </Text>
           </Pressable>
         )}
-        {!isConnectedToX && (
-          <Image
-            source={
-              themeName === "dark"
-                ? require("@/assets/images/dark/forward-arrow.png")
-                : require("@/assets/images/light/forward-arrow.png")
-            }
-            className="w-4 h-4"
-          />
-        )}
+        <Image
+          source={
+            themeName === "dark"
+              ? require("@/assets/images/dark/forward-arrow.png")
+              : require("@/assets/images/light/forward-arrow.png")
+          }
+          className="w-4 h-4"
+        />
       </View>
       <Modal
         animationType="slide"
@@ -344,20 +381,38 @@ const DeleteAccount = () => {
   const { theme } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
-  const { user } = usePrivy();
+  const { user, logout } = usePrivy();
 
   const handleDelete = async () => {
     try {
-      if (!user?.id) throw new Error("No address found");
       setModalVisible(false);
-      const { error } = await supabase
-        .from("Users")
-        .delete()
-        .eq("privy_id", user?.id);
-      if (error) console.log(error);
-      router.push("/");
+      const response = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/api/supabase/users`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "application/json",
+          },
+          body: JSON.stringify({
+            privyId: user?.id,
+          }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to delete account");
+      }
+      await logout();
+      router.replace("/");
     } catch (error) {
       console.log(error);
+      Toast.show({
+        text1: "Error deleting account",
+        text2: "Please try again",
+        type: "error",
+        visibilityTime: 2000,
+        onPress: () => Toast.hide(),
+      });
     }
   };
   return (

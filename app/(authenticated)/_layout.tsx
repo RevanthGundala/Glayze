@@ -1,26 +1,11 @@
 import { Stack } from "expo-router/stack";
 import { NativeWindStyleSheet } from "nativewind";
-import { useEffect } from "react";
-import { useSmartAccount } from "@/contexts/smart-account-context";
-import { Loading } from "@/components/loading";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
 });
 
 export default function Layout() {
-  const { smartAccountClient, isLoading, refetch, error } = useSmartAccount();
-
-  useEffect(() => {
-    if (error) {
-      console.error("Error fetching smart account client:", error);
-    }
-  }, [error]);
-
-  if (!smartAccountClient || isLoading) {
-    return <Loading />;
-  }
-
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

@@ -1,32 +1,44 @@
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, View, Text } from "react-native";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { Button } from "@/components/ui/button";
-import { usePathname, useRouter } from "expo-router";
-import { Link } from "expo-router";
+import { useRouter } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
-import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { useLinkWithOAuth, usePrivy } from "@privy-io/expo";
 import Toast from "react-native-toast-message";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
 import { upsertUser } from "@/utils/api-calls";
+import { Loading } from "@/components/loading";
 
 export default function ConnectToTwitter() {
   const router = useRouter();
   const { theme } = useTheme();
   const { smartAccountClient } = useSmartAccount();
   const address = smartAccountClient?.account.address;
-  const { user } = usePrivy();
+  const { isReady, user } = usePrivy();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (isReady) {
+      setIsLoading(false);
+      Toast.show({
+        text1: "Success",
+        text2: "Successfully Authenticated",
+        type: "success",
+      });
+    }
+  }, [isReady]);
 
   const handleUpsert = async (xUserId: string | null) => {
     try {
-      const error = await upsertUser(user?.id, {
+      const { data, error } = await upsertUser(user?.id, {
         xUserId,
         address,
         referralCode: address,
       });
-      console.log(error);
+      console.log(data);
       if (error) throw error;
       router.push("/end");
     } catch (error) {
@@ -57,15 +69,16 @@ export default function ConnectToTwitter() {
     },
   });
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <SafeAreaView
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
       <GlayzeToast />
-      {/* <View className="flex flex-row">
-        <Header backArrow />
-      </View> */}
       <View className="mt-24 space-y-4 items-center">
         <Text
           className="text-3xl font-semibold"

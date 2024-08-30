@@ -88,7 +88,7 @@ const LogOut = () => {
   const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
-  const { logout } = usePrivy();
+  const { user, logout } = usePrivy();
 
   const handleLogOut = async () => {
     setModalVisible(false);
@@ -99,9 +99,12 @@ const LogOut = () => {
   return (
     <View className="w-full pt-4 px-6">
       <View className="flex-row justify-between items-center w-full py-2">
-        <Pressable className="flex-1" onPress={() => setModalVisible(true)}>
+        <Pressable
+          className="flex-1"
+          onPress={() => (user ? setModalVisible(true) : router.push("/login"))}
+        >
           <Text style={{ color: theme.textColor }} className="text-lg">
-            Log Out
+            {user ? "Log Out" : "Login"}
           </Text>
         </Pressable>
         <Image

@@ -100,7 +100,7 @@ const fetchSmartAccountClient = async (
 
 export function SmartAccountProvider({ children }: { children: ReactNode }) {
   const wallet = useEmbeddedWallet();
-  const { isReady } = usePrivy();
+  const { isReady, user } = usePrivy();
 
   const {
     data: smartAccountClient,
@@ -110,7 +110,7 @@ export function SmartAccountProvider({ children }: { children: ReactNode }) {
   } = useQuery<SmartAccountClientType | null, Error>({
     queryKey: ["smartAccountClient", wallet],
     queryFn: async () => {
-      if (!isReady) return null;
+      if (!isReady || !user) return null;
       try {
         if (isNotCreated(wallet)) {
           const provider = await wallet.create({ recoveryMethod: "privy" });

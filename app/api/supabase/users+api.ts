@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { PrivyClient } from "@privy-io/server-auth";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
@@ -31,7 +32,8 @@ async function getUserByPrivyId(privyId: string) {
   const { data, error } = await supabase
     .from("Users")
     .select("*")
-    .eq("privy_id", privyId);
+    .eq("privy_id", privyId)
+    .single();
 
   if (!data || error) {
     throw new Error(`Error fetching user: ${error?.message}`);
@@ -88,12 +90,69 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const { privyId } = await request.json();
-    if (!privyId) throw new Error("No dynamic id");
+    if (!privyId) throw new Error("No privy id");
+    const privy = new PrivyClient(
+      process.env.EXPO_PUBLIC_PRIVY_APP_ID,
+      process.env.PRIVY_APP_SECRET
+    );
+
+    await privy.deleteUser(privyId);
     const { error } = await supabase
       .from("Users")
       .delete()
       .eq("privy_id", privyId);
     if (error) throw error;
+    return Response.json({ status: 200 });
+  } catch (error) {
+    console.log(error);
+    return Response.json({ error, status: 500 });
+  }
+}
+
+export async function PUT(request: Request) {
+  try {
+    // Unlink X account
+    const { privyId } = await request.json();
+    if (!privyId) throw new Error("No privy id");
+    const { data, error } = await supabase
+      .from("Users")
+      .select("*")
+      .eq("privy_id", privyId)
+      .single();
+
+    if (!data || error) {
+      throw new Error(`Error fetching user: ${error?.message}`);
+    }
+
+    const { error: unlinkError } = await supabase
+      .from("Users")
+      .update({
+        x_user_id: null,
+      })
+      .eq("privy_id", privyId);
+
+    if (unlinkError) throw unlinkError;
+
+    const response = await fetch(
+      `https://api.privy.io/v1/apps/${process.env.EXPO_PUBLIC_PRIVY_APP_ID}/users/unlink`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
+          Authorization: `Basic ${Buffer.from(
+            `${process.env.EXPO_PUBLIC_PRIVY_APP_ID}:${process.env.PRIVY_APP_SECRET}`
+          ).toString("base64")}`,
+          "privy-app-id": process.env.EXPO_PUBLIC_PRIVY_APP_ID,
+        },
+        body: JSON.stringify({
+          user_id: privyId,
+          type: "twitter_oauth",
+          handle: data.x_user_id,
+        }),
+      }
+    );
+    if (!response.ok) throw new Error("Failed to unlink user");
     return Response.json({ status: 200 });
   } catch (error) {
     console.log(error);

@@ -23,7 +23,7 @@ export const upsertUser = async (
   options?: CreateUserOptions
 ) => {
   try {
-    const res = await fetch(`/api/supabase/user`, {
+    const res = await fetch(`/api/supabase/users`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -34,10 +34,10 @@ export const upsertUser = async (
       }),
     });
     const data = await res.json();
-    return data;
+    return { data, error: null };
   } catch (error) {
     console.log(error);
-    return null;
+    return { data: null, error };
   }
 };
 

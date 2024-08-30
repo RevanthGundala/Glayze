@@ -9,7 +9,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAura } from "@/hooks";
-import { share } from "@/utils/helpers";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { Header } from "@/components/header";

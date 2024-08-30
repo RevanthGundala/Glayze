@@ -16,7 +16,12 @@ import { useRouter, Href } from "expo-router";
 import { ScrollView } from "react-native";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/theme-context";
-import { ABI, DEPLOYMENT_FEE, ERC20_ABI } from "@/utils/constants";
+import {
+  ABI,
+  DEPLOYMENT_FEE,
+  ERC20_ABI,
+  GLAYZE_TEXT_DISCLAIMER,
+} from "@/utils/constants";
 import { Header } from "@/components/header";
 import Toast from "react-native-toast-message";
 import { useForm, Controller } from "react-hook-form";
@@ -503,6 +508,11 @@ export default function Glayze() {
                 )}
               </View>
             </Button>
+            <View className="absolute bottom-24 mx-auto">
+              <Text style={{ color: theme.mutedForegroundColor }}>
+                {GLAYZE_TEXT_DISCLAIMER}
+              </Text>
+            </View>
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>

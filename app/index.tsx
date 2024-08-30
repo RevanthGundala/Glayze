@@ -79,7 +79,6 @@ export default function Index() {
           The ultimate app for trading X posts
         </Text>
       </View>
-      <ProgressBar sections={3} currentSection={0} />
       <View className="flex flex-row justify-center items-center pt-8">
         <Button
           buttonStyle={"rounded-full"}

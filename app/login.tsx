@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
@@ -10,51 +10,94 @@ import {
   Keyboard,
 } from "react-native";
 import { Header } from "@/components/header";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Image } from "expo-image";
 import { Href, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { colors } from "@/utils/theme";
 import { useTheme } from "@/contexts/theme-context";
-import { useLoginWithEmail } from "@privy-io/expo";
+import { useLoginWithSMS } from "@privy-io/expo";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
-import { useForm, Controller } from "react-hook-form";
+import {
+  CodeField,
+  Cursor,
+  useBlurOnFulfill,
+  useClearByFocusCell,
+} from "react-native-confirmation-code-field";
 
-interface FormInput {
-  email: string;
-}
+const CELL_COUNT = 11;
 
 export default function Login() {
   const router = useRouter();
   const { theme } = useTheme();
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormInput>({
-    defaultValues: {
-      email: "",
-    },
+  const [value, setValue] = useState("");
+  const ref = useBlurOnFulfill({ value, cellCount: CELL_COUNT });
+  const [props, getCellOnLayoutHandler] = useClearByFocusCell({
+    value,
+    setValue,
   });
 
-  const { sendCode } = useLoginWithEmail({
-    onSendCodeSuccess({ email }) {
-      router.push(("/confirm-email?email=" + email) as Href<string>);
+  const { sendCode } = useLoginWithSMS({
+    onSendCodeSuccess({ phone }) {
+      router.push(("/confirm-phone?phone=" + phone) as Href<string>);
     },
     onError(error) {
       console.log(error);
       Toast.show({
-        text1: "Error sending email",
+        text1: "Error sending code",
         text2: "Please try again",
         type: "error",
       });
     },
   });
 
-  const onSubmit = (data: FormInput) => {
-    sendCode({ email: data.email });
+  useEffect(() => {
+    if (value.length === CELL_COUNT) {
+      const formattedPhone = `+${value.slice(0, 1)} ${value.slice(
+        1,
+        4
+      )} ${value.slice(4, 7)} ${value.slice(7)}`;
+      sendCode({ phone: formattedPhone });
+    }
+  }, [value]);
+
+  const renderCell = ({ index, symbol, isFocused }) => {
+    let cellWidth = "w-[22px]";
+    if (index === 0) cellWidth = "w-[12px]";
+    const isHyphen = index === 1 || index === 4 || index === 7;
+
+    const placeholderDigit =
+      index === 0 ? "1" : index > 7 ? "5" : ((index - 1) % 3) + 1;
+
+    return (
+      <React.Fragment key={index}>
+        {isHyphen && (
+          <View className="w-[15px] items-center justify-center">
+            <Text style={{ color: theme.mutedForegroundColor }}>-</Text>
+          </View>
+        )}
+        <View
+          onLayout={getCellOnLayoutHandler(index)}
+          className={`${cellWidth} h-[40px] justify-end items-center mr-1`}
+        >
+          <Text
+            className="text-[24px] mb-1"
+            style={{
+              color: symbol ? theme.textColor : theme.mutedForegroundColor,
+            }}
+          >
+            {symbol || (isFocused ? <Cursor /> : placeholderDigit)}
+          </Text>
+          <View
+            className="w-full h-[2px]"
+            style={{
+              backgroundColor: isFocused
+                ? theme.tabBarActiveTintColor
+                : theme.mutedForegroundColor,
+            }}
+          />
+        </View>
+      </React.Fragment>
+    );
   };
 
   return (
@@ -68,7 +111,7 @@ export default function Login() {
       </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
+        className="flex-1"
       >
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-6">
@@ -80,51 +123,25 @@ export default function Login() {
                 />
               </View>
               <View>
-                <Text className="text-lg" style={{ color: theme.textColor }}>
-                  Email
-                </Text>
-                <Controller
-                  control={control}
-                  rules={{
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Invalid email address",
-                    },
-                  }}
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      placeholder="Your Email"
-                      onChangeText={onChange}
-                      value={value}
-                    />
-                  )}
-                  name="email"
-                />
-                {errors.email && (
-                  <Text style={{ color: "red" }}>{errors.email.message}</Text>
-                )}
-              </View>
-              <View>
-                <Button
-                  buttonStyle="w-full rounded-full py-3"
-                  style={{
-                    backgroundColor: theme.tabBarActiveTintColor,
-                  }}
-                  onPress={handleSubmit(onSubmit)}
+                <Text
+                  className="text-lg mb-6 text-center"
+                  style={{ color: theme.textColor }}
                 >
-                  <Text
-                    className="text-center font-semibold"
-                    style={{
-                      color: colors.white,
-                    }}
-                  >
-                    Continue
-                  </Text>
-                </Button>
+                  Enter your phone number
+                </Text>
+                <CodeField
+                  ref={ref}
+                  {...props}
+                  value={value}
+                  onChangeText={setValue}
+                  cellCount={CELL_COUNT}
+                  keyboardType="number-pad"
+                  textContentType="telephoneNumber"
+                  renderCell={renderCell}
+                />
               </View>
               <View className="pt-8">
-                <ProgressBar sections={3} currentSection={1} />
+                <ProgressBar sections={3} currentSection={0} />
               </View>
             </View>
           </ScrollView>

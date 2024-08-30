@@ -5,7 +5,7 @@ export const PrivyProvider = ({ children }: { children: React.ReactNode }) => {
   const chain = process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
   return (
     <ExpoPrivyProvider
-      appId="clymf4i5m06qx8skwtkh8emh2"
+      appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}
       clientId="client-WY2o7dkwZC3XMPwz7NiCgEgvqeNbMEdsXPcqT2pjJipkZ"
       supportedChains={[chain]}
     >

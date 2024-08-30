@@ -941,3 +941,6 @@ export const ERC20_ABI = [
     type: "event",
   },
 ] as const;
+
+export const GLAYZE_TEXT_DISCLAIMER =
+  "Note: This fee will go to the deployment of your token on the Base network. You will receive a royalty fee for every transaction made on this post until you make your dollar back.";
