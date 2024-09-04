@@ -235,7 +235,6 @@ const Unlink = () => {
 
   return (
     <View className="w-full pt-2">
-      <GlayzeToast />
       <View className="flex-row justify-between items-center w-full py-2">
         {isConnectedToX ? (
           <Pressable className="flex-1" onPress={unlinkX}>

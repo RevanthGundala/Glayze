@@ -1,3 +1,5 @@
+import { Loading } from "@/components/loading";
+import { usePrivy } from "@privy-io/expo";
 import { Stack } from "expo-router/stack";
 import { NativeWindStyleSheet } from "nativewind";
 
@@ -6,6 +8,8 @@ NativeWindStyleSheet.setOutput({
 });
 
 export default function Layout() {
+  const { isReady } = usePrivy();
+  if (!isReady) return <Loading />;
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
