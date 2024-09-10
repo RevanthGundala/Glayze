@@ -508,14 +508,14 @@ export default function Glayze() {
                 )}
               </View>
             </Button>
-            <View className="absolute bottom-24 mx-auto">
-              <Text style={{ color: theme.mutedForegroundColor }}>
-                {GLAYZE_TEXT_DISCLAIMER}
-              </Text>
-            </View>
           </ScrollView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
+      <View className="absolute bottom-24 px-6 py-3">
+        <Text style={{ color: theme.mutedForegroundColor }}>
+          {GLAYZE_TEXT_DISCLAIMER}
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
