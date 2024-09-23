@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const usePWA = () => {
+export const usePWA = () => {
   const [isPWA, setIsPWA] = useState(false);
 
   useEffect(() => {
@@ -29,5 +29,3 @@ const usePWA = () => {
 
   return isPWA;
 };
-
-export default usePWA;
