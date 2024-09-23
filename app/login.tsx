@@ -15,7 +15,7 @@ import { Href, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { useTheme } from "@/contexts/theme-context";
-import { useLoginWithSMS } from "@privy-io/expo";
+import { useLoginWithSms } from "@privy-io/react-auth";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
 import {
   CodeField,
@@ -36,27 +36,26 @@ export default function Login() {
     setValue,
   });
 
-  const { sendCode } = useLoginWithSMS({
-    onSendCodeSuccess({ phone }) {
-      router.push(("/confirm-phone?phone=" + phone) as Href<string>);
-    },
-    onError(error) {
+  const { sendCode } = useLoginWithSms();
+
+  useEffect(() => {
+    try {
+      if (value.length === CELL_COUNT) {
+        const formattedPhone = `+${value.slice(0, 1)} ${value.slice(
+          1,
+          4
+        )} ${value.slice(4, 7)} ${value.slice(7)}`;
+
+        sendCode({ phoneNumber: formattedPhone });
+        router.push(("/confirm-phone?phone=" + formattedPhone) as Href<string>);
+      }
+    } catch (error) {
       console.log(error);
       Toast.show({
         text1: "Error sending code",
         text2: "Please try again",
         type: "error",
       });
-    },
-  });
-
-  useEffect(() => {
-    if (value.length === CELL_COUNT) {
-      const formattedPhone = `+${value.slice(0, 1)} ${value.slice(
-        1,
-        4
-      )} ${value.slice(4, 7)} ${value.slice(7)}`;
-      sendCode({ phone: formattedPhone });
     }
   }, [value]);
 
@@ -109,10 +108,7 @@ export default function Login() {
       <View className="flex flex-row">
         <Header backArrow />
       </View>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
+      <KeyboardAvoidingView behavior={"padding"} className="flex-1">
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-6">
             <View className="space-y-4">

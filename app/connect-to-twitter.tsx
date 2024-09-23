@@ -6,7 +6,7 @@ import { useRouter } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { useSmartAccount } from "@/contexts/smart-account-context";
-import { useLinkWithOAuth, usePrivy } from "@privy-io/expo";
+import { useLinkAccount, usePrivy } from "@privy-io/react-auth";
 import Toast from "react-native-toast-message";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
 import { upsertUser } from "@/utils/api-calls";
@@ -17,11 +17,11 @@ export default function ConnectToTwitter() {
   const { theme } = useTheme();
   const { smartAccountClient } = useSmartAccount();
   const address = smartAccountClient?.account.address;
-  const { isReady, user } = usePrivy();
+  const { ready, user } = usePrivy();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (isReady) {
+    if (ready) {
       setIsLoading(false);
       Toast.show({
         text1: "Success",
@@ -29,7 +29,7 @@ export default function ConnectToTwitter() {
         type: "success",
       });
     }
-  }, [isReady]);
+  }, [ready]);
 
   const handleUpsert = async (xUserId: string | null) => {
     try {
@@ -51,21 +51,13 @@ export default function ConnectToTwitter() {
     }
   };
 
-  const { link } = useLinkWithOAuth({
+  const { linkTwitter } = useLinkAccount({
     onSuccess(user) {
-      const xAccount = user?.linked_accounts?.find(
+      const xAccount = user?.linkedAccounts?.find(
         (acc) => acc.type === "twitter_oauth"
       );
       if (!xAccount) throw new Error("No X account found");
       handleUpsert(xAccount.subject);
-    },
-    onError(error) {
-      console.log(error);
-      Toast.show({
-        text1: "Error Connecting to X",
-        text2: "Please try again",
-        type: "error",
-      });
     },
   });
 
@@ -90,14 +82,14 @@ export default function ConnectToTwitter() {
           className="w-[300px] text-center text-lg"
           style={{ color: theme.mutedForegroundColor }}
         >
-          When people post your X posts, you are eligible to claim trading fees
+          When people post your tweets, you are eligible to claim trading fees
         </Text>
         <View className="py-8 space-y-4">
           <Button
             buttonStyle={
               "flex flex-row justify-center items-center rounded-full"
             }
-            onPress={() => link({ provider: "twitter" })}
+            onPress={() => linkTwitter()}
             style={{
               backgroundColor: theme.tabBarActiveTintColor,
               borderColor: theme.tabBarActiveTintColor,

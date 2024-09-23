@@ -4,18 +4,18 @@ import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { useTheme } from "@/contexts/theme-context";
 import { Header } from "@/components/header";
-import { usePrivy } from "@privy-io/expo";
+import { usePrivy } from "@privy-io/react-auth";
 
 export default function End() {
   const router = useRouter();
   const { theme } = useTheme();
   const { user } = usePrivy();
-  const xAccount = user?.linked_accounts?.find(
+  const xAccount = user?.linkedAccounts?.find(
     (acc) => acc.type === "twitter_oauth"
   );
   const name = xAccount?.name ?? "Anon";
   const handle = xAccount?.username ?? "Anon";
-  const image = xAccount?.profile_picture_url ?? "";
+  const image = xAccount?.profilePictureUrl ?? "";
 
   return (
     <SafeAreaView

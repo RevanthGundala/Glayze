@@ -38,7 +38,27 @@
     "web": {
       "bundler": "metro",
       "output": "server",
-      "favicon": "./assets/images/icon.png"
+      "favicon": "./assets/images/icon.png",
+      "shortName": "Glayze",
+      "display": "standalone",
+      "themeColor": "#FFFFFF",
+      "backgroundColor": "#000000",
+      "language": "en",
+      "orientation": "portrait",
+      "startUrl": "/",
+      "scope": "/",
+      "icons": [
+        {
+          "src": "./assets/images/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        },
+        {
+          "src": "./assets/images/icon-512.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
     },
     "plugins": [
       [

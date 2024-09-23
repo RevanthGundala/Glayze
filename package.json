@@ -8,6 +8,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
+    "build:web": "expo export -p web && npx workbox-cli generateSW workbox-config.js",
     "test": "jest --watchAll",
     "lint": "expo lint",
     "create-post": "npx tsx --env-file=.env.development scripts/create-post.ts",
@@ -25,9 +26,8 @@
     "@expo/server": "0.4.4-canary-20240628-1ba8152 ",
     "@expo/vector-icons": "^14.0.2",
     "@mobile-wallet-protocol/client": "^0.0.1",
-    "@privy-io/expo": "0.22.5",
+    "@privy-io/react-auth": "^1.86.0",
     "@privy-io/server-auth": "^1.11.1",
-    "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "11.3.1",
     "@react-navigation/native": "^6.0.2",
     "@rneui/themed": "^4.0.0-rc.8",
@@ -104,7 +104,8 @@
     "supabase": "^1.187.10",
     "tslib": "^2.6.3",
     "tsx": "^4.17.0",
-    "victory-native": "^41.1.0"
+    "victory-native": "^41.1.0",
+    "workbox": "^0.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -360,10 +360,7 @@ function SendReceiveButtons({
           visible={sendModalVisible}
           onRequestClose={() => setSendModalVisible(false)}
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-          >
+          <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
             <TouchableOpacity
               activeOpacity={1}
               onPress={() =>
@@ -561,10 +558,7 @@ function SendReceiveButtons({
           visible={receiveModalVisible}
           onRequestClose={() => setReceiveModalVisible(false)}
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-          >
+          <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
             <TouchableOpacity
               activeOpacity={1}
               onPress={() =>

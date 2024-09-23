@@ -19,7 +19,7 @@ import { Route } from "@/utils/types";
 import { useTheme } from "@/contexts/theme-context";
 import { Loading } from "@/components/loading";
 import { addToSearchHistory, deleteSearchHistory } from "@/utils/helpers";
-import { usePrivy } from "@privy-io/expo";
+import { usePrivy } from "@privy-io/react-auth";
 
 const SearchScreen = () => {
   const [searchText, setSearchText] = useState("");
@@ -63,10 +63,7 @@ const SearchScreen = () => {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
+      <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
         <TouchableWithoutFeedback onPress={handleOutsideClick}>
           <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View className="mt-8">

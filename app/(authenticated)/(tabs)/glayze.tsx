@@ -308,10 +308,7 @@ export default function Glayze() {
       style={{ backgroundColor: theme.backgroundColor }}
     >
       <GlayzeToast />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
+      <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <ScrollView
             contentContainerStyle={{ flexGrow: 1 }}

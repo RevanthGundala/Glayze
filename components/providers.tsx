@@ -1,12 +1,11 @@
 import React from "react";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ThemeProvider } from "@/contexts/theme-context";
-import { Platform } from "react-native";
 import { StatusBar as ExpoStatusBar } from "expo-status-bar";
 import { useTheme } from "@/contexts/theme-context";
 import { SmartAccountProvider } from "@/contexts/smart-account-context";
 import { PostHogProvider } from "@/components/posthog";
-import { SentryProvider } from "@/components/sentry";
+// import { SentryProvider } from "@/components/sentry";
 import { PrivyProvider } from "@/components/privy";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
@@ -14,18 +13,18 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <PostHogProvider>
-        <SentryProvider>
-          <PrivyProvider>
-            <ThemeProvider>
-              <QueryClientProvider client={queryClient}>
-                <SmartAccountProvider>
-                  <StatusBar />
-                  {children}
-                </SmartAccountProvider>
-              </QueryClientProvider>
-            </ThemeProvider>
-          </PrivyProvider>
-        </SentryProvider>
+        {/* <SentryProvider> */}
+        <PrivyProvider>
+          <ThemeProvider>
+            <QueryClientProvider client={queryClient}>
+              <SmartAccountProvider>
+                <StatusBar />
+                {children}
+              </SmartAccountProvider>
+            </QueryClientProvider>
+          </ThemeProvider>
+        </PrivyProvider>
+        {/* </SentryProvider> */}
       </PostHogProvider>
     </>
   );
@@ -33,9 +32,5 @@ export const Providers = ({ children }: { children: React.ReactNode }) => {
 
 const StatusBar = () => {
   const { themeName } = useTheme();
-  if (Platform.OS === "web") {
-    return null;
-  } else {
-    return <ExpoStatusBar style={themeName === "dark" ? "light" : "dark"} />;
-  }
+  return <ExpoStatusBar style={themeName === "dark" ? "light" : "dark"} />;
 };

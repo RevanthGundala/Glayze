@@ -7,22 +7,22 @@ import { Href, useRouter } from "expo-router";
 import { useTheme } from "@/contexts/theme-context";
 import { colors } from "@/utils/theme";
 import { Loading } from "@/components/loading";
-import { usePrivy } from "@privy-io/expo";
+import { usePrivy } from "@privy-io/react-auth";
 
 export default function Index() {
   const router = useRouter();
   const { theme, themeName } = useTheme();
-  const { user, isReady } = usePrivy();
+  const { user, ready } = usePrivy();
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (isReady) {
+    if (ready) {
       setIsInitialized(true);
       if (user) {
         router.replace("/(authenticated)/(tabs)/home" as Href<string>);
       }
     }
-  }, [isReady, user, router]);
+  }, [ready, user, router]);
 
   if (!isInitialized) {
     return <Loading />;
@@ -76,7 +76,7 @@ export default function Index() {
           className="text-center text-lg"
           style={{ color: theme.textColor }}
         >
-          The ultimate app for trading X posts
+          The ultimate app for trading tweets
         </Text>
       </View>
       <View className="flex flex-row justify-center items-center pt-8">

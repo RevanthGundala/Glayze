@@ -26,11 +26,11 @@ import {
 import { baseSepolia, base } from "viem/chains";
 import type { Chain, Transport } from "viem";
 import {
-  useEmbeddedWallet,
   usePrivy,
-  isNotCreated,
-  PrivyEmbeddedWalletProvider,
-} from "@privy-io/expo";
+  useWallets,
+  getEmbeddedConnectedWallet,
+  EIP1193Provider,
+} from "@privy-io/react-auth";
 
 type SmartAccountClientType = SmartAccountClient<
   EntryPoint,
@@ -50,11 +50,9 @@ const SmartAccountContext = createContext<SmartAccountContextType | undefined>(
   undefined
 );
 
-const queryClient = new QueryClient();
-
 const fetchSmartAccountClient = async (
   address: Address,
-  provider: PrivyEmbeddedWalletProvider
+  provider: EIP1193Provider
 ): Promise<SmartAccountClientType | null> => {
   try {
     if (!address || !provider) {
@@ -99,8 +97,9 @@ const fetchSmartAccountClient = async (
 };
 
 export function SmartAccountProvider({ children }: { children: ReactNode }) {
-  const wallet = useEmbeddedWallet();
-  const { isReady, user } = usePrivy();
+  const { wallets, ready: walletReady } = useWallets();
+  const wallet = getEmbeddedConnectedWallet(wallets);
+  const { ready, user } = usePrivy();
 
   const {
     data: smartAccountClient,
@@ -110,25 +109,17 @@ export function SmartAccountProvider({ children }: { children: ReactNode }) {
   } = useQuery<SmartAccountClientType | null, Error>({
     queryKey: ["smartAccountClient", wallet],
     queryFn: async () => {
-      if (!isReady || !user) return null;
+      if (!ready || !user || !wallet || !walletReady) return null;
       try {
-        if (isNotCreated(wallet)) {
-          const provider = await wallet.create({ recoveryMethod: "privy" });
-          if (!provider) {
-            return null;
-          }
-          setTimeout(() => refetch(), 0); // Force a refetch after wallet creation
-          return null;
-        }
-        const address = wallet.account?.address as Address;
-        const provider = await wallet.getProvider();
+        const address = wallet?.address as Address;
+        const provider = await wallet.getEthereumProvider();
         return fetchSmartAccountClient(address, provider);
       } catch (error) {
         console.error("Error in smartAccountClient query:", error);
         throw error;
       }
     },
-    enabled: isReady,
+    enabled: ready && walletReady,
     retry: 2,
   });
 
@@ -136,7 +127,7 @@ export function SmartAccountProvider({ children }: { children: ReactNode }) {
     clientExists: !!smartAccountClient,
     isLoading,
     hasError: !!error,
-    isReady,
+    ready,
   });
 
   return (

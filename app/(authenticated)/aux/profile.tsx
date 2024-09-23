@@ -10,7 +10,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { GLAYZE_TWITTER, GLAYZE_DISCORD } from "@/utils/constants";
 import { Header } from "@/components/header";
 import { colors } from "@/utils/theme";
-import { usePrivy } from "@privy-io/expo";
+import { usePrivy } from "@privy-io/react-auth";
 
 const routes: Route[] = [
   {
@@ -30,12 +30,12 @@ const routes: Route[] = [
 export default function Profile() {
   const { theme, themeName } = useTheme();
   const { user } = usePrivy();
-  const xAccount = user?.linked_accounts?.find(
+  const xAccount = user?.linkedAccounts?.find(
     (acc) => acc.type === "twitter_oauth"
   );
   const name = xAccount?.name ?? "Anon";
   const handle = xAccount?.username ?? "Anon";
-  const image = xAccount?.profile_picture_url ?? "";
+  const image = xAccount?.profilePictureUrl ?? "";
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: theme.backgroundColor }}>

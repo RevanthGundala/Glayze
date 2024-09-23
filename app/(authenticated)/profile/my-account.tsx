@@ -13,7 +13,7 @@ import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import { Controller, useForm } from "react-hook-form";
 import { useReferral } from "@/hooks";
 import { useSmartAccount } from "@/contexts/smart-account-context";
-import { useLinkWithOAuth, usePrivy } from "@privy-io/expo";
+import { useLinkAccount, usePrivy } from "@privy-io/react-auth";
 import { GlayzeToast } from "@/components/ui/glayze-toast";
 import { insertReferral } from "@/utils/api-calls";
 
@@ -176,7 +176,7 @@ const Unlink = () => {
   const { theme, themeName } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
   const { user } = usePrivy();
-  const { link } = useLinkWithOAuth({
+  const { linkTwitter } = useLinkAccount({
     onSuccess: () => {
       setModalVisible(false);
     },
@@ -227,7 +227,7 @@ const Unlink = () => {
   };
 
   useEffect(() => {
-    const account = user?.linked_accounts.find(
+    const account = user?.linkedAccounts.find(
       (account) => account.type === "twitter_oauth"
     );
     if (account) setIsConnectedToX(true);
@@ -290,7 +290,7 @@ const Unlink = () => {
                 </Text>
               </Button>
               <Button
-                onPress={() => link({ provider: "twitter" })}
+                onPress={() => linkTwitter()}
                 buttonStyle="py-3 flex-1 rounded-lg ml-2"
                 style={{ backgroundColor: theme.tabBarActiveTintColor }}
               >

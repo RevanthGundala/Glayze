@@ -434,10 +434,7 @@ export default function Sell() {
           visible={modalVisible}
           onRequestClose={closeModal}
         >
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            style={{ flex: 1 }}
-          >
+          <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
             <TouchableOpacity
               activeOpacity={1}
               onPress={() =>
