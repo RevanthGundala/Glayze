@@ -12,8 +12,8 @@ export default function RootLayout() {
   const isPWA = usePWA();
   if (isPWA) {
     return (
-      <View>
-        <Text>Download app</Text>
+      <View className="flex-1 justify-center items-center bg-black">
+        <Text className="text-white text-lg">Download app</Text>
       </View>
     );
   }
