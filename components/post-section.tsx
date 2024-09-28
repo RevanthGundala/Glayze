@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { TouchableWithoutFeedback, View, Image, Text } from "react-native";
+import {
+  TouchableWithoutFeedback,
+  View,
+  Image,
+  Text,
+  useWindowDimensions,
+} from "react-native";
 import { Link } from "expo-router";
 import { EmbeddedTweet } from "./twitter-theme/embedded-tweet";
 import { useEmbeddedTweet, useShareInfo, usePriceHistory } from "@/hooks";
@@ -54,6 +60,8 @@ export const PostSection = ({
     </View>
   );
 };
+const DESKTOP_BREAKPOINT = 768;
+
 type PostComponentProps = {
   post: Post;
   viewTweets: boolean;
@@ -70,6 +78,13 @@ export const PostComponent = ({
   const { data: shareInfo } = useShareInfo(post.post_id);
   const { theme } = useTheme();
   const image = `${process.env.EXPO_PUBLIC_IPFS_GATEWAY}/ipfs/${post.image_uri}`;
+
+  // Get window dimensions
+  const { width } = useWindowDimensions();
+
+  // Determine if the device is desktop/laptop based on the breakpoint
+  const isDesktop = width >= DESKTOP_BREAKPOINT;
+
   return (
     <View
       className={border ? "border-b overflow-hidden" : "overflow-hidden"}
@@ -89,7 +104,7 @@ export const PostComponent = ({
                 >
                   <Image
                     source={{ uri: image || "" }}
-                    className="w-12 h-12 rounded-full "
+                    className="w-12 h-12 rounded-full"
                     resizeMode="cover"
                   />
                 </View>
@@ -150,13 +165,20 @@ export const PostComponent = ({
         </TouchableWithoutFeedback>
       </Link>
 
-      {viewTweets
-        ? tweet && (
-            <View className="px-3">
-              <EmbeddedTweet tweet={tweet} />
-            </View>
-          )
-        : null}
+      {viewTweets && tweet && (
+        <View
+          className="px-3"
+          style={
+            isDesktop
+              ? {
+                  alignItems: "center", // Centers the EmbeddedTweet horizontally
+                }
+              : {}
+          }
+        >
+          <EmbeddedTweet tweet={tweet} />
+        </View>
+      )}
     </View>
   );
 };

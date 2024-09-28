@@ -3,7 +3,7 @@
   "compilerOptions": {
     "jsx": "react-native",
     "strict": true,
-    "module": "ESNext",
+    "module": "NodeNext",
     "paths": {
       "@/*": ["./*"]
     }

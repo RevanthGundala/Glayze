@@ -13,7 +13,8 @@ export const PrivyProvider = ({ children }: { children: React.ReactNode }) => {
         embeddedWallets: {
           createOnLogin: "all-users",
         },
-        supportedChains: [chain],
+        supportedChains: [baseSepolia],
+        defaultChain: baseSepolia,
       }}
     >
       {children}

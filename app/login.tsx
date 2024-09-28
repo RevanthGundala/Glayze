@@ -14,7 +14,6 @@ import { useLogin } from "@privy-io/react-auth";
 export default function Login() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { authenticated } = usePrivy();
   const { login } = useLogin({
     onComplete(isNewUser) {
       if (isNewUser) {
@@ -24,13 +23,6 @@ export default function Login() {
       }
     },
   });
-
-  useEffect(() => {
-    if (authenticated) {
-      // User is authenticated, navigate to the desired screen
-      router.push("/home"); // Replace "/home" with your target route
-    }
-  }, [authenticated]);
 
   const handleLogin = () => {
     try {

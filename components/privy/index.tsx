@@ -7,10 +7,13 @@ export const PrivyProvider = ({ children }: { children: React.ReactNode }) => {
     <ReactPrivyProvider
       appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}
       config={{
+        appearance: {
+          theme: "dark",
+        },
         embeddedWallets: {
           createOnLogin: "all-users",
         },
-        supportedChains: [chain],
+        supportedChains: [baseSepolia],
       }}
     >
       {children}

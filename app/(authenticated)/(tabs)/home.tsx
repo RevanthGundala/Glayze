@@ -8,16 +8,19 @@ import { PostSection } from "@/components/post-section";
 import { useHomeScrollY } from "@/hooks/use-home-scroll-y";
 import { useTheme } from "@/contexts/theme-context";
 import { usePosts } from "@/hooks";
-
+import { usePrivy } from "@privy-io/react-auth";
 export default function Home() {
   const [selectedTab, setSelectedTab] = useState("Trending");
   const tabs = useMemo(() => ["Trending", "New"], []);
   const scrollY = useHomeScrollY();
   const ref = useRef(null);
-  // useScrollToTop(ref);
+  useScrollToTop(ref);
   const { theme } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const { data: posts, isLoading, isError, refetch } = usePosts(selectedTab);
+  const { user } = usePrivy();
+
+  console.log("user: ", user);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

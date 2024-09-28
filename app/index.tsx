@@ -21,7 +21,7 @@ export default function Index() {
         router.replace("/(authenticated)/(tabs)/home" as Href<string>);
       }
     }
-  }, [ready, user, router]);
+  }, [ready, user]);
 
   if (!isInitialized) {
     return <Loading />;

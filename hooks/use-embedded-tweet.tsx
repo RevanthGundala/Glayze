@@ -12,6 +12,7 @@ export const fetchTweet = async (
     const response = await fetch(
       `${process.env.EXPO_PUBLIC_API_URL}/api/twitter/tweet/${id}`
     );
+    console.log("response", response);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Failed to fetch tweet");
