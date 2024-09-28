@@ -21,10 +21,10 @@ const routes: Route[] = [
     name: "Appearance",
     href: "/(authenticated)/profile/appearance",
   },
-  {
-    name: "Privacy and Legal",
-    href: "/(authenticated)/profile/privacy-and-legal",
-  },
+  // {
+  //   name: "Privacy and Legal",
+  //   href: "/(authenticated)/profile/privacy-and-legal",
+  // },
 ];
 
 export default function Profile() {

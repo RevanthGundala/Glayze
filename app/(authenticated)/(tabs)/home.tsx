@@ -14,7 +14,7 @@ export default function Home() {
   const tabs = useMemo(() => ["Trending", "New"], []);
   const scrollY = useHomeScrollY();
   const ref = useRef(null);
-  useScrollToTop(ref);
+  // useScrollToTop(ref);
   const { theme } = useTheme();
   const [refreshing, setRefreshing] = useState(false);
   const { data: posts, isLoading, isError, refetch } = usePosts(selectedTab);

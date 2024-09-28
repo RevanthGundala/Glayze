@@ -52,7 +52,7 @@ export default function ConnectToTwitter() {
   };
 
   const { linkTwitter } = useLinkAccount({
-    onSuccess(user) {
+    onSuccess: async (user) => {
       const xAccount = user?.linkedAccounts?.find(
         (acc) => acc.type === "twitter_oauth"
       );

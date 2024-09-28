@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode, useMemo } from "react";
 import {
   useQuery,
   QueryClient,
@@ -58,10 +58,27 @@ const fetchSmartAccountClient = async (
     if (!address || !provider) {
       throw new Error("No address or provider found.");
     }
-    const chain = process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
+
+    const {
+      EXPO_PUBLIC_CHAIN,
+      EXPO_PUBLIC_RPC_URL,
+      EXPO_PUBLIC_BASE_FACTORY_ADDRESS,
+      EXPO_PUBLIC_PAYMASTER_KEY,
+    } = process.env;
+
+    if (
+      !EXPO_PUBLIC_CHAIN ||
+      !EXPO_PUBLIC_RPC_URL ||
+      !EXPO_PUBLIC_BASE_FACTORY_ADDRESS ||
+      !EXPO_PUBLIC_PAYMASTER_KEY
+    ) {
+      throw new Error("Missing one or more required environment variables.");
+    }
+
+    const chain = EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
     const publicClient = createPublicClient({
       chain,
-      transport: http(process.env.EXPO_PUBLIC_RPC_URL as string),
+      transport: http(EXPO_PUBLIC_RPC_URL),
     });
 
     const walletClient = createWalletClient({
@@ -72,19 +89,19 @@ const fetchSmartAccountClient = async (
     const signer = walletClientToSmartAccountSigner(walletClient);
     const simpleAccount = await signerToSimpleSmartAccount(publicClient, {
       signer,
-      factoryAddress: process.env.EXPO_PUBLIC_BASE_FACTORY_ADDRESS as Address,
+      factoryAddress: EXPO_PUBLIC_BASE_FACTORY_ADDRESS as Address,
       entryPoint: ENTRYPOINT_ADDRESS_V06,
     });
     const cloudPaymaster = createPimlicoPaymasterClient({
       chain,
-      transport: http(process.env.EXPO_PUBLIC_PAYMASTER_KEY as string),
+      transport: http(EXPO_PUBLIC_PAYMASTER_KEY),
       entryPoint: ENTRYPOINT_ADDRESS_V06,
     });
     const smartAccountClient = createSmartAccountClient({
       account: simpleAccount,
       chain,
       entryPoint: ENTRYPOINT_ADDRESS_V06,
-      bundlerTransport: http(process.env.EXPO_PUBLIC_PAYMASTER_KEY as string),
+      bundlerTransport: http(EXPO_PUBLIC_PAYMASTER_KEY),
       middleware: {
         sponsorUserOperation: cloudPaymaster.sponsorUserOperation,
       },
@@ -98,8 +115,8 @@ const fetchSmartAccountClient = async (
 
 export function SmartAccountProvider({ children }: { children: ReactNode }) {
   const { wallets, ready: walletReady } = useWallets();
+  const { ready, user, createWallet } = usePrivy();
   const wallet = getEmbeddedConnectedWallet(wallets);
-  const { ready, user } = usePrivy();
 
   const {
     data: smartAccountClient,
@@ -107,11 +124,11 @@ export function SmartAccountProvider({ children }: { children: ReactNode }) {
     error,
     refetch,
   } = useQuery<SmartAccountClientType | null, Error>({
-    queryKey: ["smartAccountClient", wallet],
+    queryKey: ["smartAccountClient", wallet?.address],
     queryFn: async () => {
       if (!ready || !user || !wallet || !walletReady) return null;
       try {
-        const address = wallet?.address as Address;
+        const address = wallet.address as Address;
         const provider = await wallet.getEthereumProvider();
         return fetchSmartAccountClient(address, provider);
       } catch (error) {
@@ -119,26 +136,31 @@ export function SmartAccountProvider({ children }: { children: ReactNode }) {
         throw error;
       }
     },
-    enabled: ready && walletReady,
+    enabled: ready && walletReady && !!wallet?.address,
     retry: 2,
   });
 
-  console.log("SmartAccountProvider render:", {
-    clientExists: !!smartAccountClient,
-    isLoading,
-    hasError: !!error,
-    ready,
-  });
+  if (process.env.NODE_ENV === "development") {
+    console.log("SmartAccountProvider render:", {
+      clientExists: !!smartAccountClient,
+      isLoading,
+      hasError: !!error,
+      ready,
+    });
+  }
+
+  const contextValue = useMemo(
+    () => ({
+      smartAccountClient: smartAccountClient ?? null,
+      isLoading,
+      error: error ?? null,
+      refetch,
+    }),
+    [smartAccountClient, isLoading, error, refetch]
+  );
 
   return (
-    <SmartAccountContext.Provider
-      value={{
-        smartAccountClient: smartAccountClient ?? null,
-        isLoading,
-        error: error ?? null,
-        refetch,
-      }}
-    >
+    <SmartAccountContext.Provider value={contextValue}>
       {children}
     </SmartAccountContext.Provider>
   );
