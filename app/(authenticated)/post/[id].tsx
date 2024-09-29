@@ -21,7 +21,9 @@ import { useShareInfo, useShares } from "@/hooks";
 import { Loading } from "@/components/loading";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { formatUSDC } from "@/utils/helpers";
-import { WithSkiaWeb } from "@shopify/react-native-skia/lib/module/web";
+import Graph from "@/components/graph";
+import { Platform } from "react-native";
+import { LoadSkiaWeb } from "@shopify/react-native-skia/lib/module/web";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
@@ -46,6 +48,7 @@ export default function Post() {
     shares?.number,
     shares?.value
   );
+  const [skiaLoaded, setSkiaLoaded] = useState(false);
 
   const navigation = useNavigation();
   const image = `${process.env.EXPO_PUBLIC_IPFS_GATEWAY}/ipfs/${post?.image_uri}`;
@@ -62,7 +65,26 @@ export default function Post() {
     return unsubscribe;
   }, [navigation, id]);
 
-  if (isLoading || isError || !post || shareInfoLoading || shareInfoError)
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      LoadSkiaWeb({ locateFile: () => "/canvaskit.wasm" })
+        .then(() => {
+          setSkiaLoaded(true);
+        })
+        .catch((err) => console.error(err));
+    } else {
+      setSkiaLoaded(true);
+    }
+  }, []);
+
+  if (
+    isLoading ||
+    isError ||
+    !post ||
+    shareInfoLoading ||
+    shareInfoError ||
+    !skiaLoaded
+  )
     return <Loading error={isError ? "Error loading post" : null} />;
 
   return (
@@ -84,12 +106,7 @@ export default function Post() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 80 }}
       >
-        <WithSkiaWeb
-          getComponent={() => import("@/components/graph")}
-          fallback={<Text>Loading Graph...</Text>}
-          price={shareInfo?.price}
-        />
-        {/* <Graph price={shareInfo?.price} /> */}
+        <Graph price={shareInfo?.price} />
         <Position
           marketValue={formatUSDC(shares?.value ?? "0")}
           shares={shares?.number ?? "0"}

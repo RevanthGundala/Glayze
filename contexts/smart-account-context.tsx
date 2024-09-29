@@ -46,6 +46,7 @@ const fetchSmartAccountClient = async (
 
     const chain: Chain =
       process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
+    const paymasterUrl = `${process.env.EXPO_PUBLIC_API_URL}/api/paymaster`;
     const publicClient = createPublicClient({
       chain,
       transport: http(process.env.EXPO_PUBLIC_RPC_URL),
@@ -64,8 +65,8 @@ const fetchSmartAccountClient = async (
         version: "0.6",
       },
     });
-    const cloudPaymaster = createPimlicoClient({
-      transport: http(process.env.EXPO_PUBLIC_PAYMASTER_KEY),
+    const pimlicoClient = createPimlicoClient({
+      transport: http(paymasterUrl),
       entryPoint: {
         address: entryPoint06Address,
         version: "0.6",
@@ -74,8 +75,13 @@ const fetchSmartAccountClient = async (
     const smartAccountClient = createSmartAccountClient({
       account: simpleSmartAccount,
       chain,
-      bundlerTransport: http(process.env.EXPO_PUBLIC_PAYMASTER_KEY),
-      paymaster: cloudPaymaster,
+      bundlerTransport: http(paymasterUrl),
+      paymaster: pimlicoClient,
+      userOperation: {
+        estimateFeesPerGas: async () => {
+          return (await pimlicoClient.getUserOperationGasPrice()).fast; // only when using pimlico bundler
+        },
+      },
     });
     return smartAccountClient as SmartAccountClient;
   } catch (error) {
