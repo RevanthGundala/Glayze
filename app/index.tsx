@@ -14,6 +14,8 @@ export default function Index() {
   const { user, ready } = usePrivy();
   const [isInitialized, setIsInitialized] = useState(false);
 
+  console.log("user", user);
+
   useEffect(() => {
     if (ready) {
       setIsInitialized(true);
