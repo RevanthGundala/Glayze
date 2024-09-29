@@ -44,24 +44,11 @@ const fetchSmartAccountClient = async (
       throw new Error("No address or provider found.");
     }
 
-    const {
-      EXPO_PUBLIC_CHAIN,
-      EXPO_PUBLIC_RPC_URL,
-      EXPO_PUBLIC_PAYMASTER_KEY,
-    } = process.env;
-
-    if (
-      !EXPO_PUBLIC_CHAIN ||
-      !EXPO_PUBLIC_RPC_URL ||
-      !EXPO_PUBLIC_PAYMASTER_KEY
-    ) {
-      throw new Error("Missing one or more required environment variables.");
-    }
-
-    const chain: Chain = EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
+    const chain: Chain =
+      process.env.EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
     const publicClient = createPublicClient({
       chain,
-      transport: http(EXPO_PUBLIC_RPC_URL),
+      transport: http(process.env.EXPO_PUBLIC_RPC_URL),
     });
 
     const walletClient = createWalletClient({
@@ -78,7 +65,7 @@ const fetchSmartAccountClient = async (
       },
     });
     const cloudPaymaster = createPimlicoClient({
-      transport: http(EXPO_PUBLIC_PAYMASTER_KEY),
+      transport: http(process.env.EXPO_PUBLIC_PAYMASTER_KEY),
       entryPoint: {
         address: entryPoint06Address,
         version: "0.6",
@@ -87,7 +74,7 @@ const fetchSmartAccountClient = async (
     const smartAccountClient = createSmartAccountClient({
       account: simpleSmartAccount,
       chain,
-      bundlerTransport: http(EXPO_PUBLIC_PAYMASTER_KEY),
+      bundlerTransport: http(process.env.EXPO_PUBLIC_PAYMASTER_KEY),
       paymaster: cloudPaymaster,
     });
     return smartAccountClient as SmartAccountClient;
