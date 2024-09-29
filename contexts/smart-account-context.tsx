@@ -1,21 +1,6 @@
 import React, { createContext, useContext, ReactNode, useMemo } from "react";
-import {
-  useQuery,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
-import {
-  createSmartAccountClient,
-  ENTRYPOINT_ADDRESS_V06,
-  walletClientToSmartAccountSigner,
-} from "permissionless";
-import {
-  signerToSimpleSmartAccount,
-  SmartAccount,
-} from "permissionless/accounts";
-import { EntryPoint } from "permissionless/_types/types";
-import { createPimlicoPaymasterClient } from "permissionless/clients/pimlico";
-import { SmartAccountClient } from "permissionless";
+import { useQuery } from "@tanstack/react-query";
+import type { SmartAccountClient } from "permissionless";
 import {
   http,
   Address,
@@ -31,16 +16,13 @@ import {
   getEmbeddedConnectedWallet,
   EIP1193Provider,
 } from "@privy-io/react-auth";
-
-type SmartAccountClientType = SmartAccountClient<
-  EntryPoint,
-  Transport,
-  Chain,
-  SmartAccount<EntryPoint, string, Transport, Chain>
->;
+import { toSimpleSmartAccount } from "permissionless/accounts";
+import { entryPoint07Address } from "viem/account-abstraction";
+import { createPimlicoClient } from "permissionless/clients/pimlico";
+import { createSmartAccountClient } from "permissionless";
 
 type SmartAccountContextType = {
-  smartAccountClient: SmartAccountClientType | null;
+  smartAccountClient: SmartAccountClient | null;
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
@@ -53,7 +35,7 @@ const SmartAccountContext = createContext<SmartAccountContextType | undefined>(
 const fetchSmartAccountClient = async (
   address: Address,
   provider: EIP1193Provider
-): Promise<SmartAccountClientType | null> => {
+): Promise<SmartAccountClient | null> => {
   try {
     if (!address || !provider) {
       throw new Error("No address or provider found.");
@@ -75,7 +57,7 @@ const fetchSmartAccountClient = async (
       throw new Error("Missing one or more required environment variables.");
     }
 
-    const chain = EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
+    const chain: Chain = EXPO_PUBLIC_CHAIN === "base" ? base : baseSepolia;
     const publicClient = createPublicClient({
       chain,
       transport: http(EXPO_PUBLIC_RPC_URL),
@@ -86,27 +68,28 @@ const fetchSmartAccountClient = async (
       chain,
       transport: custom(provider),
     });
-    const signer = walletClientToSmartAccountSigner(walletClient);
-    const simpleAccount = await signerToSimpleSmartAccount(publicClient, {
-      signer,
-      factoryAddress: EXPO_PUBLIC_BASE_FACTORY_ADDRESS as Address,
-      entryPoint: ENTRYPOINT_ADDRESS_V06,
-    });
-    const cloudPaymaster = createPimlicoPaymasterClient({
-      chain,
-      transport: http(EXPO_PUBLIC_PAYMASTER_KEY),
-      entryPoint: ENTRYPOINT_ADDRESS_V06,
-    });
-    const smartAccountClient = createSmartAccountClient({
-      account: simpleAccount,
-      chain,
-      entryPoint: ENTRYPOINT_ADDRESS_V06,
-      bundlerTransport: http(EXPO_PUBLIC_PAYMASTER_KEY),
-      middleware: {
-        sponsorUserOperation: cloudPaymaster.sponsorUserOperation,
+    const simpleSmartAccount = await toSimpleSmartAccount({
+      owner: walletClient,
+      client: publicClient,
+      entryPoint: {
+        address: entryPoint07Address,
+        version: "0.7",
       },
     });
-    return smartAccountClient as SmartAccountClientType;
+    const cloudPaymaster = createPimlicoClient({
+      transport: http(EXPO_PUBLIC_PAYMASTER_KEY),
+      entryPoint: {
+        address: entryPoint07Address,
+        version: "0.7",
+      },
+    });
+    const smartAccountClient = createSmartAccountClient({
+      account: simpleSmartAccount,
+      chain,
+      bundlerTransport: http(EXPO_PUBLIC_PAYMASTER_KEY),
+      paymaster: cloudPaymaster,
+    });
+    return smartAccountClient as SmartAccountClient;
   } catch (error) {
     console.error("Error in fetchSmartAccountClient:", error);
     throw error;
@@ -123,9 +106,10 @@ export function SmartAccountProvider({ children }: { children: ReactNode }) {
     isLoading,
     error,
     refetch,
-  } = useQuery<SmartAccountClientType | null, Error>({
+  } = useQuery<SmartAccountClient | null, Error>({
     queryKey: ["smartAccountClient", wallet?.address],
     queryFn: async () => {
+      console.log("Wallet: ", wallet);
       if (!ready || !user || !wallet || !walletReady) return null;
       try {
         const address = wallet.address as Address;
