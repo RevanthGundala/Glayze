@@ -47,7 +47,7 @@ export default function Wallet() {
   useScrollToTop(ref);
   const { smartAccountClient } = useSmartAccount();
   const [refreshing, setRefreshing] = useState(false);
-  const address = smartAccountClient?.account.address;
+  const address = smartAccountClient?.account?.address;
   const {
     data: balance,
     isLoading: isBalanceLoading,

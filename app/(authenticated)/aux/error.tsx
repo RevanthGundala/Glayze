@@ -26,7 +26,7 @@ export default function Error() {
           className="text-center mb-8 px-10 leading-5"
           style={{ color: theme.textColor }}
         >
-          {success
+          {success === "true"
             ? "Your transaction was successful, but we couldn't update our records. Please contact us for support."
             : "Something went wrong. Please try again.\nIf the problem persists, please contact support."}
         </Text>
