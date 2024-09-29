@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { Graph } from "@/components/graph";
 import { Button } from "@/components/ui/button";
 import { BlurView } from "expo-blur";
 import { usePost } from "@/hooks/use-post";
@@ -22,11 +21,12 @@ import { useShareInfo, useShares } from "@/hooks";
 import { Loading } from "@/components/loading";
 import { useSmartAccount } from "@/contexts/smart-account-context";
 import { formatUSDC } from "@/utils/helpers";
+import { WithSkiaWeb } from "@shopify/react-native-skia/lib/module/web";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
   const { smartAccountClient } = useSmartAccount();
-  const address = smartAccountClient?.account.address;
+  const address = smartAccountClient?.account?.address;
   const { data: post, isLoading, isError, refetch } = usePost(id);
   const { theme } = useTheme();
   const {
@@ -84,7 +84,12 @@ export default function Post() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 80 }}
       >
-        <Graph price={shareInfo?.price} />
+        <WithSkiaWeb
+          getComponent={() => import("@/components/graph")}
+          fallback={<Text>Loading Graph...</Text>}
+          price={shareInfo?.price}
+        />
+        {/* <Graph price={shareInfo?.price} /> */}
         <Position
           marketValue={formatUSDC(shares?.value ?? "0")}
           shares={shares?.number ?? "0"}

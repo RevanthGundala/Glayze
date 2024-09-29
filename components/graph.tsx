@@ -16,7 +16,7 @@ type GraphProps = {
   price: string | undefined;
 };
 
-export const Graph = ({ price }: GraphProps) => {
+export default function Graph({ price }: GraphProps) {
   const { id } = useLocalSearchParams();
   const [selectedTime, setSelectedTime] = useState<Time>("1H");
   const { data: priceHistory } = usePriceHistory(id as string);
@@ -158,7 +158,7 @@ export const Graph = ({ price }: GraphProps) => {
       </View>
     </View>
   );
-};
+}
 
 function ToolTip({ x, y }: { x: SharedValue<number>; y: SharedValue<number> }) {
   const { theme } = useTheme();

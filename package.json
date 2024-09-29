@@ -70,6 +70,7 @@
     "fast-text-encoding": "^1.0.6",
     "is-ipfs": "^8.0.4",
     "nativewind": "^2.0.11",
+    "nullthrows": "^1.1.1",
     "permissionless": "^0.2.3",
     "pinata": "^0.1.10",
     "plaid": "^26.0.0",
