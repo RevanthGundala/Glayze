@@ -16,7 +16,7 @@ export default function ConnectToTwitter() {
   const router = useRouter();
   const { theme } = useTheme();
   const { smartAccountClient } = useSmartAccount();
-  const address = smartAccountClient?.account.address;
+  const address = smartAccountClient?.account?.address;
   const { ready, user } = usePrivy();
   const [isLoading, setIsLoading] = useState(true);
 

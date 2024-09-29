@@ -6,10 +6,8 @@ export const fetchTweet = async (
   url: string | null
 ): Promise<EnrichedTweet | null> => {
   try {
-    console.log("url", url);
     if (!url) return null;
     const id = getPostIdFromUrl(url);
-    console.log("id", id);
     if (!id) return null;
     const response = await fetch(
       `${process.env.EXPO_PUBLIC_API_URL}/api/twitter/tweet/${id}`

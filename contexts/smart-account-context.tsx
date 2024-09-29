@@ -17,7 +17,10 @@ import {
   EIP1193Provider,
 } from "@privy-io/react-auth";
 import { toSimpleSmartAccount } from "permissionless/accounts";
-import { entryPoint07Address } from "viem/account-abstraction";
+import {
+  entryPoint06Address,
+  entryPoint07Address,
+} from "viem/account-abstraction";
 import { createPimlicoClient } from "permissionless/clients/pimlico";
 import { createSmartAccountClient } from "permissionless";
 
@@ -44,14 +47,12 @@ const fetchSmartAccountClient = async (
     const {
       EXPO_PUBLIC_CHAIN,
       EXPO_PUBLIC_RPC_URL,
-      EXPO_PUBLIC_BASE_FACTORY_ADDRESS,
       EXPO_PUBLIC_PAYMASTER_KEY,
     } = process.env;
 
     if (
       !EXPO_PUBLIC_CHAIN ||
       !EXPO_PUBLIC_RPC_URL ||
-      !EXPO_PUBLIC_BASE_FACTORY_ADDRESS ||
       !EXPO_PUBLIC_PAYMASTER_KEY
     ) {
       throw new Error("Missing one or more required environment variables.");
@@ -72,15 +73,15 @@ const fetchSmartAccountClient = async (
       owner: walletClient,
       client: publicClient,
       entryPoint: {
-        address: entryPoint07Address,
-        version: "0.7",
+        address: entryPoint06Address,
+        version: "0.6",
       },
     });
     const cloudPaymaster = createPimlicoClient({
       transport: http(EXPO_PUBLIC_PAYMASTER_KEY),
       entryPoint: {
-        address: entryPoint07Address,
-        version: "0.7",
+        address: entryPoint06Address,
+        version: "0.6",
       },
     });
     const smartAccountClient = createSmartAccountClient({

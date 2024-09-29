@@ -65,7 +65,7 @@ export default function Glayze() {
     isLoading: smartAccountLoading,
     error: smartAccountError,
   } = useSmartAccount();
-  const address = smartAccountClient?.account.address;
+  const address = smartAccountClient?.account?.address;
   const {
     data: balance,
     isLoading: balanceLoading,
@@ -236,9 +236,10 @@ export default function Glayze() {
           value: 0n,
         },
       ];
-      const txHash = await smartAccountClient.sendTransactions({
-        transactions,
+      const txHash = await smartAccountClient.sendTransaction({
+        calls: transactions,
       });
+      console.log("txHash", txHash);
       console.log("✅ Transaction successfully sponsored!");
       console.log(
         `🔍 View on Blockscout: https://base-sepolia.blockscout.com/tx/${txHash}`
@@ -248,7 +249,7 @@ export default function Glayze() {
         hash: txHash as Address,
       });
       if (!txReceipt) throw new Error("Failed to get transaction receipt.");
-
+      console.log("Receipt: ", txReceipt);
       const error = await insertPost(
         postId,
         name,
@@ -259,7 +260,7 @@ export default function Glayze() {
         imageIpfsHash,
         realCreator
       );
-      txSuccess = true;
+      // txSuccess = true;
       if (error) throw error;
       if (realCreator) {
         const response = await fetch(
