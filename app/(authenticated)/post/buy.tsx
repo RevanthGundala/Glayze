@@ -11,6 +11,7 @@ import {
   Keyboard,
   Animated,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { Image } from "expo-image";
 import { useRouter, Href } from "expo-router";
@@ -43,7 +44,7 @@ export default function Buy() {
   const [isLoading, setIsLoading] = useState(false);
   const { id, name, symbol, image } = useLocalSearchParams();
   const { smartAccountClient, error: smartAccountError } = useSmartAccount();
-  const address = smartAccountClient?.account.address;
+  const address = smartAccountClient?.account?.address;
   const { data: referrals } = useReferral(address);
   type FormData = {
     auraAmount: string;
@@ -195,8 +196,8 @@ export default function Buy() {
         },
       ];
 
-      const txHash = await smartAccountClient?.sendTransactions({
-        transactions,
+      const txHash = await smartAccountClient?.sendTransaction({
+        calls: transactions,
       });
 
       console.log("✅ Transaction successfully sponsored!");
@@ -287,325 +288,322 @@ export default function Buy() {
       className="flex-1"
       style={{ backgroundColor: theme.backgroundColor }}
     >
-      <View className="flex-row items-center justify-between px-4 w-full">
-        <Header backArrow />
-        <ShareHeader
-          name={name as string}
-          symbol={symbol as string}
-          image={image as string}
-        />
-        <View className="w-1/5" />
-      </View>
-      <View className="flex-1 px-4 pt-2">
-        <Text
-          className="text-3xl font-semibold text-center"
-          style={{ color: theme.textColor }}
-        >
-          Buy
-        </Text>
-        <Text
-          className="text-center text-sm pt-2"
-          style={{ color: theme.mutedForegroundColor }}
-        >
-          {shares?.number ?? "0"} Shares (~$
-          {formatUSDC(shares?.value ?? "0")})
-        </Text>
-        <View className="mt-2 rounded-xl p-4">
+      <ScrollView>
+        <View className="flex-row items-center justify-between px-4 w-full">
+          <Header backArrow />
+          <ShareHeader
+            name={name as string}
+            symbol={symbol as string}
+            image={image as string}
+          />
+          <View className="w-1/5" />
+        </View>
+        <View className="flex-1 px-4 pt-2">
           <Text
-            className="font-bold text-center"
-            style={{ color: theme.textColor, fontSize }}
+            className="text-3xl font-semibold text-center"
+            style={{ color: theme.textColor }}
           >
-            {amount}
+            Buy
           </Text>
-        </View>
-
-        <View className="flex-row justify-between mt-2 px-4">
-          {percentages.map((percent, i) => (
-            <Button
-              key={i}
-              style={{ backgroundColor: theme.tabBarActiveTintColor }}
-              buttonStyle="bg-neutral px-5 py-3 rounded-full"
-              onPress={() => setAmount(percent)}
-            >
-              <Text className="font-semibold" style={{ color: colors.white }}>
-                {percent}
-              </Text>
-            </Button>
-          ))}
-        </View>
-
-        <View className="flex-row flex-wrap justify-between mt-6">
-          {numpad.map((num, i) =>
-            num === "X" ? (
-              <TouchableOpacity
-                key={i}
-                onPress={() =>
-                  setAmount((prev) =>
-                    prev.slice(0, -1) === "" ? "0" : prev.slice(0, -1)
-                  )
-                }
-                className="w-[30%] aspect-square items-center justify-center mb-4"
-              >
-                <Image
-                  source={
-                    themeName === "dark"
-                      ? require("@/assets/images/dark/backspace.png")
-                      : require("@/assets/images/light/backspace.png")
-                  }
-                  className="w-12 h-6"
-                />
-              </TouchableOpacity>
-            ) : num === "CLEAR" ? (
-              <TouchableOpacity
-                key={i}
-                onPress={clearAmount}
-                className="w-[30%] aspect-square items-center justify-center mb-4"
-              >
-                <Image
-                  source={
-                    themeName === "dark"
-                      ? require("@/assets/images/dark/clear.png")
-                      : require("@/assets/images/light/clear.png")
-                  }
-                  className="w-9 h-9"
-                />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                key={i}
-                onPress={() => updateAmount(num)}
-                className="w-[30%] aspect-square items-center justify-center mb-4"
-              >
-                <Text
-                  className="text-2xl font-semibold"
-                  style={{ color: theme.textColor }}
-                >
-                  {num}
-                </Text>
-              </TouchableOpacity>
-            )
-          )}
-        </View>
-        <View className="mt-auto mb-10">
-          <Button
-            buttonStyle="w-full rounded-full"
-            onPress={openModal}
-            disabled={amount === "0" || !hasSufficientBalance}
-            style={{
-              backgroundColor:
-                amount === "0" || !hasSufficientBalance
-                  ? theme.mutedForegroundColor
-                  : theme.tabBarActiveTintColor,
-            }}
+          <Text
+            className="text-center text-sm pt-2"
+            style={{ color: theme.mutedForegroundColor }}
           >
-            <View
+            {shares?.number ?? "0"} Shares (~$
+            {formatUSDC(shares?.value ?? "0")})
+          </Text>
+          <View className="mt-2 rounded-xl p-4">
+            <Text
+              className="font-bold text-center"
+              style={{ color: theme.textColor, fontSize }}
+            >
+              {amount}
+            </Text>
+          </View>
+
+          <View className="flex-row justify-between mt-2 px-4">
+            {percentages.map((percent, i) => (
+              <Button
+                key={i}
+                style={{ backgroundColor: theme.tabBarActiveTintColor }}
+                buttonStyle="bg-neutral px-5 py-3 rounded-full"
+                onPress={() => setAmount(percent)}
+              >
+                <Text className="font-semibold" style={{ color: colors.white }}>
+                  {percent}
+                </Text>
+              </Button>
+            ))}
+          </View>
+
+          <View className="flex-row flex-wrap justify-between mt-6">
+            {numpad.map((num, i) =>
+              num === "X" ? (
+                <TouchableOpacity
+                  key={i}
+                  onPress={() =>
+                    setAmount((prev) =>
+                      prev.slice(0, -1) === "" ? "0" : prev.slice(0, -1)
+                    )
+                  }
+                  className="w-[30%] aspect-square items-center justify-center mb-4"
+                >
+                  <Image
+                    source={
+                      themeName === "dark"
+                        ? require("@/assets/images/dark/backspace.png")
+                        : require("@/assets/images/light/backspace.png")
+                    }
+                    className="w-12 h-6"
+                  />
+                </TouchableOpacity>
+              ) : num === "CLEAR" ? (
+                <View
+                  key={i}
+                  className="w-[30%] aspect-square items-center justify-center mb-4"
+                />
+              ) : (
+                <TouchableOpacity
+                  key={i}
+                  onPress={() => updateAmount(num)}
+                  className="w-[30%] aspect-square items-center justify-center mb-4"
+                >
+                  <Text
+                    className="text-2xl font-semibold"
+                    style={{ color: theme.textColor }}
+                  >
+                    {num}
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
+          </View>
+          <View className="mt-auto mb-10">
+            <Button
+              buttonStyle="w-full rounded-full"
+              onPress={openModal}
+              disabled={amount === "0" || !hasSufficientBalance}
               style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
+                backgroundColor:
+                  amount === "0" || !hasSufficientBalance
+                    ? theme.mutedForegroundColor
+                    : theme.tabBarActiveTintColor,
               }}
             >
-              {!isLoading ? (
-                <>
-                  <Text
-                    className="text-center py-4 font-semibold text-lg"
-                    style={{ color: colors.white }}
-                  >
-                    {amount === "0"
-                      ? "Place an order"
-                      : !hasSufficientBalance &&
-                        !buyPriceLoading &&
-                        buyPriceData
-                      ? `Insufficient Balance: $${formatUSDC(
-                          buyPriceData?.buyPriceAfterFees
-                        )}`
-                      : `Buy for ${
-                          !buyPriceLoading &&
-                          buyPriceData &&
-                          buyPriceData?.buyPriceAfterFees === "0"
-                            ? "Free"
-                            : !buyPriceLoading && buyPriceData
-                            ? `$${formatUSDC(buyPriceData?.buyPriceAfterFees)}`
-                            : ""
-                        }`}
-                  </Text>
-                  {buyPriceLoading && (
-                    <ActivityIndicator
-                      size="small"
-                      color={colors.white}
-                      style={{ marginLeft: 10 }}
-                    />
-                  )}
-                </>
-              ) : (
-                <ActivityIndicator
-                  size="small"
-                  color={colors.white}
-                  className="py-4"
-                />
-              )}
-            </View>
-          </Button>
-        </View>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={closeModal}
-        >
-          <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() =>
-                isKeyboardVisible ? Keyboard.dismiss() : closeModal()
-              }
-              className="flex-1 justify-end bg-black/50"
-            >
               <View
-                style={{ backgroundColor: theme.backgroundColor }}
-                className="rounded-t-3xl p-6 h-[300px]"
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
-                <Text
-                  style={{ color: theme.textColor }}
-                  className="text-xl font-medium text-center"
-                >
-                  Confirm your order
-                </Text>
-                <Text
-                  style={{ color: theme.mutedForegroundColor }}
-                  className="py-2 text-center"
-                >
-                  You are buying {amount ?? "0"} shares of {symbol}
-                </Text>
-
-                <Text className="py-2" style={{ color: theme.textColor }}>
-                  Balance: {formatUSDC(aura ?? "0")} $AURA
-                </Text>
-
-                <View className="flex-row items-center justify-between mb-4">
-                  <View className="w-2/3">
-                    <Controller
-                      control={control}
-                      rules={{
-                        validate: (value) => {
-                          if (value === "") return true;
-                          const numValue = Number(value);
-                          if (isNaN(numValue))
-                            return "Please enter a valid number";
-                          if (numValue < 0) return "Amount cannot be negative";
-                          if (aura && numValue > Number(aura))
-                            return "Amount exceeds balance";
-                          return true;
-                        },
-                      }}
-                      render={({ field: { onChange, value } }) => (
-                        <Input
-                          style={{
-                            color: theme.textColor,
-                            backgroundColor: theme.secondaryBackgroundColor,
-                            borderColor: errors.auraAmount
-                              ? "red"
-                              : theme.mutedForegroundColor,
-                          }}
-                          placeholder={formatUSDC(aura ?? "0")}
-                          onChangeText={(text) => {
-                            onChange(text);
-                            setLocalAuraAmount(text === "" ? "0" : text);
-                          }}
-                          value={value}
-                          keyboardType="numeric"
-                        />
-                      )}
-                      name="auraAmount"
-                    />
-                    {errors.auraAmount && (
-                      <Text style={{ color: "red", fontSize: 12 }}>
-                        {errors.auraAmount.message}
-                      </Text>
-                    )}
-                  </View>
-                  <TouchableOpacity
-                    className="absolute right-32"
-                    style={{
-                      backgroundColor: theme.backgroundColor,
-                      borderColor: theme.mutedForegroundColor,
-                    }}
-                    onPress={() => {
-                      const maxAmount = formatUSDC(aura ?? "0");
-                      setValue("auraAmount", maxAmount);
-                      setLocalAuraAmount(maxAmount); // Update local state
-                    }}
-                  >
+                {!isLoading ? (
+                  <>
                     <Text
-                      className="text-sm"
-                      style={{ color: theme.textColor }}
+                      className="text-center py-4 font-semibold text-lg"
+                      style={{ color: colors.white }}
                     >
-                      MAX
+                      {amount === "0"
+                        ? "Place an order"
+                        : !hasSufficientBalance &&
+                          !buyPriceLoading &&
+                          buyPriceData
+                        ? `Insufficient Balance: $${formatUSDC(
+                            buyPriceData?.buyPriceAfterFees
+                          )}`
+                        : `Buy for ${
+                            !buyPriceLoading &&
+                            buyPriceData &&
+                            buyPriceData?.buyPriceAfterFees === "0"
+                              ? "Free"
+                              : !buyPriceLoading && buyPriceData
+                              ? `$${formatUSDC(
+                                  buyPriceData?.buyPriceAfterFees
+                                )}`
+                              : ""
+                          }`}
                     </Text>
-                  </TouchableOpacity>
-                </View>
-                <View className="mt-auto mb-8">
-                  <Button
-                    buttonStyle="w-full rounded-full"
-                    onPress={handleSubmit(handleBuy)}
-                    disabled={
-                      amount === "0" ||
-                      !hasSufficientBalance ||
-                      !hasSufficientAura ||
-                      !!errors.auraAmount
-                    }
-                    style={{
-                      backgroundColor:
-                        amount === "0" ||
-                        !hasSufficientBalance ||
-                        !hasSufficientAura ||
-                        errors.auraAmount
-                          ? theme.mutedForegroundColor
-                          : theme.tabBarActiveTintColor,
-                    }}
+                    {buyPriceLoading && (
+                      <ActivityIndicator
+                        size="small"
+                        color={colors.white}
+                        style={{ marginLeft: 10 }}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <ActivityIndicator
+                    size="small"
+                    color={colors.white}
+                    className="py-4"
+                  />
+                )}
+              </View>
+            </Button>
+          </View>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={closeModal}
+          >
+            <KeyboardAvoidingView behavior={"padding"} style={{ flex: 1 }}>
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() =>
+                  isKeyboardVisible ? Keyboard.dismiss() : closeModal()
+                }
+                className="flex-1 justify-end bg-black/50"
+              >
+                <View
+                  style={{ backgroundColor: theme.backgroundColor }}
+                  className="rounded-t-3xl p-6 h-[300px]"
+                >
+                  <Text
+                    style={{ color: theme.textColor }}
+                    className="text-xl font-medium text-center"
                   >
-                    <View
+                    Confirm your order
+                  </Text>
+                  <Text
+                    style={{ color: theme.mutedForegroundColor }}
+                    className="py-2 text-center"
+                  >
+                    You are buying {amount ?? "0"} shares of {symbol}
+                  </Text>
+
+                  <Text className="py-2" style={{ color: theme.textColor }}>
+                    Balance: {formatUSDC(aura ?? "0")} $AURA
+                  </Text>
+
+                  <View className="flex-row items-center justify-between mb-4">
+                    <View className="w-2/3">
+                      <Controller
+                        control={control}
+                        rules={{
+                          validate: (value) => {
+                            if (value === "") return true;
+                            const numValue = Number(value);
+                            if (isNaN(numValue))
+                              return "Please enter a valid number";
+                            if (numValue < 0)
+                              return "Amount cannot be negative";
+                            if (aura && numValue > Number(aura))
+                              return "Amount exceeds balance";
+                            return true;
+                          },
+                        }}
+                        render={({ field: { onChange, value } }) => (
+                          <Input
+                            style={{
+                              color: theme.textColor,
+                              backgroundColor: theme.secondaryBackgroundColor,
+                              borderColor: errors.auraAmount
+                                ? "red"
+                                : theme.mutedForegroundColor,
+                            }}
+                            placeholder={formatUSDC(aura ?? "0")}
+                            onChangeText={(text) => {
+                              onChange(text);
+                              setLocalAuraAmount(text === "" ? "0" : text);
+                            }}
+                            value={value}
+                            keyboardType="numeric"
+                          />
+                        )}
+                        name="auraAmount"
+                      />
+                      {errors.auraAmount && (
+                        <Text style={{ color: "red", fontSize: 12 }}>
+                          {errors.auraAmount.message}
+                        </Text>
+                      )}
+                    </View>
+                    <TouchableOpacity
+                      className="absolute right-32"
                       style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        backgroundColor: theme.backgroundColor,
+                        borderColor: theme.mutedForegroundColor,
+                      }}
+                      onPress={() => {
+                        const maxAmount = formatUSDC(aura ?? "0");
+                        setValue("auraAmount", maxAmount);
+                        setLocalAuraAmount(maxAmount); // Update local state
                       }}
                     >
                       <Text
-                        className="text-center py-3 font-semibold text-lg"
-                        style={{ color: colors.white }}
+                        className="text-sm"
+                        style={{ color: theme.textColor }}
                       >
-                        {!hasSufficientAura && !buyPriceLoading && buyPriceData
-                          ? "Not enough $AURA"
-                          : `Buy for ${
-                              !buyPriceLoading &&
-                              buyPriceData &&
-                              buyPriceData?.buyPriceAfterFees === "0"
-                                ? "Free"
-                                : `${
-                                    !buyPriceLoading && buyPriceData
-                                      ? `$${formatUSDC(
-                                          buyPriceData?.buyPriceAfterFees
-                                        )}`
-                                      : ""
-                                  }`
-                            }`}
+                        MAX
                       </Text>
-                      {buyPriceLoading && (
-                        <ActivityIndicator
-                          size="small"
-                          color={colors.white}
-                          style={{ marginLeft: 10 }}
-                        />
-                      )}
-                    </View>
-                  </Button>
+                    </TouchableOpacity>
+                  </View>
+                  <View className="mt-auto mb-8">
+                    <Button
+                      buttonStyle="w-full rounded-full"
+                      onPress={handleSubmit(handleBuy)}
+                      disabled={
+                        amount === "0" ||
+                        !hasSufficientBalance ||
+                        !hasSufficientAura ||
+                        !!errors.auraAmount
+                      }
+                      style={{
+                        backgroundColor:
+                          amount === "0" ||
+                          !hasSufficientBalance ||
+                          !hasSufficientAura ||
+                          errors.auraAmount
+                            ? theme.mutedForegroundColor
+                            : theme.tabBarActiveTintColor,
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Text
+                          className="text-center py-3 font-semibold text-lg"
+                          style={{ color: colors.white }}
+                        >
+                          {!hasSufficientAura &&
+                          !buyPriceLoading &&
+                          buyPriceData
+                            ? "Not enough $AURA"
+                            : `Buy for ${
+                                !buyPriceLoading &&
+                                buyPriceData &&
+                                buyPriceData?.buyPriceAfterFees === "0"
+                                  ? "Free"
+                                  : `${
+                                      !buyPriceLoading && buyPriceData
+                                        ? `$${formatUSDC(
+                                            buyPriceData?.buyPriceAfterFees
+                                          )}`
+                                        : ""
+                                    }`
+                              }`}
+                        </Text>
+                        {buyPriceLoading && (
+                          <ActivityIndicator
+                            size="small"
+                            color={colors.white}
+                            style={{ marginLeft: 10 }}
+                          />
+                        )}
+                      </View>
+                    </Button>
+                  </View>
                 </View>
-              </View>
-            </TouchableOpacity>
-          </KeyboardAvoidingView>
-        </Modal>
-      </View>
+              </TouchableOpacity>
+            </KeyboardAvoidingView>
+          </Modal>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

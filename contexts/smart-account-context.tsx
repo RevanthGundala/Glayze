@@ -77,11 +77,11 @@ const fetchSmartAccountClient = async (
       chain,
       bundlerTransport: http(paymasterUrl),
       paymaster: pimlicoClient,
-      userOperation: {
-        estimateFeesPerGas: async () => {
-          return (await pimlicoClient.getUserOperationGasPrice()).fast; // only when using pimlico bundler
-        },
-      },
+      // userOperation: {
+      //   estimateFeesPerGas: async () => {
+      //     return (await pimlicoClient.getUserOperationGasPrice()).fast; // only when using pimlico bundler
+      //   },
+      // },
     });
     return smartAccountClient as SmartAccountClient;
   } catch (error) {
