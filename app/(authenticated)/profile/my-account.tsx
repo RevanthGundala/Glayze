@@ -24,7 +24,7 @@ interface FormData {
 export default function MyAccount() {
   const { theme, themeName } = useTheme();
   const { smartAccountClient, error: smartAccountError } = useSmartAccount();
-  const address = smartAccountClient?.account.address;
+  const address = smartAccountClient?.account?.address;
   const { data: referrals } = useReferral(address);
 
   const {

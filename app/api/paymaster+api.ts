@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       throw new Error("No data received from paymaster");
     }
 
-    data.result.paymasterPostOpGasLimit = 1000000;
+    // data.result.paymasterPostOpGasLimit = 1000000;
 
     console.log("data:", data);
 

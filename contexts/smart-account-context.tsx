@@ -9,7 +9,7 @@ import {
   custom,
 } from "viem";
 import { baseSepolia, base } from "viem/chains";
-import type { Chain, Transport } from "viem";
+import type { Chain } from "viem";
 import {
   usePrivy,
   useWallets,
@@ -17,10 +17,7 @@ import {
   EIP1193Provider,
 } from "@privy-io/react-auth";
 import { toSimpleSmartAccount } from "permissionless/accounts";
-import {
-  entryPoint06Address,
-  entryPoint07Address,
-} from "viem/account-abstraction";
+import { entryPoint06Address } from "viem/account-abstraction";
 import { createPimlicoClient } from "permissionless/clients/pimlico";
 import { createSmartAccountClient } from "permissionless";
 
@@ -92,7 +89,7 @@ const fetchSmartAccountClient = async (
 
 export function SmartAccountProvider({ children }: { children: ReactNode }) {
   const { wallets, ready: walletReady } = useWallets();
-  const { ready, user, createWallet } = usePrivy();
+  const { ready, user } = usePrivy();
   const wallet = getEmbeddedConnectedWallet(wallets);
 
   const {
